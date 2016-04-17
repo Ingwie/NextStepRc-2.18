@@ -18,7 +18,11 @@ extern "C" {
 / Functions and Buffer Configurations
 /---------------------------------------------------------------------------*/
 
-#define	_FS_TINY		0
+#if defined (FATFSTINY)
+						#define	_FS_TINY		1 //test Bracame reduce ram usage
+#else
+						#define	_FS_TINY		0
+#endif
 /* This option switches tiny buffer configuration. (0:Normal or 1:Tiny)
 /  At the tiny configuration, size of the file object (FIL) is reduced _MAX_SS
 /  bytes. Instead of private sector buffer eliminated from the file object,

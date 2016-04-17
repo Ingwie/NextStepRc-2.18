@@ -37,6 +37,18 @@
 #include "../../opentx.h"
 
 #if defined(SPLASH)
+#if defined(PCBMEGA2560)
+const uint32_t splashdata[] PROGMEM = {
+  'S','P','S',0,
+  #include "bitmaps/9x/splash.lbm"
+  'S','P','E',0 };
+const uint32_t * const splash_lbm = splashdata+4;
+
+void displaySplash()
+{
+  lcd_clear();
+  lcd_imgfar(0, 0, splash_lbm, 0, 0); //Bracame : use progmem "far" for splash working with all options enabled
+#else
 const pm_uchar splashdata[] PROGMEM = {
   'S','P','S',0,
   #include "bitmaps/9X/splash.lbm"
@@ -46,15 +58,19 @@ const pm_uchar * const splash_lbm = splashdata+4;
 void displaySplash()
 {
   lcd_clear();
-  lcd_img(0, 0, splash_lbm, 0, 0);
-
+  lcd_img(0, 0, splash_lbm, 0, 0);  
+#endif
+  
 #if MENUS_LOCK == 1
   if (readonly == false) {
-    drawFilledRect((LCD_W-(sizeof(TR_UNLOCKED)-1)*FW)/2 - 9, 50, (sizeof(TR_UNLOCKED)-1)*FW+16, 11, SOLID, ERASE|ROUND);
-    lcd_puts((LCD_W-(sizeof(TR_UNLOCKED)-1)*FW)/2 , 53, STR_UNLOCKED);
+    lcdDrawFilledRect((LCD_W-(sizeof(TR_UNLOCKED)-1)*FW)/2 - 9, 50, (sizeof(TR_UNLOCKED)-1)*FW+16, 11, SOLID, ERASE|ROUND);
+    lcdDrawText((LCD_W-(sizeof(TR_UNLOCKED)-1)*FW)/2 , 53, STR_UNLOCKED);
   }
 #endif
 
   lcdRefresh();
+ #if defined(LCD_KS108)
+  lcdRefresh(); // For the other side
+ #endif
 }
 #endif

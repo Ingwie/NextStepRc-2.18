@@ -58,7 +58,7 @@ PCB = 9X
 PCBREV =
 
 # LCD
-# Values: DEFAULT, ST7565P, ST7565R, ERC12864FSF, ST7920
+# Values: DEFAULT, ST7565P, ST7565R, ERC12864FSF, ST7920, KS108
 LCD = DEFAULT
 
 # Enable JETI-Telemetry or FrSky Telemetry reception on UART0
@@ -314,7 +314,7 @@ MENUS_LOCK = NO
 # JOYSTICK: The TX will appear as a joystick
 # MASSSTORAGE: The TX will appear as a drive
 # SERIAL: The TX will appear as a serial port
-USB = JOYSTICK
+USB = MASSSTORAGE
 
 # Mixers monitor view added to Channels monitor one
 # Values = NO, YES
@@ -382,14 +382,6 @@ WARNINGS_AS_ERRORS = NO
 # Enable saving of Lua byte-code of all loaded scripts
 # Values = NO, YES
 LUA_COMPILER = NO
-
-# Enable ADC jitter measurement
-# Values = NO, YES
-JITTER_MEASURE = NO
-
-# Enable ADC jitter filtering
-# Values = NO, YES
-JITTER_FILTER = YES
 
 #------- END BUILD OPTIONS ---------------------------
 
@@ -721,6 +713,7 @@ ifeq ($(PCB), MEGA2560)
   MCU = atmega2560
   OPT = s
   CPPDEFS = -DF_CPU=$(F_CPU)UL -DPCBMEGA2560 -DCPUM2560 -DEEPROM_RLC -DEEPROM_VARIANT=0
+  # -DAUDIO Removed by Bracame 
   SDCARD = NO
   BUZZER = YES
   THR_TRACE = YES
@@ -733,7 +726,11 @@ ifeq ($(PCB), MEGA2560)
   BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
   GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
 
+  ifeq ($(LCD), KS108)
+  EXTRABOARDSRC = targets/common_avr/adc_driver.cpp targets/mega2560/lcd_ks108.cpp targets/common_avr/telemetry_driver.cpp
+  else
   EXTRABOARDSRC = targets/common_avr/adc_driver.cpp targets/stock/lcd_driver.cpp targets/common_avr/telemetry_driver.cpp
+  endif
          
   ifeq ($(PWRMANAGE), YES)
     CPPDEFS += -DPWRMANAGE
@@ -761,7 +758,7 @@ ifeq ($(PCB), MEGA2560)
 
   ifeq ($(VOICE), YES)
     CPPDEFS += -DVOICE
-    CPPSRC += targets/gruvin9x/somo14d.cpp
+    CPPSRC += targets/mega2560/somo14dmega.cpp
   endif
   
   ifeq ($(HAPTIC), YES)
@@ -1075,12 +1072,6 @@ ifeq ($(PCB), TARANIS)
   ifeq ($(WATCHDOG_TEST), YES)
     CPPDEFS += -DWATCHDOG_TEST
   endif
-  ifeq ($(JITTER_MEASURE), YES)
-    CPPDEFS += -DJITTER_MEASURE
-  endif
-  ifeq ($(JITTER_FILTER), YES)
-    CPPDEFS += -DJITTER_FILTER
-  endif
 endif
 
 CC      = $(TRGT)gcc
@@ -1179,6 +1170,8 @@ else ifeq ($(LCD), ERC12864FSF)
   CPPDEFS += -DLCD_ERC12864FSF
 else ifeq ($(LCD), ST7920)
   CPPDEFS += -DLCD_ST7920
+else ifeq ($(LCD), KS108)
+  CPPDEFS += -DLCD_KS108
 endif   
 
 ifeq ($(AUTOSWITCH), YES)
@@ -1453,6 +1446,8 @@ endif
 CPPFLAGS = -g$(DBGFMT)
 CPPFLAGS += $(CPPDEFS)
 CPPFLAGS += -Wall
+#CPPFLAGS += -mrelax 
+# bracame modif au dessus
 CPPFLAGS += -fno-exceptions
 CPPFLAGS += -Wno-strict-aliasing
 CPPFLAGS += -Wformat -Wreturn-type -Wunused -Wuninitialized -Wunknown-pragmas -Wno-switch -Wtype-limits
@@ -1468,7 +1463,7 @@ MATH_LIB = -lm
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
+LDFLAGS = -Wl,-Map=$(TARGET).map,--cref,-Map,opentx.map
 LDFLAGS += $(MATH_LIB)
 
 # Define Messages
@@ -1532,12 +1527,12 @@ bootloader.lbm: targets/taranis/bootloader/bootloader_ramBoot.bin
 else ifeq ($(PCB), $(filter $(PCB), 9XRPRO AR9X))
 bootloader.lbm:
 	@echo "Fetching Mike's bootloader..."
-	wget https://github.com/MikeBland/OpenRcBootloader/releases/download/V1.9/bootflash8.lbm
+	wget http://ersky9x.googlecode.com/svn/trunk/src/bootloader/bootflash8.lbm
 	mv bootflash8.lbm $@
 else ifeq ($(PCB), SKY9X)
 bootloader.lbm:
 	@echo "Fetching Mike's bootloader..."
-	wget https://github.com/MikeBland/OpenRcBootloader/releases/download/V1.9/bootflash4.lbm
+	wget http://ersky9x.googlecode.com/svn/trunk/src/bootloader/bootflash4.lbm
 	mv bootflash4.lbm $@
 endif
 
@@ -1672,14 +1667,14 @@ endif
 
 lua_exports_taranis.inc: myeeprom.h ../util/luaexport.py
 	@echo "Generating a list of Lua exported constants in lua_exports_taranis.txt"
-	@$(PARSER) -DEXPORT -DCPUARM -DPCBTARANIS -DLUA -DVIRTUALINPUTS myeeprom.h | grep LEXP > lua_exports_taranis.txt
+	@$(PARSER) -DEXPORT -DPCBTARANIS -DLUA -DVIRTUALINPUTS myeeprom.h | grep LEXP > lua_exports_taranis.txt
 	@echo "Parsing and generating C Lua exports in lua/lua_exports_taranis.inc"
-	@python ../util/luaexport.py $(VERSION) lua_exports_taranis.txt lua/lua_exports_taranis.inc lua_fields_taranis.txt
+	@$(PYTHON) ../util/luaexport.py $(VERSION) lua_exports_taranis.txt lua/lua_exports_taranis.inc lua_fields_taranis.txt
 	@rm lua_exports_taranis.txt
 
 lua_exports_taranis_x9e.inc: myeeprom.h ../util/luaexport.py
 	@echo "Generating a list of Lua exported constants in lua_exports_taranis_x9e.txt"
-	@$(PARSER) -DEXPORT -DCPUARM -DPCBTARANIS -DREVPLUS -DREV9E -DLUA -DVIRTUALINPUTS myeeprom.h | grep LEXP > lua_exports_taranis_x9e.txt
+	@$(PARSER) -DEXPORT -DPCBTARANIS -DREVPLUS -DREV9E -DLUA -DVIRTUALINPUTS myeeprom.h | grep LEXP > lua_exports_taranis_x9e.txt
 	@echo "Parsing and generating C Lua exports in lua/lua_exports_taranis_x9e.inc"
 	@python ../util/luaexport.py $(VERSION) lua_exports_taranis_x9e.txt lua/lua_exports_taranis_x9e.inc lua_fields_taranis_x9e.txt
 	@rm lua_exports_taranis_x9e.txt
