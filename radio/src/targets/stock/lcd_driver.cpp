@@ -1,27 +1,12 @@
 /*
- * Authors (alphabetical order)
- * - Andre Bernet <bernet.andre@gmail.com>
- * - Andreas Weitl
- * - Bertrand Songis <bsongis@gmail.com>
- * - Bryan J. Rentoul (Gruvin) <gruvin@gmail.com>
- * - Cameron Weeks <th9xer@gmail.com>
- * - Erez Raviv
- * - Gabriel Birkus
- * - Jean-Pierre Parisy
- * - Karl Szmutny
- * - Michael Blandford
- * - Michal Hlavinka
- * - Pat Mackenzie
- * - Philip Moss
- * - Rob Thomson
- * - Romolo Manfredini <romolo.manfredini@gmail.com>
- * - Thomas Husterer
+ * Copyright (C) OpenTX
  *
- * opentx is based on code named
- * gruvin9x by Bryan J. Rentoul: http://code.google.com/p/gruvin9x/,
- * er9x by Erez Raviv: http://code.google.com/p/er9x/,
- * and the original (and ongoing) project by
- * Thomas Husterer, th9x: http://code.google.com/p/th9x/
+ * Based on code named
+ *   th9x - http://code.google.com/p/th9x 
+ *   er9x - http://code.google.com/p/er9x
+ *   gruvin9x - http://code.google.com/p/gruvin9x
+ *
+ * License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -31,13 +16,42 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
  */
 
 #include "opentx.h"
 
+#if defined(LCD_KS108) // KS108 diver
+#define DISPLAY_SET_COLUMN       0x40
+#define DISPLAY_SET_PAGE         0xB8
+#define DISPLAY_SET_START        0XC0 
+#define DISPLAY_ON_CMD	         0x3F
+#define CS1_on   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_CS1)
+#define CS1_off   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_CS1)
+#define CS2_on   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_CS2)
+#define CS2_off   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_CS2)
+#define A0_on   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_A0)
+#define A0_off   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_A0)
+#define E_on   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_E)
+#define E_off   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_E)
+#endif
+
+#if defined(LCD_KS108)
+void lcdPulseEnable(void)
+{
+  E_on;
+  _delay_us(4);
+  E_off;
+}
+#endif
+
 void lcdSendCtl(uint8_t val)
 {
+#if defined(LCD_KS108)
+  PORTA_LCD_DAT = val;
+  A0_off;
+  lcdPulseEnable();
+  A0_on;
+# else
   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_CS1);
 #if defined(LCD_MULTIPLEX)
   DDRA = 0xFF; //Set LCD_DAT pins to output
@@ -52,6 +66,7 @@ void lcdSendCtl(uint8_t val)
   DDRA = 0x00; //Set LCD_DAT pins to input
 #endif
   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_CS1);
+#endif
 }
 
 #if defined(PCBSTD) && defined(VOICE)
@@ -63,6 +78,7 @@ void lcdSendCtl(uint8_t val)
   #define LCD_UNLOCK()
 #endif
 
+#if !defined(LCD_KS108)
 const static pm_uchar lcdInitSequence[] PROGMEM =
 {
 //ST7565 eq. : KS0713, SED1565, S6B1713, SPLC501C, NT7532 /34 /38, TL03245
@@ -114,9 +130,23 @@ const static pm_uchar lcdInitSequence[] PROGMEM =
    0xAF  //DON = 1: display ON
 #endif
 };
+#endif
 
-inline void lcdInit()
+void lcdInit()
 {
+#if defined(LCD_KS108)
+  PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_RES);  //LCD reset
+  _delay_us(20);
+  PORTC_LCD_CTRL |= (1<<OUT_C_LCD_RES);  //LCD normal operation
+  CS1_on;
+  lcdSendCtl(DISPLAY_ON_CMD);
+  lcdSendCtl(DISPLAY_SET_START);
+  CS1_off;
+  CS2_on;
+  lcdSendCtl(DISPLAY_ON_CMD);
+  lcdSendCtl(DISPLAY_SET_START);
+  CS2_off;
+#else
   LCD_LOCK();
   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_RES);  //LCD reset
   _delay_us(2);
@@ -138,11 +168,12 @@ inline void lcdInit()
   g_eeGeneral.contrast = 0x22;
 #endif
   LCD_UNLOCK();
+#endif  
 }
 
 void lcdSetRefVolt(uint8_t val)
 {
-#if !defined(LCD_ST7920) // No contrast setting for ST7920
+#if !defined(LCD_ST7920) && !defined(LCD_KS108)// No contrast setting for ST7920 and KS108
   LCD_LOCK();
   lcdSendCtl(0x81);
   lcdSendCtl(val);
@@ -161,6 +192,41 @@ uint8_t lcdRefresh_ST7920(uint8_t full)
 void lcdRefresh()
 {
 #endif
+#if defined(LCD_KS108)
+static uint8_t change = 0; // toggle left or right lcd writing
+
+ uint8_t *p;
+ 
+if (change == 0) // Right
+{
+ p = displayBuf;
+ CS1_on;
+ change = 1;
+}
+else // Left
+{
+ CS2_on;
+ p = displayBuf + 64;
+ change = 0;	
+}
+ 
+  for (uint8_t page=0; page < 8; page++)
+ {
+    lcdSendCtl(DISPLAY_SET_COLUMN); // Column addr 0
+    lcdSendCtl( page | DISPLAY_SET_PAGE); //Page addr
+    A0_on;
+    for (coord_t x=64; x>0; --x)
+    {
+      PORTA_LCD_DAT = *p++;
+      lcdPulseEnable();
+    }
+   p += 64;
+  }
+  
+  A0_off;
+  CS2_off;
+  CS1_off;  
+#else // Not a KS108
   LCD_LOCK();
 #if defined(LCD_ST7920)
   static uint8_t state;
@@ -275,5 +341,5 @@ void lcdRefresh()
 #if defined(LCD_ST7920)
   return state;
 #endif  
-
+#endif
 }

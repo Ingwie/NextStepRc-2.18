@@ -726,12 +726,8 @@ ifeq ($(PCB), MEGA2560)
   BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
   GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
 
-  ifeq ($(LCD), KS108)
-  EXTRABOARDSRC = targets/common_avr/adc_driver.cpp targets/mega2560/lcd_ks108.cpp targets/common_avr/telemetry_driver.cpp
-  else
   EXTRABOARDSRC = targets/common_avr/adc_driver.cpp targets/stock/lcd_driver.cpp targets/common_avr/telemetry_driver.cpp
-  endif
-         
+   
   ifeq ($(PWRMANAGE), YES)
     CPPDEFS += -DPWRMANAGE
   endif
