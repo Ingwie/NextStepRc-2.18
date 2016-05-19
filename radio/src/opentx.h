@@ -1758,8 +1758,6 @@ void varioWakeup();
   extern void usbPluggedIn();
 #endif
 
-#include "lua/lua_api.h"
-
 #if defined(SDCARD)
 enum ClipboardType {
   CLIPBOARD_TYPE_NONE,
