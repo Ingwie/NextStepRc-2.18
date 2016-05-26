@@ -39,9 +39,6 @@
 
 CustomFunctionsContext modelFunctionsContext = { 0 };
 
-#if defined(CPUARM)
-CustomFunctionsContext globalFunctionsContext = { 0 };
-#endif
 
 
 #if defined(DEBUG)
@@ -67,47 +64,6 @@ PLAY_FUNCTION(playValue, source_t idx)
 
   getvalue_t val = getValue(idx);
 
-#if defined(CPUARM)
-  if (idx >= MIXSRC_FIRST_TELEM) {
-    TelemetrySensor & telemetrySensor = g_model.telemetrySensors[(idx-MIXSRC_FIRST_TELEM) / 3];
-    uint8_t attr = 0;
-    if (telemetrySensor.prec > 0) {
-      if (telemetrySensor.prec == 2) {
-        if (val >= 5000) {
-          val = div100_and_round(val);
-        }
-        else {
-          val = div10_and_round(val);
-          attr = PREC1;
-        }
-      }
-      else {
-        if (val >= 500) {
-          val = div10_and_round(val);
-        }
-        else {
-          attr = PREC1;
-        }
-      }
-    }
-    PLAY_NUMBER(val, telemetrySensor.unit == UNIT_CELLS ? UNIT_VOLTS : telemetrySensor.unit, attr);
-  }
-  else if (idx >= MIXSRC_FIRST_TIMER && idx <= MIXSRC_LAST_TIMER) {
-    PLAY_DURATION(val, 0);
-  }
-  else if (idx == MIXSRC_TX_TIME) {
-    PLAY_DURATION(val*60, PLAY_TIME);
-  }
-  else if (idx == MIXSRC_TX_VOLTAGE) {
-    PLAY_NUMBER(val, UNIT_VOLTS, PREC1);
-  }
-  else {
-    if (idx <= MIXSRC_LAST_CH) {
-      val = calcRESXto100(val);
-    }
-    PLAY_NUMBER(val, 0, 0);
-  }
-#else
   switch (idx) {
     case MIXSRC_FIRST_TELEM+TELEM_TX_VOLTAGE-1:
       PLAY_NUMBER(val, 1+UNIT_VOLTS, PREC1);
@@ -228,44 +184,17 @@ PLAY_FUNCTION(playValue, source_t idx)
   }
 #endif
 }
-#endif
 
-#if defined(CPUARM)
-void playCustomFunctionFile(const CustomFunctionData *sd, uint8_t id)
-{
-  if (sd->play.name[0] != '\0') {
-    char filename[sizeof(SOUNDS_PATH)+sizeof(sd->play.name)+sizeof(SOUNDS_EXT)] = SOUNDS_PATH "/";
-    strncpy(filename+SOUNDS_PATH_LNG_OFS, currentLanguagePack->id, 2);
-    strncpy(filename+sizeof(SOUNDS_PATH), sd->play.name, sizeof(sd->play.name));
-    filename[sizeof(SOUNDS_PATH)+sizeof(sd->play.name)] = '\0';
-    strcat(filename+sizeof(SOUNDS_PATH), SOUNDS_EXT);
-    PLAY_FILE(filename, sd->func==FUNC_BACKGND_MUSIC ? PLAY_BACKGROUND : 0, id);
-  }
-}
-#endif
-
-#if defined(CPUARM)
-#define VOLUME_HYSTERESIS 10            // how much must a input value change to actually be considered for new volume setting
-getvalue_t requiredSpeakerVolumeRawLast = 1024 + 1; //initial value must be outside normal range
-#endif
-
-#if defined(CPUARM)
-void evalFunctions(const CustomFunctionData * functions, CustomFunctionsContext & functionsContext)
-#else
 #define functions g_model.customFn
 #define functionsContext modelFunctionsContext
 void evalFunctions()
-#endif
+
 {
   MASK_FUNC_TYPE newActiveFunctions  = 0;
   MASK_CFN_TYPE  newActiveSwitches = 0;
 
-#if defined(CPUARM)
-  uint8_t playFirstIndex = (functions == g_model.customFn ? 1 : 1+NUM_CFN);
-  #define PLAY_INDEX   (i+playFirstIndex)
-#else
   #define PLAY_INDEX   (i+1)
-#endif
+
 
 #if defined(ROTARY_ENCODERS) && defined(GVARS)
   static rotenc_t rePreviousValues[ROTARY_ENCODERS];
@@ -289,11 +218,7 @@ void evalFunctions()
     if (swtch) {
       MASK_CFN_TYPE switch_mask = ((MASK_CFN_TYPE)1 << i);
 
-#if defined(CPUARM)
-      bool active = getSwitch(swtch, IS_PLAY_FUNC(CFN_FUNC(cfn)) ? GETSWITCH_MIDPOS_DELAY : 0);
-#else
       bool active = getSwitch(swtch);
-#endif
 
       if (HAS_ENABLE_PARAM(CFN_FUNC(cfn))) {
         active &= (bool)CFN_ACTIVE(cfn);
@@ -327,10 +252,6 @@ void evalFunctions()
 #if defined(FRSKY)
                 || menuHandlers[0] == menuTelemetryFrsky
 #endif
-#if defined(PCBTARANIS)
-                || menuHandlers[0] == menuMainViewChannelsMonitor
-                || menuHandlers[0] == menuChannelsView
-#endif
               )
 #endif
               {
@@ -343,9 +264,6 @@ void evalFunctions()
             switch (CFN_PARAM(cfn)) {
               case FUNC_RESET_TIMER1:
               case FUNC_RESET_TIMER2:
-#if defined(CPUARM)
-              case FUNC_RESET_TIMER3:
-#endif
                 timerReset(CFN_PARAM(cfn));
                 break;
               case FUNC_RESET_FLIGHT:
@@ -365,40 +283,9 @@ void evalFunctions()
                 break;
 #endif
             }
-#if defined(CPUARM)
-            if (CFN_PARAM(cfn)>=FUNC_RESET_PARAM_FIRST_TELEM) {
-              uint8_t item = CFN_PARAM(cfn)-FUNC_RESET_PARAM_FIRST_TELEM;
-              if (item < MAX_SENSORS) {
-                telemetryItems[item].clear();
-              }
-            }
-#endif
             break;
 
-#if defined(CPUARM)
-          case FUNC_SET_TIMER:
-          {
-            timerSet(CFN_TIMER_INDEX(cfn), CFN_PARAM(cfn));
-            break;
-          }
-#endif
 
-#if defined(CPUARM)
-          case FUNC_SET_FAILSAFE:
-          {
-            unsigned int moduleIndex = CFN_PARAM(cfn);
-            if (moduleIndex < NUM_MODULES) {
-              for (int ch=0; ch<NUM_CHNOUT; ch++) {
-                if (ch < g_model.moduleData[moduleIndex].channelsStart || ch >= NUM_CHANNELS(moduleIndex) + g_model.moduleData[moduleIndex].channelsStart) {
-                  g_model.moduleData[moduleIndex].failsafeChannels[ch] = 0;
-                }
-                else if (g_model.moduleData[moduleIndex].failsafeChannels[ch] < FAILSAFE_CHANNEL_HOLD) {
-                  g_model.moduleData[moduleIndex].failsafeChannels[ch] = channelOutputs[ch];
-                }
-              }
-            }
-          }
-#endif
 
 #if defined(DANGEROUS_MODULE_FUNCTIONS)
           case FUNC_RANGECHECK:
@@ -446,99 +333,7 @@ void evalFunctions()
             break;
 #endif
 
-#if defined(CPUARM) && defined(SDCARD)
-          case FUNC_VOLUME:
-          {
-            getvalue_t raw = getValue(CFN_PARAM(cfn));
-            //only set volume if input changed more than hysteresis
-            if (abs(requiredSpeakerVolumeRawLast - raw) > VOLUME_HYSTERESIS) {
-              requiredSpeakerVolumeRawLast = raw;
-            }
-            requiredSpeakerVolume = ((1024 + requiredSpeakerVolumeRawLast) * VOLUME_LEVEL_MAX) / 2048;
-            break;
-          }
-#endif
 
-#if defined(CPUARM) && defined(SDCARD)
-          case FUNC_PLAY_SOUND:
-          case FUNC_PLAY_TRACK:
-          case FUNC_PLAY_VALUE:
-#if defined(HAPTIC)
-          case FUNC_HAPTIC:
-#endif
-          {
-            tmr10ms_t tmr10ms = get_tmr10ms();
-            uint8_t repeatParam = CFN_PLAY_REPEAT(cfn);
-            if (!IS_SILENCE_PERIOD_ELAPSED() && repeatParam == CFN_PLAY_REPEAT_NOSTART) {
-              functionsContext.lastFunctionTime[i] = tmr10ms;
-            }
-            if (!functionsContext.lastFunctionTime[i] || (repeatParam && repeatParam!=CFN_PLAY_REPEAT_NOSTART && (signed)(tmr10ms-functionsContext.lastFunctionTime[i])>=100*repeatParam)) {
-              if (!IS_PLAYING(PLAY_INDEX)) {
-                functionsContext.lastFunctionTime[i] = tmr10ms;
-                if (CFN_FUNC(cfn) == FUNC_PLAY_SOUND) {
-                  AUDIO_PLAY(AU_FRSKY_FIRST+CFN_PARAM(cfn));
-                }
-                else if (CFN_FUNC(cfn) == FUNC_PLAY_VALUE) {
-                  PLAY_VALUE(CFN_PARAM(cfn), PLAY_INDEX);
-                }
-#if defined(HAPTIC)
-                else if (CFN_FUNC(cfn) == FUNC_HAPTIC) {
-                  haptic.event(AU_FRSKY_LAST+CFN_PARAM(cfn));
-                }
-#endif
-                else {
-                  playCustomFunctionFile(cfn, PLAY_INDEX);
-                }
-              }
-            }
-            break;
-          }
-
-          case FUNC_BACKGND_MUSIC:
-            if (!(newActiveFunctions & (1 << FUNCTION_BACKGND_MUSIC))) {
-              newActiveFunctions |= (1 << FUNCTION_BACKGND_MUSIC);
-              if (!IS_PLAYING(PLAY_INDEX)) {
-                playCustomFunctionFile(cfn, PLAY_INDEX);
-              }
-            }
-            break;
-
-          case FUNC_BACKGND_MUSIC_PAUSE:
-            newActiveFunctions |= (1 << FUNCTION_BACKGND_MUSIC_PAUSE);
-            break;
-
-#elif defined(VOICE)
-          case FUNC_PLAY_SOUND:
-          case FUNC_PLAY_TRACK:
-          case FUNC_PLAY_BOTH:
-          case FUNC_PLAY_VALUE:
-          {
-            tmr10ms_t tmr10ms = get_tmr10ms();
-            uint8_t repeatParam = CFN_PLAY_REPEAT(cfn);
-            if (!functionsContext.lastFunctionTime[i] || (CFN_FUNC(cfn)==FUNC_PLAY_BOTH && active!=(bool)(functionsContext.activeSwitches&switch_mask)) || (repeatParam && (signed)(tmr10ms-functionsContext.lastFunctionTime[i])>=1000*repeatParam)) {
-              functionsContext.lastFunctionTime[i] = tmr10ms;
-              uint8_t param = CFN_PARAM(cfn);
-              if (CFN_FUNC(cfn) == FUNC_PLAY_SOUND) {
-                AUDIO_PLAY(AU_FRSKY_FIRST+param);
-              }
-              else if (CFN_FUNC(cfn) == FUNC_PLAY_VALUE) {
-                PLAY_VALUE(param, PLAY_INDEX);
-              }
-              else {
-#if defined(GVARS)
-                if (CFN_FUNC(cfn) == FUNC_PLAY_TRACK && param > 250)
-                  param = GVAR_VALUE(param-251, getGVarFlightPhase(mixerCurrentFlightMode, param-251));
-#endif
-                PUSH_CUSTOM_PROMPT(active ? param : param+1, PLAY_INDEX);
-              }
-            }
-            if (!active) {
-              // PLAY_BOTH would change activeFnSwitches otherwise
-              switch_mask = 0;
-            }
-            break;
-          }
-#else
           case FUNC_PLAY_SOUND:
           {
             tmr10ms_t tmr10ms = get_tmr10ms();
@@ -549,7 +344,6 @@ void evalFunctions()
             }
             break;
           }
-#endif
 
 #if defined(FRSKY) && defined(VARIO)
           case FUNC_VARIO:
@@ -583,13 +377,6 @@ void evalFunctions()
             newActiveFunctions |= (1 << FUNCTION_BACKLIGHT);
             break;
 
-#if defined(PCBTARANIS)
-          case FUNC_SCREENSHOT:
-            if (!(functionsContext.activeSwitches & switch_mask)) {
-              requestScreenshot = true;
-            }
-            break;
-#endif
 
 #if defined(DEBUG)
           case FUNC_TEST:

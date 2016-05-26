@@ -40,17 +40,10 @@
 enum EnumKeys {
   KEY_MENU,
   KEY_EXIT,
-#if defined(PCBTARANIS)
-  KEY_ENTER,
-  KEY_PAGE,
-  KEY_PLUS,
-  KEY_MINUS,
-#else
   KEY_DOWN,
   KEY_UP,
   KEY_RIGHT,
   KEY_LEFT,
-#endif
 
   TRM_BASE,
   TRM_LH_DWN = TRM_BASE,
@@ -72,64 +65,6 @@ enum EnumKeys {
   NUM_KEYS,
   SW_BASE=NUM_KEYS,
 
-#if defined(PCBTARANIS)
-  SW_SA0=SW_BASE,
-  SW_SA1,
-  SW_SA2,
-  SW_SB0,
-  SW_SB1,
-  SW_SB2,
-  SW_SC0,
-  SW_SC1,
-  SW_SC2,
-  SW_SD0,
-  SW_SD1,
-  SW_SD2,
-  SW_SE0,
-  SW_SE1,
-  SW_SE2,
-  SW_SF0,
-  SW_SF1,
-  SW_SF2,
-  SW_SG0,
-  SW_SG1,
-  SW_SG2,
-  SW_SH0,
-  SW_SH1,
-  SW_SH2,
-#if defined(REV9E)
-  SW_SI0,
-  SW_SI1,
-  SW_SI2,
-  SW_SJ0,
-  SW_SJ1,
-  SW_SJ2,
-  SW_SK0,
-  SW_SK1,
-  SW_SK2,
-  SW_SL0,
-  SW_SL1,
-  SW_SL2,
-  SW_SM0,
-  SW_SM1,
-  SW_SM2,
-  SW_SN0,
-  SW_SN1,
-  SW_SN2,
-  SW_SO0,
-  SW_SO1,
-  SW_SO2,
-  SW_SP0,
-  SW_SP1,
-  SW_SP2,
-  SW_SQ0,
-  SW_SQ1,
-  SW_SQ2,
-  SW_SR0,
-  SW_SR1,
-  SW_SR2,
-#endif
-#else
   SW_ID0=SW_BASE,
   SW_ID1,
   SW_ID2,
@@ -139,8 +74,6 @@ enum EnumKeys {
   SW_AIL,
   SW_GEA,
   SW_TRN,
-#endif
-
 };
 
 #define EVT_KEY_MASK(e)      ((e) & 0x1f)
@@ -164,34 +97,12 @@ enum EnumKeys {
 #define EVT_ENTRY_UP         0xbe
 #define EVT_MENU_UP          0xbd
 
-#if defined(PCBTARANIS)
-  #define EVT_ROTARY_BREAK   EVT_KEY_BREAK(KEY_ENTER)
-  #define EVT_ROTARY_LONG    EVT_KEY_LONG(KEY_ENTER)
-#else
   #define EVT_ROTARY_BREAK   0xcf
   #define EVT_ROTARY_LONG    0xce
   #define EVT_ROTARY_LEFT    0xdf
   #define EVT_ROTARY_RIGHT   0xde
-#endif
 
-#if defined(PCBTARANIS)
-  #define IS_ROTARY_LEFT(evt)   (evt==EVT_KEY_FIRST(KEY_MINUS) || evt==EVT_KEY_REPT(KEY_MINUS))
-  #define IS_ROTARY_RIGHT(evt)  (evt==EVT_KEY_FIRST(KEY_PLUS) || evt==EVT_KEY_REPT(KEY_PLUS))
-  #define IS_ROTARY_UP(evt)     (evt==EVT_KEY_FIRST(KEY_PLUS) || evt==EVT_KEY_REPT(KEY_PLUS))
-  #define IS_ROTARY_DOWN(evt)   (evt==EVT_KEY_FIRST(KEY_MINUS) || evt==EVT_KEY_REPT(KEY_MINUS))
-  #define IS_ROTARY_BREAK(evt)  (evt==EVT_KEY_BREAK(KEY_ENTER))
-  #define IS_ROTARY_LONG(evt)   (evt==EVT_KEY_LONG(KEY_ENTER))
-  #define IS_ROTARY_EVENT(evt)  (0)
-  #define CASE_EVT_ROTARY_BREAK /*case EVT_KEY_BREAK(KEY_ENTER):*/
-  #define CASE_EVT_ROTARY_LONG  /*case EVT_KEY_LONG(KEY_ENTER):*/
-  #if defined(REV9E) && !defined(SIMU)
-    #define CASE_EVT_ROTARY_LEFT  case EVT_KEY_FIRST(KEY_MOVE_UP): case EVT_KEY_REPT(KEY_MOVE_UP):
-    #define CASE_EVT_ROTARY_RIGHT case EVT_KEY_FIRST(KEY_MOVE_DOWN): case EVT_KEY_REPT(KEY_MOVE_DOWN):
-  #else
-    #define CASE_EVT_ROTARY_LEFT  case EVT_KEY_FIRST(KEY_MOVE_DOWN): case EVT_KEY_REPT(KEY_MOVE_DOWN):
-    #define CASE_EVT_ROTARY_RIGHT case EVT_KEY_FIRST(KEY_MOVE_UP): case EVT_KEY_REPT(KEY_MOVE_UP):
-  #endif
-#elif defined(ROTARY_ENCODER_NAVIGATION)
+#if defined(ROTARY_ENCODER_NAVIGATION)
   #define IS_ROTARY_LEFT(evt)   (evt == EVT_ROTARY_LEFT)
   #define IS_ROTARY_RIGHT(evt)  (evt == EVT_ROTARY_RIGHT)
   #define IS_ROTARY_UP(evt)     IS_ROTARY_LEFT(evt)
@@ -253,14 +164,8 @@ extern uint8_t s_evt;
 
 void pauseEvents(uint8_t enuk);
 void killEvents(uint8_t enuk);
-
-#if defined(CPUARM)
-  bool clearKeyEvents();
-  uint8_t getEvent(bool trim=false);
-#else
   void clearKeyEvents();
   uint8_t getEvent();
-#endif
 
 uint8_t keyDown();
 

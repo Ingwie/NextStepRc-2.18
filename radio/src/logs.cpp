@@ -41,11 +41,7 @@ FIL g_oLogFile = {0};
 const pm_char * g_logError = NULL;
 uint8_t logDelay;
 
-#if defined(PCBTARANIS)
-  #define get2PosState(sw) (switchState(SW_ ## sw ## 0) ? -1 : 1)
-#else
   #define get2PosState(sw) (switchState(SW_ ## sw) ? -1 : 1)
-#endif
 
 #define get3PosState(sw) (switchState(SW_ ## sw ## 0) ? -1 : (switchState(SW_ ## sw ## 2) ? 1 : 0))
 
@@ -167,40 +163,9 @@ void writeHeader()
   }
 #endif
 #endif
-
-#if defined(CPUARM)
-  char label[TELEM_LABEL_LEN+7];
-  for (int i=0; i<MAX_SENSORS; i++) {
-    TelemetrySensor & sensor = g_model.telemetrySensors[i];
-    if (sensor.logs) {
-      memset(label, 0, sizeof(label));
-      zchar2str(label, sensor.label, TELEM_LABEL_LEN);
-      if (sensor.unit != UNIT_RAW && sensor.unit != UNIT_GPS && sensor.unit != UNIT_DATETIME) {
-        strcat(label, "(");
-        strncat(label, STR_VTELEMUNIT+1+3*sensor.unit, 3);
-        strcat(label, ")");
-      }
-      strcat(label, ",");
-      f_puts(label, &g_oLogFile);
-    }
-  }
-#endif
 #endif
 
-#if defined(PCBTARANIS)
-  for (uint8_t i=1; i<NUM_STICKS+NUM_POTS+1; i++) {
-    const char * p = STR_VSRCRAW + i * STR_VSRCRAW[0] + 2;
-    for (uint8_t j=0; j<STR_VSRCRAW[0]-1; ++j) {
-      if (!*p) break;
-      f_putc(*p, &g_oLogFile);
-      ++p;
-    }
-    f_putc(',', &g_oLogFile);
-  }
-  f_puts("SA,SB,SC,SD,SE,SF,SG,SH\n", &g_oLogFile);
-#else
   f_puts("Rud,Ele,Thr,Ail,P1,P2,P3,THR,RUD,ELE,3POS,AIL,GEA,TRN\n", &g_oLogFile);
-#endif
 }
 
 void writeLogs()
@@ -290,57 +255,12 @@ void writeLogs()
       }
 #endif
 #endif
-
-#if defined(CPUARM)
-      for (int i=0; i<MAX_SENSORS; i++) {
-        TelemetrySensor & sensor = g_model.telemetrySensors[i];
-        TelemetryItem & telemetryItem = telemetryItems[i];
-        if (sensor.logs) {
-          if (sensor.unit == UNIT_GPS) {
-            if (telemetryItem.gps.longitudeEW && telemetryItem.gps.latitudeNS)
-              f_printf(&g_oLogFile, "%03d.%04d%c %03d.%04d%c,", telemetryItem.gps.longitude_bp, telemetryItem.gps.longitude_ap, telemetryItem.gps.longitudeEW, telemetryItem.gps.latitude_bp, telemetryItem.gps.latitude_ap, telemetryItem.gps.latitudeNS);
-            else
-              f_printf(&g_oLogFile, ",");
-          }
-          else if (sensor.unit == UNIT_DATETIME) {
-            if (telemetryItem.datetime.datestate)
-              f_printf(&g_oLogFile, "%4d-%02d-%02d %02d:%02d:%02d,", telemetryItem.datetime.year, telemetryItem.datetime.month, telemetryItem.datetime.day, telemetryItem.datetime.hour, telemetryItem.datetime.min, telemetryItem.datetime.sec);
-            else
-              f_printf(&g_oLogFile, ",");
-          }
-          else if (sensor.prec == 2) {
-            div_t qr = div(telemetryItem.value, 100);
-            if (telemetryItem.value < 0) f_printf(&g_oLogFile, "-");
-            f_printf(&g_oLogFile, "%d.%02d,", abs(qr.quot), abs(qr.rem));
-          }
-          else if (sensor.prec == 1) {
-            div_t qr = div(telemetryItem.value, 10);
-            if (telemetryItem.value < 0) f_printf(&g_oLogFile, "-");
-            f_printf(&g_oLogFile, "%d.%d,", abs(qr.quot), abs(qr.rem));
-          }
-          else {
-            f_printf(&g_oLogFile, "%d,", telemetryItem.value);
-          }
-        }
-      }
-#endif
 #endif
 
       for (uint8_t i=0; i<NUM_STICKS+NUM_POTS; i++) {
         f_printf(&g_oLogFile, "%d,", calibratedStick[i]);
       }
 
-#if defined(PCBTARANIS)
-      int result = f_printf(&g_oLogFile, "%d,%d,%d,%d,%d,%d,%d,%d\n",
-          get3PosState(SA),
-          get3PosState(SB),
-          get3PosState(SC),
-          get3PosState(SD),
-          get3PosState(SE),
-          get2PosState(SF),
-          get3PosState(SG),
-          get2PosState(SH));
-#else
       int result = f_printf(&g_oLogFile, "%d,%d,%d,%d,%d,%d,%d\n",
           get2PosState(THR),
           get2PosState(RUD),
@@ -349,7 +269,6 @@ void writeLogs()
           get2PosState(AIL),
           get2PosState(GEA),
           get2PosState(TRN));
-#endif
 
       if (result<0 && !error_displayed) {
         error_displayed = STR_SDCARD_ERROR;

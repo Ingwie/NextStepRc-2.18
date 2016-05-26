@@ -169,17 +169,6 @@ int16_t applyLimits(uint8_t channel, int32_t value)
 {
   LimitData * lim = limitAddress(channel);
 
-#if defined(PCBTARANIS)
-  if (lim->curve) {
-    // TODO we loose precision here, applyCustomCurve could work with int32_t on ARM boards...
-    if (lim->curve > 0)
-      value = 256 * applyCustomCurve(value/256, lim->curve-1);
-    else
-      value = 256 * applyCustomCurve(-value/256, -lim->curve-1);
-  }
-#endif
-
-
   int16_t ofs   = LIMIT_OFS_RESX(lim);
   int16_t lim_p = LIMIT_MAX_RESX(lim);
   int16_t lim_n = LIMIT_MIN_RESX(lim);
@@ -281,22 +270,9 @@ getvalue_t getValue(mixsrc_t i)
 #endif
 
   else if (i<=MIXSRC_TrimAil) return calc1000toRESX((int16_t)8 * getTrimValue(mixerCurrentFlightMode, i-MIXSRC_TrimRud));
-
-#if defined(PCBTARANIS)
-  else if ((i >= MIXSRC_FIRST_SWITCH) && (i <= MIXSRC_LAST_SWITCH)) {
-    mixsrc_t sw = i-MIXSRC_FIRST_SWITCH;
-    if (SWITCH_EXISTS(sw)) {
-      return (switchState((EnumKeys)(SW_BASE+(3*sw))) ? -1024 : (switchState((EnumKeys)(SW_BASE+(3*sw)+1)) ? 0 : 1024));
-    }
-    else {
-      return 0;
-    }
-  }
-#else
   else if (i==MIXSRC_3POS) return (getSwitch(SW_ID0-SW_BASE+1) ? -1024 : (getSwitch(SW_ID1-SW_BASE+1) ? 0 : 1024));
   // don't use switchState directly to give getSwitch possibility to hack values if needed for switch warning
   else if (i<MIXSRC_SW1) return getSwitch(SWSRC_THR+i-MIXSRC_THR) ? 1024 : -1024;
-#endif
   else if (i<=MIXSRC_LAST_LOGICAL_SWITCH) return getSwitch(SWSRC_FIRST_LOGICAL_SWITCH+i-MIXSRC_FIRST_LOGICAL_SWITCH) ? 1024 : -1024;
   else if (i<=MIXSRC_LAST_TRAINER) { int16_t x = ppmInput[i-MIXSRC_FIRST_TRAINER]; if (i<MIXSRC_FIRST_TRAINER+NUM_CAL_PPM) { x-= g_eeGeneral.trainer.calib[i-MIXSRC_FIRST_TRAINER]; } return x*2; }
   else if (i<=MIXSRC_LAST_CH) return ex_chans[i-MIXSRC_CH1];
@@ -305,35 +281,10 @@ getvalue_t getValue(mixsrc_t i)
   else if (i<=MIXSRC_LAST_GVAR) return GVAR_VALUE(i-MIXSRC_GVAR1, getGVarFlightPhase(mixerCurrentFlightMode, i-MIXSRC_GVAR1));
 #endif
 
-#if defined(CPUARM)
-  else if (i==MIXSRC_TX_VOLTAGE) return g_vbat100mV;
-  else if (i<MIXSRC_FIRST_TIMER) // TX_TIME + SPARES
-  #if defined(RTCLOCK)
-     return (g_rtcTime % SECS_PER_DAY) / 60; // number of minutes from midnight
-  #else
-     return 0;
-  #endif
-  else if (i<=MIXSRC_LAST_TIMER) return timersStates[i-MIXSRC_FIRST_TIMER].val;
-#else
   else if (i==MIXSRC_FIRST_TELEM-1+TELEM_TX_VOLTAGE) return g_vbat100mV;
   else if (i<=MIXSRC_FIRST_TELEM-1+TELEM_TIMER2) return timersStates[i-MIXSRC_FIRST_TELEM+1-TELEM_TIMER1].val;
-#endif
 
-#if defined(CPUARM)
-  else if (i<=MIXSRC_LAST_TELEM) {
-    i -= MIXSRC_FIRST_TELEM;
-    div_t qr = div(i, 3);
-    TelemetryItem & telemetryItem = telemetryItems[qr.quot];
-    switch (qr.rem) {
-      case 1:
-        return telemetryItem.valueMin;
-      case 2:
-        return telemetryItem.valueMax;
-      default:
-        return telemetryItem.value;
-    }
-  }
-#elif defined(FRSKY)
+#if defined(FRSKY)
   else if (i==MIXSRC_FIRST_TELEM-1+TELEM_RSSI_TX) return frskyData.rssi[1].value;
   else if (i==MIXSRC_FIRST_TELEM-1+TELEM_RSSI_RX) return frskyData.rssi[0].value;
   else if (i==MIXSRC_FIRST_TELEM-1+TELEM_A1) return frskyData.analog[TELEM_ANA_A1].value;

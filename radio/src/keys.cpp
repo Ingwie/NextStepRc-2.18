@@ -39,29 +39,12 @@
 uint8_t s_evt;
 struct t_inactivity inactivity = {0};
 
-#if defined(CPUARM)
-uint8_t getEvent(bool trim)
-{
-  uint8_t evt = s_evt;
-  int8_t k = EVT_KEY_MASK(s_evt) - TRM_BASE;
-  bool trim_evt = (k>=0 && k<8);
-
-  if (trim == trim_evt) {
-    s_evt = 0;
-    return evt;
-  }
-  else {
-    return 0;
-  }
-}
-#else
 uint8_t getEvent()
 {
   uint8_t evt = s_evt;
   s_evt = 0;
   return evt;
 }
-#endif
 
 #define KEY_LONG_DELAY 32
 
@@ -159,39 +142,6 @@ void killEvents(uint8_t event)
   }
 }
 
-#if defined(CPUARM)
-bool clearKeyEvents()
-{
-#if defined(PCBSKY9X)
-  CoTickDelay(100);  // 200ms
-#endif
-
-  // loop until all keys are up
-#if !defined(BOOT)
-  tmr10ms_t start = get_tmr10ms();
-#endif
-
-  while (keyDown()) {
-
-#if defined(SIMU)
-    SIMU_SLEEP_NORET(1/*ms*/);
-#else
-    wdt_reset();
-#endif
-
-#if !defined(BOOT)
-    if ((get_tmr10ms() - start) >= 300) {  // wait no more than 3 seconds
-      //timeout expired, at least one key stuck
-      return false;
-    }
-#endif
-  }
-
-  memclear(keys, sizeof(keys));
-  putEvent(0);
-  return true;
-}
-#else    // #if defined(CPUARM)
 void clearKeyEvents()
 {
   // loop until all keys are up
@@ -211,6 +161,5 @@ void clearKeyEvents()
   memclear(keys, sizeof(keys));
   putEvent(0);
 }
-#endif   // #if defined(CPUARM)
 
 
