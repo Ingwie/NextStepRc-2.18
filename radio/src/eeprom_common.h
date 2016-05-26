@@ -36,10 +36,6 @@
 
 #if defined(SIMU)
   #define WRITE_DELAY_10MS 200
-#elif defined(PCBTARANIS)
-  #define WRITE_DELAY_10MS 500
-#elif defined(PCBSKY9X) && !defined(REV0)
-  #define WRITE_DELAY_10MS 500
 #elif defined(PCBGRUVIN9X) && !defined(REV0)
   #define WRITE_DELAY_10MS 500
 #else
@@ -62,10 +58,4 @@ void ConvertModel(int id, int version);
 uint8_t eeFindEmptyModel(uint8_t id, bool down);
 void selectModel(uint8_t sub);
 
-#if defined(CPUARM)
-  extern ModelHeader modelHeaders[MAX_MODELS];
-  void eeLoadModelHeader(uint8_t id, ModelHeader *header);
-  void eeLoadModelHeaders();
-#else
-  #define eeLoadModelHeaders()
-#endif
+#define eeLoadModelHeaders()

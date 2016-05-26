@@ -62,25 +62,13 @@ uint8_t eeFindEmptyModel(uint8_t id, bool down)
 
 void selectModel(uint8_t sub)
 {
-#if !defined(COLORLCD)
   displayPopup(STR_LOADINGMODEL);
-#endif
   saveTimers();
   eeCheck(true); // force writing of current model data before this is changed
   g_eeGeneral.currModel = sub;
   eeDirty(EE_GENERAL);
   eeLoadModel(sub);
 }
-
-#if defined(CPUARM)
-ModelHeader modelHeaders[MAX_MODELS];
-void eeLoadModelHeaders()
-{
-  for (uint32_t i=0; i<MAX_MODELS; i++) {
-    eeLoadModelHeader(i, &modelHeaders[i]);
-  }
-}
-#endif
 
 void eeReadAll()
 {
@@ -90,19 +78,6 @@ void eeReadAll()
   else {
     eeLoadModelHeaders();
   }
-
   stickMode = g_eeGeneral.stickMode;
-
-#if defined(CPUARM)
-  for (uint8_t i=0; languagePacks[i]!=NULL; i++) {
-    if (!strncmp(g_eeGeneral.ttsLanguage, languagePacks[i]->id, 2)) {
-      currentLanguagePackIdx = i;
-      currentLanguagePack = languagePacks[i];
-    }
-  }
-#endif
-
-#if !defined(CPUARM)
   eeLoadModel(g_eeGeneral.currModel);
-#endif
 }
