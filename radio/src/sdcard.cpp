@@ -51,29 +51,8 @@ bool listSdFiles(const char *path, const char *extension, const uint8_t maxlen, 
   fno.lfsize = sizeof(lfn);
 #endif
 
-#if defined(PCBTARANIS)
-  popupMenuOffsetType = MENU_OFFSET_EXTERNAL;
-#endif
   static uint16_t lastpopupMenuOffset = 0;
 
-#if defined(CPUARM)
-  static uint8_t s_last_flags;
-
-  if (selection) {
-    s_last_flags = flags;
-    memset(reusableBuffer.modelsel.menu_bss, 0, sizeof(reusableBuffer.modelsel.menu_bss));
-    strcpy(reusableBuffer.modelsel.menu_bss[0], path);
-    strcat(reusableBuffer.modelsel.menu_bss[0], "/");
-    strncat(reusableBuffer.modelsel.menu_bss[0], selection, maxlen);
-    strcat(reusableBuffer.modelsel.menu_bss[0], extension);
-    if (f_stat(reusableBuffer.modelsel.menu_bss[0], &fno) != FR_OK) {
-      selection = NULL;
-    }
-  }
-  else {
-    flags = s_last_flags;
-  }
-#endif
 
   if (popupMenuOffset == 0) {
     lastpopupMenuOffset = 0;
@@ -188,52 +167,6 @@ bool listSdFiles(const char *path, const char *extension, const uint8_t maxlen, 
   return popupMenuNoItems;
 }
 
-#if defined(CPUARM) && defined(SDCARD)
-const char *fileCopy(const char *filename, const char *srcDir, const char *destDir)
-{
-  FIL srcFile;
-  FIL dstFile;
-  char buf[256];
-  UINT read = sizeof(buf);
-  UINT written = sizeof(buf);
-
-  char path[2*CLIPBOARD_PATH_LEN+1];
-  char *tmp = strAppend(path, srcDir, CLIPBOARD_PATH_LEN);
-  *tmp++ = '/';
-  strAppend(tmp, filename, CLIPBOARD_PATH_LEN);
-
-  FRESULT result = f_open(&srcFile, path, FA_OPEN_EXISTING | FA_READ);
-  if (result != FR_OK) {
-    return SDCARD_ERROR(result);
-  }
-
-  tmp = strAppend(path, destDir, CLIPBOARD_PATH_LEN);
-  *tmp++ = '/';
-  strAppend(tmp, filename, CLIPBOARD_PATH_LEN);
-
-  result = f_open(&dstFile, path, FA_CREATE_ALWAYS | FA_WRITE);
-  if (result != FR_OK) {
-    f_close(&srcFile);
-    return SDCARD_ERROR(result);
-  }
-
-  while (result==FR_OK && read==sizeof(buf) && written==sizeof(buf)) {
-    result = f_read(&srcFile, buf, sizeof(buf), &read);
-    if (result == FR_OK) {
-      result = f_write(&dstFile, buf, read, &written);
-    }
-  }
-
-  f_close(&dstFile);
-  f_close(&srcFile);
-
-  if (result != FR_OK) {
-    return SDCARD_ERROR(result);
-  }
-
-  return NULL;
-}
-#endif // #if defined(PCBTARANIS)
 
 
 #if !defined(SIMU) || defined(SIMU_DISKIO)

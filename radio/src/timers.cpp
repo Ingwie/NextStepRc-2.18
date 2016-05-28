@@ -51,17 +51,8 @@ void timerReset(uint8_t idx)
   timerState.val_10ms = 0 ;
 }
 
-#if defined(CPUARM)
-void timerSet(int idx, int val)
-{
-  TimerState & timerState = timersStates[idx];
-  timerState.state = TMR_OFF; // is changed to RUNNING dep from mode
-  timerState.val = val;
-  timerState.val_10ms = 0 ;
-}
-#endif // #if defined(CPUARM)
 
-#if defined(CPUARM) || defined(CPUM2560)
+#if defined(CPUM2560)
 void restoreTimers()
 {
   for (uint8_t i=0; i<TIMERS; i++) {
@@ -83,13 +74,6 @@ void saveTimers()
     }
   }
 
-#if defined(CPUARM) && !defined(REVA)
-  if (sessionTimer > 0) {
-    g_eeGeneral.globalTimer += sessionTimer;
-    eeDirty(EE_GENERAL);
-    sessionTimer = 0;
-  }
-#endif
 }
 #endif  // #if defined(CPUARM) || defined(CPUM2560)
 

@@ -45,53 +45,12 @@
   #define MODEL_CUSTOM_FUNC_4TH_COLUMN_ONOFF  (18*FW+2)
 #endif
 
-#if defined(CPUARM) && defined(SDCARD)
-void onCustomFunctionsFileSelectionMenu(const char *result)
-{
-  int  sub = menuVerticalPosition - 1;
-  CustomFunctionData * cfn;
-  uint8_t eeFlags;
-
-  if (menuHandlers[menuLevel] == menuModelCustomFunctions) {
-    cfn = &g_model.customFn[sub];
-    eeFlags = EE_MODEL;
-  }
-  else {
-    cfn = &g_eeGeneral.customFn[sub];
-    eeFlags = EE_GENERAL;
-  }
-
-  uint8_t func = CFN_FUNC(cfn);
-
-  if (result == STR_UPDATE_LIST) {
-    char directory[256];
-    if (func == FUNC_PLAY_SCRIPT) {
-      strcpy(directory, SCRIPTS_FUNCS_PATH);
-    }
-    else {
-      strcpy(directory, SOUNDS_PATH);
-      strncpy(directory+SOUNDS_PATH_LNG_OFS, currentLanguagePack->id, 2);
-    }
-    if (!listSdFiles(directory, func==FUNC_PLAY_SCRIPT ? SCRIPTS_EXT : SOUNDS_EXT, sizeof(cfn->play.name), NULL)) {
-      POPUP_WARNING(func==FUNC_PLAY_SCRIPT ? STR_NO_SCRIPTS_ON_SD : STR_NO_SOUNDS_ON_SD);
-      popupMenuFlags = 0;
-    }
-  }
-  else {
-    // The user choosed a file in the list
-    memcpy(cfn->play.name, result, sizeof(cfn->play.name));
-    eeDirty(eeFlags);
-  }
-}
-#endif
 
 void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFunctionsContext * functionsContext)
 {
   int8_t sub = menuVerticalPosition - 1;
 
-#if defined(CPUARM)
-  uint8_t eeFlags = (functions == g_model.customFn) ? EE_MODEL : EE_GENERAL;
-#elif !defined(CPUM64) || defined(AUTOSWITCH)
+#if   !defined(CPUM64) || defined(AUTOSWITCH)
   uint8_t eeFlags = EE_MODEL;
 #endif
 
@@ -108,22 +67,13 @@ void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFu
         case 0:
           putsSwitches(MODEL_CUSTOM_FUNC_1ST_COLUMN, y, CFN_SWITCH(cfn), attr | ((functionsContext->activeSwitches & ((MASK_CFN_TYPE)1 << k)) ? BOLD : 0));
           if (active || AUTOSWITCH_ENTER_LONG()) CHECK_INCDEC_SWITCH(event, CFN_SWITCH(cfn), SWSRC_FIRST, SWSRC_LAST, eeFlags, isSwitchAvailableInCustomFunctions);
-#if defined(CPUARM)
-          if (func == FUNC_OVERRIDE_CHANNEL && functions != g_model.customFn) {
-            func = CFN_FUNC(cfn) = func+1;
-          }
-#endif
           break;
 
         case 1:
           if (CFN_SWITCH(cfn)) {
             lcd_putsiAtt(MODEL_CUSTOM_FUNC_2ND_COLUMN, y, STR_VFSWFUNC, func, attr);
             if (active) {
-#if defined(CPUARM)
-              CFN_FUNC(cfn) = checkIncDec(event, CFN_FUNC(cfn), 0, FUNC_MAX-1, eeFlags, isAssignableFunctionAvailable);
-#else
               CHECK_INCDEC_MODELVAR_ZERO(event, CFN_FUNC(cfn), FUNC_MAX-1);
-#endif
               if (checkIncDec_Ret) CFN_RESET(cfn);
             }
           }
@@ -146,29 +96,13 @@ void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFu
 #endif
           if (func == FUNC_TRAINER) {
             maxParam = 4;
-#if defined(CPUARM)
-            putsMixerSource(lcdNextPos, y, CFN_CH_INDEX(cfn)==0 ? 0 : MIXSRC_Rud+CFN_CH_INDEX(cfn)-1, attr);
-#else
             putsMixerSource(lcdNextPos, y, MIXSRC_Rud+CFN_CH_INDEX(cfn)-1, attr);
-#endif
           }
 #if defined(GVARS)
           else if (func == FUNC_ADJUST_GVAR) {
             maxParam = MAX_GVARS-1;
             putsStrIdx(lcdNextPos, y, STR_GV, CFN_GVAR_INDEX(cfn)+1, attr);
-#if defined(CPUARM)
-            if (active) CFN_GVAR_INDEX(cfn) = checkIncDec(event, CFN_GVAR_INDEX(cfn), 0, maxParam, eeFlags);
-#else
             if (active) CHECK_INCDEC_MODELVAR_ZERO(event, CFN_GVAR_INDEX(cfn), maxParam);
-#endif
-            break;
-          }
-#endif
-#if defined(CPUARM)
-          else if (func == FUNC_SET_TIMER) {
-            maxParam = MAX_TIMERS-1;
-            lcd_putsiAtt(lcdNextPos, y, STR_VFSWRESET, CFN_TIMER_INDEX(cfn), attr);
-            if (active) CFN_TIMER_INDEX(cfn) = checkIncDec(event, CFN_TIMER_INDEX(cfn), 0, maxParam, eeFlags);
             break;
           }
 #endif
@@ -183,36 +117,17 @@ void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFu
         {
           INCDEC_DECLARE_VARS(eeFlags);
           int16_t val_displayed = CFN_PARAM(cfn);
-#if defined(CPUARM)
-          int16_t val_min = 0;
-          int16_t val_max = 255;
-#else
           int8_t val_min = 0;
           uint8_t val_max = 255;
-#endif
           if (func == FUNC_RESET) {
             val_max = FUNC_RESET_PARAM_LAST;
             lcd_putsiAtt(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, STR_VFSWRESET, CFN_PARAM(cfn), attr);
           }
 #if defined(OVERRIDE_CHANNEL_FUNCTION)
           else if (func == FUNC_OVERRIDE_CHANNEL) {
-#if !defined(CPUARM)
             val_displayed = (int8_t)CFN_PARAM(cfn);
-#endif
             val_min = -LIMIT_EXT_PERCENT; val_max = +LIMIT_EXT_PERCENT;
             lcd_outdezAtt(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, val_displayed, attr|LEFT);
-          }
-#endif
-#if defined(CPUARM)
-          else if (func >= FUNC_SET_FAILSAFE && func <= FUNC_BIND) {
-            val_max = NUM_MODULES-1;
-            lcd_putsiAtt(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, "\004Int.Ext.", CFN_PARAM(cfn), attr);
-          }
-#endif
-#if defined(CPUARM)
-          else if (func == FUNC_SET_TIMER) {
-            val_max = 539*60+59;
-            putsTimer(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, val_displayed, attr|LEFT, attr);
           }
 #endif
 #if defined(AUDIO)
@@ -227,47 +142,7 @@ void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFu
             lcd_outdezAtt(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, val_displayed, attr|LEFT);
           }
 #endif
-#if defined(CPUARM) && defined(SDCARD)
-          else if (func == FUNC_PLAY_TRACK || func == FUNC_BACKGND_MUSIC || func == FUNC_PLAY_SCRIPT) {
-            coord_t x = (func == FUNC_PLAY_TRACK ? MODEL_CUSTOM_FUNC_2ND_COLUMN + FW + FW*strlen(TR_PLAY_TRACK) : MODEL_CUSTOM_FUNC_3RD_COLUMN);
-            if (ZEXIST(cfn->play.name))
-              lcd_putsnAtt(x, y, cfn->play.name, sizeof(cfn->play.name), attr);
-            else
-              lcd_putsiAtt(x, y, STR_VCSWFUNC, 0, attr);
-            if (active && event==EVT_KEY_BREAK(KEY_ENTER)) {
-              s_editMode = 0;
-              char directory[256];
-              if (func==FUNC_PLAY_SCRIPT) {
-                strcpy(directory, SCRIPTS_FUNCS_PATH);
-              }
-              else {
-                strcpy(directory, SOUNDS_PATH);
-                strncpy(directory+SOUNDS_PATH_LNG_OFS, currentLanguagePack->id, 2);
-              }
-              if (listSdFiles(directory, func==FUNC_PLAY_SCRIPT ? SCRIPTS_EXT : SOUNDS_EXT, sizeof(cfn->play.name), cfn->play.name)) {
-                popupMenuHandler = onCustomFunctionsFileSelectionMenu;
-              }
-              else {
-                POPUP_WARNING(func==FUNC_PLAY_SCRIPT ? STR_NO_SCRIPTS_ON_SD : STR_NO_SOUNDS_ON_SD);
-                popupMenuFlags = 0;
-              }
-            }
-            break;
-          }
-          else if (func == FUNC_PLAY_VALUE) {
-            val_max = MIXSRC_LAST_TELEM;
-            putsMixerSource(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, val_displayed, attr);
-            INCDEC_ENABLE_CHECK(isSourceAvailable);
-          }
-#endif
-#if defined(CPUARM)
-          else if (func == FUNC_VOLUME) {
-            val_max = MIXSRC_LAST_CH;
-            putsMixerSource(MODEL_CUSTOM_FUNC_3RD_COLUMN, y, val_displayed, attr);
-            INCDEC_SET_FLAG(eeFlags | INCDEC_SOURCE);
-            INCDEC_ENABLE_CHECK(isSourceAvailable);
-          }
-#elif defined(VOICE)
+#if   defined(VOICE)
           else if (func == FUNC_PLAY_TRACK) {
 #if defined(GVARS)
             if (attr && event==EVT_KEY_LONG(KEY_ENTER)) {
@@ -337,9 +212,6 @@ void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFu
               s_editMode = !s_editMode;
               active = true;
               CFN_GVAR_MODE(cfn) += 1;
-#if defined(CPUARM)
-              CFN_GVAR_MODE(cfn) &= 0x03;
-#endif
               val_displayed = 0;
             }
           }
@@ -357,29 +229,16 @@ void menuCustomFunctions(uint8_t event, CustomFunctionData * functions, CustomFu
         case 4:
           if (HAS_ENABLE_PARAM(func)) {
             menu_lcd_onoff(MODEL_CUSTOM_FUNC_4TH_COLUMN_ONOFF, y, CFN_ACTIVE(cfn), attr);
-#if defined(CPUARM)
-            if (active) CFN_ACTIVE(cfn) = checkIncDec(event, CFN_ACTIVE(cfn), 0, 1, eeFlags);
-#else
             if (active) CHECK_INCDEC_MODELVAR_ZERO(event, CFN_ACTIVE(cfn), 1);
-#endif
           }
           else if (HAS_REPEAT_PARAM(func)) {
             if (CFN_PLAY_REPEAT(cfn) == 0) {
               lcd_putcAtt(MODEL_CUSTOM_FUNC_4TH_COLUMN_ONOFF+3, y, '-', attr);
             }
-#if defined(CPUARM)
-            else if (CFN_PLAY_REPEAT(cfn) == CFN_PLAY_REPEAT_NOSTART) {
-              lcd_putsAtt(MODEL_CUSTOM_FUNC_4TH_COLUMN_ONOFF, y, "!-", attr);
-            }
-#endif
             else {
               lcd_outdezAtt(MODEL_CUSTOM_FUNC_4TH_COLUMN+2+FW, y, CFN_PLAY_REPEAT(cfn)*CFN_PLAY_REPEAT_MUL, attr);
             }
-#if defined(CPUARM)
-            if (active) CFN_PLAY_REPEAT(cfn) = checkIncDec(event, CFN_PLAY_REPEAT(cfn)==CFN_PLAY_REPEAT_NOSTART?-1:CFN_PLAY_REPEAT(cfn), -1, 60/CFN_PLAY_REPEAT_MUL, eeFlags);
-#else
             if (active) CHECK_INCDEC_MODELVAR_ZERO(event, CFN_PLAY_REPEAT(cfn), 60/CFN_PLAY_REPEAT_MUL);
-#endif
           }
           else if (attr) {
             REPEAT_LAST_CURSOR_MOVE();

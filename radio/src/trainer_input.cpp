@@ -40,30 +40,3 @@ int16_t ppmInput[NUM_TRAINER];
 uint8_t ppmInputValidityTimer;
 
 
-#if defined(CPUARM)
-#include "audio_arm.h"
-
-void checkTrainerSignalWarning()
-{
-  enum PpmInValidState_t {
-    PPM_IN_IS_NOT_USED=0,
-    PPM_IN_IS_VALID,
-    PPM_IN_INVALID
-  };
-
-  static uint8_t ppmInputValidState = PPM_IN_IS_NOT_USED;
-
-  if (ppmInputValidityTimer && (ppmInputValidState == PPM_IN_IS_NOT_USED)) {
-    ppmInputValidState = PPM_IN_IS_VALID;
-  }
-  else if (!ppmInputValidityTimer && (ppmInputValidState == PPM_IN_IS_VALID)) {
-    ppmInputValidState = PPM_IN_INVALID;
-    AUDIO_TRAINER_LOST();
-  }
-  else if (ppmInputValidityTimer && (ppmInputValidState == PPM_IN_INVALID)) {
-    ppmInputValidState = PPM_IN_IS_VALID;
-    AUDIO_TRAINER_BACK();
-  }
-}
-
-#endif

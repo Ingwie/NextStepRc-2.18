@@ -70,13 +70,9 @@ void onModelSelectMenu(const char *result)
 #endif
   else if (result == STR_DELETE_MODEL) {
     POPUP_CONFIRMATION(STR_DELETEMODEL);
-#if defined(CPUARM)
-    SET_WARNING_INFO(modelHeaders[sub].name, sizeof(g_model.header.name), ZCHAR);
-#else
     char * name = reusableBuffer.modelsel.mainname;
     eeLoadModelName(sub, name);
     SET_WARNING_INFO(name, sizeof(g_model.header.name), ZCHAR);
-#endif
   }
 #if defined(SDCARD)
   else {
@@ -117,11 +113,9 @@ void menuModelSelect(uint8_t event)
 
   if (s_editMode > 0) s_editMode = 0;
 
-#if !defined(CPUARM)
   if (event) {
     eeFlush(); // flush eeprom write
   }
-#endif
 
   int8_t sub = menuVerticalPosition;
 
@@ -139,13 +133,9 @@ void menuModelSelect(uint8_t event)
         killEvents(event);
         if (s_copyMode && s_copyTgtOfs == 0 && g_eeGeneral.currModel != sub && eeModelExists(sub)) {
           POPUP_CONFIRMATION(STR_DELETEMODEL);
-#if defined(CPUARM)
-          SET_WARNING_INFO(modelHeaders[sub].name, sizeof(g_model.header.name), ZCHAR);
-#else
           char * name = reusableBuffer.modelsel.mainname;
           eeLoadModelName(sub, name);
           SET_WARNING_INFO(name, sizeof(g_model.header.name), ZCHAR);
-#endif
         }
         else {
           s_copyMode = 0;
@@ -317,11 +307,9 @@ void menuModelSelect(uint8_t event)
         break;
   }
 
-#if !defined(PCBSKY9X)
   lcd_puts(9*FW-(LEN_FREE-4)*FW, 0, STR_FREE);
   if (event) reusableBuffer.modelsel.eepromfree = EeFsGetFree();
   lcd_outdezAtt(17*FW, 0, reusableBuffer.modelsel.eepromfree, 0);
-#endif
 
 #if defined(ROTARY_ENCODER_NAVIGATION)
   displayScreenIndex(e_ModelSelect, DIM(menuTabModel), (sub == g_eeGeneral.currModel) ? ((IS_RE_NAVIGATION_ENABLE() && s_editMode < 0) ? INVERS|BLINK : INVERS) : 0);
@@ -356,14 +344,10 @@ void menuModelSelect(uint8_t event)
     k %= MAX_MODELS;
 
     if (eeModelExists(k)) {
-#if defined(PCBSKY9X)
-      putsModelName(4*FW, y, modelHeaders[k].name, k, 0);
-#else
       char * name = reusableBuffer.modelsel.listnames[i];
       if (event) eeLoadModelName(k, name);
       putsModelName(4*FW, y, name, k, 0);
       lcd_outdezAtt(20*FW, y, eeModelSize(k), 0);
-#endif
       if (k==g_eeGeneral.currModel && (s_copyMode!=COPY_MODE || s_copySrcRow<0 || i+menuVerticalOffset!=(vertpos_t)sub))
         lcd_putc(1, y, '*');
     }

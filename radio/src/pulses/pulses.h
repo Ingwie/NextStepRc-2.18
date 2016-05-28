@@ -45,9 +45,6 @@ enum ModuleFlag
   // MODULE_OFF, // will need an EEPROM conversion
 };
 
-#if defined(CPUARM) // (PXX) || defined(DSM2)
-  extern uint8_t moduleFlag[NUM_MODULES];
-#endif
 
 #if NUM_MODULES > 1
   #define IS_RANGECHECK_ENABLE()             (moduleFlag[0] == MODULE_RANGECHECK || moduleFlag[1] == MODULE_RANGECHECK)
@@ -55,16 +52,12 @@ enum ModuleFlag
   #define IS_RANGECHECK_ENABLE()             (moduleFlag[0] == MODULE_RANGECHECK)
 #endif
 
-#if defined(DSM2) && !defined(PCBTARANIS)
+#if defined(DSM2) 
   #define DSM2_BIND_TIMEOUT      255         // 255*11ms
   extern uint8_t dsm2BindTimer;
 #endif
 
-#if defined(CPUARM)
-  #define IS_PPM_PROTOCOL(protocol)          (protocol==PROTO_PPM)
-#else
   #define IS_PPM_PROTOCOL(protocol)          (protocol<=PROTO_PPMSIM)
-#endif
 
 #if defined(PXX)
   #define IS_PXX_PROTOCOL(protocol)          (protocol==PROTO_PXX)
@@ -84,10 +77,6 @@ enum ModuleFlag
   #define IS_DSM2_SERIAL_PROTOCOL(protocol)  (0)
 #endif
 
-#if defined(CPUARM)
-  #include "pulses_arm.h"
-#else
   #include "pulses_avr.h"
-#endif
 
 #endif

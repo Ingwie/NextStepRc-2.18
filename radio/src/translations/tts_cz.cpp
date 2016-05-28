@@ -42,11 +42,7 @@ enum CzechPrompts {
 
 #if defined(VOICE)
 
-#if defined(CPUARM)
-  #define CZ_PUSH_UNIT_PROMPT(p, u) cz_pushUnitPrompt((p), (u), id)
-#else
   #define CZ_PUSH_UNIT_PROMPT(p, u) pushUnitPrompt((p), (u))
-#endif
 
 #define MUZSKY 0x80
 #define ZENSKY 0x81
@@ -70,7 +66,6 @@ I18N_PLAY_FUNCTION(cz, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
 
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -84,17 +79,10 @@ I18N_PLAY_FUNCTION(cz, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);   
       if (qr.rem) {
         PLAY_NUMBER(qr.quot, 0, ZENSKY);
@@ -111,30 +99,6 @@ I18N_PLAY_FUNCTION(cz, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
   }
 
   int16_t tmp = number;
-#if defined(CPUARM) 
-  switch(unit) {
-    case 0:
-      break;
-    case 6:
-    case 8:
-    case 10:
-    case 14:
-    case 17:
-    case 21:
-    case 22:
-    case 23:
-    case 24:
-      att = ZENSKY;
-      break;
-    case 13:
-    case 18:
-      att = STREDNI;
-      break;
-    default:
-      att = MUZSKY;
-      break;
-  }
-#else
   switch(unit) {
     case 0:
       break;
@@ -156,7 +120,6 @@ I18N_PLAY_FUNCTION(cz, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
       att = MUZSKY;
       break;
   }
-#endif
 
   if ((number == 1) && (att == MUZSKY)) {
     PUSH_NUMBER_PROMPT(CZ_PROMPT_JEDEN);

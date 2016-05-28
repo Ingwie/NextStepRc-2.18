@@ -51,9 +51,6 @@
   FILE * diskImage = 0;
 #endif
 
-#if defined(SIMU_AUDIO) && defined(CPUARM)
-  #include <SDL.h>
-#endif
 
 volatile uint8_t pina=0xff, pinb=0xff, pinc=0xff, pind, pine=0xff, pinf=0xff, ping=0xff, pinh=0xff, pinj=0, pinl=0;
 uint8_t portb, portc, porth=0, dummyport;
@@ -70,13 +67,6 @@ RCC_TypeDef rcc;
 DMA_Stream_TypeDef dma2_stream2, dma2_stream6;
 DMA_TypeDef dma2;
 USART_TypeDef Usart0, Usart1, Usart2, Usart3, Usart4;
-#elif defined(CPUARM)
-Pio Pioa, Piob, Pioc;
-Pwm pwm;
-Twi Twio;
-Usart Usart0;
-Dacc dacc;
-Adc Adc0;
 #endif
 
 #if defined(EEPROM_RLC)
@@ -118,20 +108,6 @@ void simuInit()
       if ((int)state > 0) pin |= (mask); else pin &= ~(mask); \
       break;
 
-#if defined(CPUARM)
-  #if defined(PCBTARANIS) && !defined(REV9E)
-    #define SWITCH_CASE NEG_CASE
-  #else
-    #define SWITCH_CASE POS_CASE
-  #endif
-  #define SWITCH_3_CASE(swtch, pin1, pin2, mask1, mask2) \
-    case swtch: \
-      if ((int)state < 0) pin1 &= ~(mask1); else pin1 |= (mask1); \
-      if ((int)state > 0) pin2 &= ~(mask2); else pin2 |= (mask2); \
-      break;
-  #define KEY_CASE NEG_CASE
-  #define TRIM_CASE NEG_CASE
-#else
   #if defined(PCBMEGA2560)
     #define SWITCH_CASE POS_CASE
   #else
@@ -144,7 +120,6 @@ void simuInit()
       break;
   #define KEY_CASE POS_CASE
   #define TRIM_CASE KEY_CASE
-#endif
 
 void simuSetKey(uint8_t key, bool state)
 {
@@ -152,20 +127,11 @@ void simuSetKey(uint8_t key, bool state)
   switch (key) {
     KEY_CASE(KEY_MENU, KEYS_GPIO_REG_MENU, KEYS_GPIO_PIN_MENU)
     KEY_CASE(KEY_EXIT, KEYS_GPIO_REG_EXIT, KEYS_GPIO_PIN_EXIT)
-#if defined(PCBTARANIS)
-    KEY_CASE(KEY_ENTER, KEYS_GPIO_REG_ENTER, KEYS_GPIO_PIN_ENTER)
-    KEY_CASE(KEY_PAGE, KEYS_GPIO_REG_PAGE, KEYS_GPIO_PIN_PAGE)
-    KEY_CASE(KEY_MINUS, KEYS_GPIO_REG_MINUS, KEYS_GPIO_PIN_MINUS)
-    KEY_CASE(KEY_PLUS, KEYS_GPIO_REG_PLUS, KEYS_GPIO_PIN_PLUS)
-#else
     KEY_CASE(KEY_RIGHT, KEYS_GPIO_REG_RIGHT, KEYS_GPIO_PIN_RIGHT)
     KEY_CASE(KEY_LEFT, KEYS_GPIO_REG_LEFT, KEYS_GPIO_PIN_LEFT)
     KEY_CASE(KEY_UP, KEYS_GPIO_REG_UP, KEYS_GPIO_PIN_UP)
     KEY_CASE(KEY_DOWN, KEYS_GPIO_REG_DOWN, KEYS_GPIO_PIN_DOWN)
-#endif
-#if defined(PCBSKY9X) && !defined(REVX)
-    KEY_CASE(BTN_REa, PIOB->PIO_PDSR, 0x40)
-#elif defined(PCBGRUVIN9X) || defined(PCBMEGA2560)
+#if   defined(PCBGRUVIN9X) || defined(PCBMEGA2560)
     KEY_CASE(BTN_REa, pind, 0x20)
 #elif defined(ROTARY_ENCODER_NAVIGATION)
     KEY_CASE(BTN_REa, RotEncoder, 0x20)
@@ -194,43 +160,7 @@ void simuSetSwitch(uint8_t swtch, int8_t state)
 {
   // TRACE("simuSetSwitch(%d, %d)", swtch, state);
   switch (swtch) {
-#if defined(PCBTARANIS) && defined(REV9E)
-    SWITCH_3_CASE(0,  SWITCHES_GPIO_REG_A_L, SWITCHES_GPIO_REG_A_H, SWITCHES_GPIO_PIN_A_L, SWITCHES_GPIO_PIN_A_H)
-    SWITCH_3_CASE(1,  SWITCHES_GPIO_REG_B_L, SWITCHES_GPIO_REG_B_H, SWITCHES_GPIO_PIN_B_L, SWITCHES_GPIO_PIN_B_H)
-    SWITCH_3_CASE(2,  SWITCHES_GPIO_REG_C_L, SWITCHES_GPIO_REG_C_H, SWITCHES_GPIO_PIN_C_L, SWITCHES_GPIO_PIN_C_H)
-    SWITCH_3_CASE(3,  SWITCHES_GPIO_REG_D_L, SWITCHES_GPIO_REG_D_H, SWITCHES_GPIO_PIN_D_L, SWITCHES_GPIO_PIN_D_H)
-    SWITCH_3_CASE(4,  SWITCHES_GPIO_REG_E_L, SWITCHES_GPIO_REG_E_H, SWITCHES_GPIO_PIN_E_L, SWITCHES_GPIO_PIN_E_H)
-    SWITCH_CASE(5, SWITCHES_GPIO_REG_F, SWITCHES_GPIO_PIN_F)
-    SWITCH_3_CASE(6,  SWITCHES_GPIO_REG_G_L, SWITCHES_GPIO_REG_G_H, SWITCHES_GPIO_PIN_G_L, SWITCHES_GPIO_PIN_G_H)
-    SWITCH_CASE(7, SWITCHES_GPIO_REG_H, SWITCHES_GPIO_PIN_H)
-    SWITCH_3_CASE(8,  SWITCHES_GPIO_REG_I_L, SWITCHES_GPIO_REG_I_H, SWITCHES_GPIO_PIN_I_L, SWITCHES_GPIO_PIN_I_H)
-    SWITCH_3_CASE(9,  SWITCHES_GPIO_REG_J_L, SWITCHES_GPIO_REG_J_H, SWITCHES_GPIO_PIN_J_L, SWITCHES_GPIO_PIN_J_H)
-    SWITCH_3_CASE(10, SWITCHES_GPIO_REG_K_L, SWITCHES_GPIO_REG_K_H, SWITCHES_GPIO_PIN_K_L, SWITCHES_GPIO_PIN_K_H)
-    SWITCH_3_CASE(11, SWITCHES_GPIO_REG_L_L, SWITCHES_GPIO_REG_L_H, SWITCHES_GPIO_PIN_L_L, SWITCHES_GPIO_PIN_L_H)
-    SWITCH_3_CASE(12, SWITCHES_GPIO_REG_M_L, SWITCHES_GPIO_REG_M_H, SWITCHES_GPIO_PIN_M_L, SWITCHES_GPIO_PIN_M_H)
-    SWITCH_3_CASE(13, SWITCHES_GPIO_REG_N_L, SWITCHES_GPIO_REG_N_H, SWITCHES_GPIO_PIN_N_L, SWITCHES_GPIO_PIN_N_H)
-    SWITCH_3_CASE(14, SWITCHES_GPIO_REG_O_L, SWITCHES_GPIO_REG_O_H, SWITCHES_GPIO_PIN_O_L, SWITCHES_GPIO_PIN_O_H)
-    SWITCH_3_CASE(15, SWITCHES_GPIO_REG_P_L, SWITCHES_GPIO_REG_P_H, SWITCHES_GPIO_PIN_P_L, SWITCHES_GPIO_PIN_P_H)
-    SWITCH_3_CASE(16, SWITCHES_GPIO_REG_Q_L, SWITCHES_GPIO_REG_Q_H, SWITCHES_GPIO_PIN_Q_L, SWITCHES_GPIO_PIN_Q_H)
-    SWITCH_3_CASE(17, SWITCHES_GPIO_REG_R_L, SWITCHES_GPIO_REG_R_H, SWITCHES_GPIO_PIN_R_L, SWITCHES_GPIO_PIN_R_H)
-#elif defined(PCBTARANIS)
-    SWITCH_3_CASE(0,  SWITCHES_GPIO_REG_A_L, SWITCHES_GPIO_REG_A_H, SWITCHES_GPIO_PIN_A_L, SWITCHES_GPIO_PIN_A_H)
-    SWITCH_3_CASE(1,  SWITCHES_GPIO_REG_B_L, SWITCHES_GPIO_REG_B_H, SWITCHES_GPIO_PIN_B_L, SWITCHES_GPIO_PIN_B_H)
-    SWITCH_3_CASE(2,  SWITCHES_GPIO_REG_C_L, SWITCHES_GPIO_REG_C_H, SWITCHES_GPIO_PIN_C_L, SWITCHES_GPIO_PIN_C_H)
-    SWITCH_3_CASE(3,  SWITCHES_GPIO_REG_D_L, SWITCHES_GPIO_REG_D_H, SWITCHES_GPIO_PIN_D_L, SWITCHES_GPIO_PIN_D_H)
-    SWITCH_3_CASE(4,  SWITCHES_GPIO_REG_E_H, SWITCHES_GPIO_REG_E_L, SWITCHES_GPIO_PIN_E_H, SWITCHES_GPIO_PIN_E_L)
-    SWITCH_CASE(5, SWITCHES_GPIO_REG_F, SWITCHES_GPIO_PIN_F)
-    SWITCH_3_CASE(6,  SWITCHES_GPIO_REG_G_L, SWITCHES_GPIO_REG_G_H, SWITCHES_GPIO_PIN_G_L, SWITCHES_GPIO_PIN_G_H)
-    SWITCH_CASE(7, SWITCHES_GPIO_REG_H, SWITCHES_GPIO_PIN_H)
-#elif defined(PCBSKY9X)
-    SWITCH_CASE(0, PIOC->PIO_PDSR, 1<<20)
-    SWITCH_CASE(1, PIOA->PIO_PDSR, 1<<15)
-    SWITCH_CASE(2, PIOC->PIO_PDSR, 1<<31)
-    SWITCH_3_CASE(3, PIOC->PIO_PDSR, PIOC->PIO_PDSR, 0x00004000, 0x00000800)
-    SWITCH_CASE(4, PIOA->PIO_PDSR, 1<<2)
-    SWITCH_CASE(5, PIOC->PIO_PDSR, 1<<16)
-    SWITCH_CASE(6, PIOC->PIO_PDSR, 1<<8)
-#elif defined(PCBGRUVIN9X)
+#if   defined(PCBGRUVIN9X)
     SWITCH_CASE(0, ping, 1<<INP_G_ThrCt)
     SWITCH_CASE(1, ping, 1<<INP_G_RuddDR)
     SWITCH_CASE(2, pinc, 1<<INP_C_ElevDR)
@@ -271,20 +201,12 @@ uint16_t getTmr16KHz()
   return get_tmr10ms() * 160;
 }
 
-#if !defined(PCBTARANIS)
 bool eeprom_thread_running = true;
 void *eeprom_write_function(void *)
 {
   while (!sem_wait(eeprom_write_sem)) {
     if (!eeprom_thread_running)
       return NULL;
-#if defined(CPUARM)
-    if (eeprom_read_operation) {
-      assert(eeprom_buffer_size);
-      eepromReadBlock(eeprom_buffer_data, eeprom_pointer, eeprom_buffer_size);
-    }
-    else {
-#endif
     if (fp) {
       if (fseek(fp, eeprom_pointer, SEEK_SET) == -1)
         perror("error in fseek");
@@ -294,9 +216,7 @@ void *eeprom_write_function(void *)
       if (fp) {
         if (fwrite(eeprom_buffer_data, 1, 1, fp) != 1)
           perror("error in fwrite");
-#if !defined(CPUARM)
         sleep(5/*ms*/);
-#endif
       }
       else {
         memcpy(&eeprom[eeprom_pointer], eeprom_buffer_data, 1);
@@ -308,14 +228,9 @@ void *eeprom_write_function(void *)
         fflush(fp);
       }
     }
-#if defined(CPUARM)
-    }
-    Spi_complete = 1;
-#endif
   }
   return 0;
 }
-#endif
 
 uint8_t main_thread_running = 0;
 char * main_thread_error = NULL;
@@ -329,9 +244,6 @@ void *main_thread(void *)
   try {
 #endif
 
-#if defined(CPUARM)
-    stackPaint();
-#endif
     
     s_current_protocol[0] = 255;
 
@@ -347,9 +259,6 @@ void *main_thread(void *)
     sdGetFreeSectors();
 #endif
 
-#if defined(CPUARM) && defined(SDCARD)
-    referenceSystemAudioFiles();
-#endif
 
     if (g_eeGeneral.backlightMode != e_backlight_mode_off) backlightOn(); // on Tx start turn the light on
 
@@ -357,21 +266,11 @@ void *main_thread(void *)
       opentxStart();
     }
     else {
-#if defined(CPUARM)
-      eeLoadModel(g_eeGeneral.currModel);
-#endif
     }
 
     s_current_protocol[0] = 0;
 
     while (main_thread_running) {
-#if defined(CPUARM)
-      doMixerCalculations();
-#if defined(FRSKY) || defined(MAVLINK)
-      telemetryWakeup();
-#endif
-      checkTrims();
-#endif
       perMain();
       sleep(10/*ms*/);
     }
@@ -409,10 +308,6 @@ void StartMainThread(bool tests)
     getcwd(simuSdDirectory, 1024);
 #endif
 
-#if defined(CPUARM)
-  pthread_mutex_init(&mixerMutex, NULL);
-  pthread_mutex_init(&audioMutex, NULL);
-#endif
 
   /*
     g_tmr10ms must be non-zero otherwise some SF functions (that use this timer as a marker when it was last executed) 
@@ -443,147 +338,7 @@ void StopMainThread()
   pthread_join(main_thread_pid, NULL);
 }
 
-#if defined(CPUARM)
 
-struct SimulatorAudio {
-  int volumeGain;
-  int currentVolume;
-  uint16_t leftoverData[AUDIO_BUFFER_SIZE];
-  int leftoverLen;
-  bool threadRunning;
-  pthread_t threadPid;
-} simuAudio;
-
-bool dacQueue(AudioBuffer *buffer)
-{
-  return false;
-}
-
-void setVolume(uint8_t volume)
-{
-  simuAudio.currentVolume = min<int>((volumeScale[min<uint8_t>(volume, VOLUME_LEVEL_MAX)] * simuAudio.volumeGain) / 10, 127);
-  // TRACE("setVolume(): in: %u, out: %u", volume, simuAudio.currentVolume);
-}
-#endif
-
-#if defined(SIMU_AUDIO) && defined(CPUARM)
-
-void copyBuffer(uint8_t * dest, uint16_t * buff, unsigned int samples) 
-{
-  for(unsigned int i=0; i<samples; i++) {
-    int sample = ((int32_t)(uint32_t)(buff[i]) - 0x8000);  // conversion from uint16_t 
-    *((uint16_t*)dest) = (int16_t)((sample * simuAudio.currentVolume)/127);
-    dest += 2;
-  }
-}
-
-void fillAudioBuffer(void *udata, Uint8 *stream, int len)
-{
-  SDL_memset(stream, 0, len);
-
-  if (simuAudio.leftoverLen) {
-    copyBuffer(stream, simuAudio.leftoverData, simuAudio.leftoverLen);
-    len -= simuAudio.leftoverLen*2;
-    stream += simuAudio.leftoverLen*2;
-    simuAudio.leftoverLen = 0;
-    // putchar('l');
-  }
-
-  if (audioQueue.filledAtleast(len/(AUDIO_BUFFER_SIZE*2)+1) ) {
-    while(true) {
-      AudioBuffer *nextBuffer = audioQueue.getNextFilledBuffer();
-      if (nextBuffer) {
-        if (len >= nextBuffer->size*2) {
-          copyBuffer(stream, nextBuffer->data, nextBuffer->size);
-          stream += nextBuffer->size*2;
-          len -= nextBuffer->size*2;
-          // putchar('+');
-        }
-        else {
-          //partial
-          copyBuffer(stream, nextBuffer->data, len/2);
-          simuAudio.leftoverLen = (nextBuffer->size-len/2);
-          memcpy(simuAudio.leftoverData, &nextBuffer->data[len/2], simuAudio.leftoverLen*2);
-          len = 0;
-          // putchar('p');
-          break;
-        }
-      }
-      else {
-        break;
-      }
-    }
-  }
-
-  //fill the rest of buffer with silence
-  if (len > 0) {
-    SDL_memset(stream, 0x8000, len);  // make sure this is silence.
-    // putchar('.');
-  }
-}
-
-void * audioThread(void *)
-{
-  /*
-    Checking here if SDL audio was initialized is wrong, because
-    the SDL_CloseAudio() de-initializes it.
-
-    if ( !SDL_WasInit(SDL_INIT_AUDIO) ) {
-      fprintf(stderr, "ERROR: couldn't initialize SDL audio support\n");
-      return 0;
-    }
-  */
-
-  SDL_AudioSpec wanted, have;
-
-  /* Set the audio format */
-  wanted.freq = AUDIO_SAMPLE_RATE;
-  wanted.format = AUDIO_S16SYS;
-  wanted.channels = 1;    /* 1 = mono, 2 = stereo */
-  wanted.samples = AUDIO_BUFFER_SIZE*2;  /* Good low-latency value for callback */
-  wanted.callback = fillAudioBuffer;
-  wanted.userdata = NULL;
-
-  /*
-    SDL_OpenAudio() internally calls SDL_InitSubSystem(SDL_INIT_AUDIO),
-    which initializes SDL Audio subsystem if necessary
-  */
-  if ( SDL_OpenAudio(&wanted, &have) < 0 ) {
-    fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-    return 0;
-  }
-  SDL_PauseAudio(0);
-
-  while (simuAudio.threadRunning) {
-    audioQueue.wakeup();
-    sleep(1);
-  }
-  SDL_CloseAudio();
-  return 0;
-}
-
-void StartAudioThread(int volumeGain)
-{ 
-  simuAudio.leftoverLen = 0;
-  simuAudio.threadRunning = true;
-  simuAudio.volumeGain = volumeGain;
-  setVolume(VOLUME_LEVEL_DEF);
-
-  pthread_attr_t attr;
-  pthread_attr_init(&attr);
-  struct sched_param sp;
-  sp.sched_priority = SCHED_RR;
-  pthread_attr_setschedparam(&attr, &sp);
-  pthread_create(&simuAudio.threadPid, &attr, &audioThread, NULL);
-  return;
-}
-
-void StopAudioThread()
-{
-  simuAudio.threadRunning = false;
-  pthread_join(simuAudio.threadPid, NULL);
-}
-#endif // #if defined(SIMU_AUDIO) && defined(CPUARM)
 
 pthread_t eeprom_thread_pid;
 
@@ -603,19 +358,15 @@ void StartEepromThread(const char *filename)
   sem_init(eeprom_write_sem, 0, 0);
 #endif
 
-#if !defined(PCBTARANIS)
   eeprom_thread_running = true;
   assert(!pthread_create(&eeprom_thread_pid, NULL, &eeprom_write_function, NULL));
-#endif
 }
 
 void StopEepromThread()
 {
-#if !defined(PCBTARANIS)
   eeprom_thread_running = false;
   sem_post(eeprom_write_sem);
   pthread_join(eeprom_thread_pid, NULL);
-#endif
 #ifdef __APPLE__
   //TODO free semaphore eeprom_write_sem
 #else
@@ -640,22 +391,6 @@ void eepromReadBlock (uint8_t * pointer_ram, uint32_t pointer_eeprom, uint32_t s
   }
 }
 
-#if defined(PCBTARANIS)
-void eepromWriteBlock(uint8_t * pointer_ram, uint32_t pointer_eeprom, uint32_t size)
-{
-  assert(size);
-
-  if (fp) {
-    // TRACE("EEPROM write (pos=%d, size=%d)", pointer_eeprom, size);
-    if (fseek(fp, (long)pointer_eeprom, SEEK_SET)==-1) perror("error in fseek");
-    if (fwrite(pointer_ram, size, 1, fp) <= 0) perror("error in fwrite");
-  }
-  else {
-    memcpy(&eeprom[(uint64_t)pointer_eeprom], pointer_ram, size);
-  }
-}
-
-#endif
 
 uint16_t stackAvailable()
 {
@@ -690,9 +425,6 @@ namespace simu {
 #include <map>
 #include <string>
 
-#if defined(CPUARM)
-FATFS g_FATFS_Obj;
-#endif
 
 char *convertSimuPath(const char *path)
 {
@@ -1019,10 +751,6 @@ FRESULT f_getfree (const TCHAR* path, DWORD* nclst, FATFS** fatfs)
   return FR_OK;  
 }
 
-#if defined(PCBSKY9X)
-int32_t Card_state = SD_ST_MOUNTED;
-uint32_t Card_CSD[4]; // TODO elsewhere
-#endif
 
 #endif  // #if defined(SDCARD) && !defined(SKIP_FATFS_DECLARATION) && !defined(SIMU_DISKIO)
 
@@ -1032,9 +760,6 @@ uint32_t Card_CSD[4]; // TODO elsewhere
 #include <time.h>
 #include <stdio.h>
 
-#if defined(CPUARM)
-FATFS g_FATFS_Obj = { 0};
-#endif
 
 int ff_cre_syncobj (BYTE vol, _SYNC_t* sobj) /* Create a sync object */
 {
@@ -1223,11 +948,6 @@ void adcPrepareBandgap()
 {
 }
 
-#if defined(PCBTARANIS)
-void lcdOff()
-{
-}
-#endif
 
 void lcdRefresh()
 {
@@ -1239,60 +959,4 @@ void telemetryPortInit()
 {
 }
 
-#if defined(PCBTARANIS)
-void pwrInit() { }
-void pwrOff() { }
-#if defined(REV9E)
-uint32_t pwrPressed() { return false; }
-#else
-uint32_t pwrCheck() { return true; }
-#endif
-int usbPlugged() { return false; }
-void USART_DeInit(USART_TypeDef* ) { }
-ErrorStatus RTC_SetTime(uint32_t RTC_Format, RTC_TimeTypeDef* RTC_TimeStruct) { return SUCCESS; }
-ErrorStatus RTC_SetDate(uint32_t RTC_Format, RTC_DateTypeDef* RTC_DateStruct) { return SUCCESS; }
-void RTC_GetTime(uint32_t RTC_Format, RTC_TimeTypeDef* RTC_TimeStruct) { }
-void RTC_GetDate(uint32_t RTC_Format, RTC_DateTypeDef* RTC_DateStruct) { }
-void RTC_TimeStructInit(RTC_TimeTypeDef* RTC_TimeStruct) { }
-void RTC_DateStructInit(RTC_DateTypeDef* RTC_DateStruct) { }
-void PWR_BackupAccessCmd(FunctionalState NewState) { }
-void RCC_RTCCLKConfig(uint32_t RCC_RTCCLKSource) { }
-void RCC_APB1PeriphClockCmd(uint32_t RCC_APB1Periph, FunctionalState NewState) { }
-void RCC_RTCCLKCmd(FunctionalState NewState) { }
-ErrorStatus RTC_Init(RTC_InitTypeDef* RTC_InitStruct) { return SUCCESS; }
-void USART_SendData(USART_TypeDef* USARTx, uint16_t Data) { }
-FlagStatus USART_GetFlagStatus(USART_TypeDef* USARTx, uint16_t USART_FLAG) { return SET; }
-void GPIO_PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource, uint8_t GPIO_AF) { }
-void USART_Init(USART_TypeDef* USARTx, USART_InitTypeDef* USART_InitStruct) { }
-void USART_Cmd(USART_TypeDef* USARTx, FunctionalState NewState) { }
-void USART_ITConfig(USART_TypeDef* USARTx, uint16_t USART_IT, FunctionalState NewState) { }
-void RCC_PLLI2SConfig(uint32_t PLLI2SN, uint32_t PLLI2SR) { }
-void RCC_PLLI2SCmd(FunctionalState NewState) { }
-void RCC_I2SCLKConfig(uint32_t RCC_I2SCLKSource) { }
-void SPI_I2S_DeInit(SPI_TypeDef* SPIx) { }
-void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct) { }
-void I2S_Cmd(SPI_TypeDef* SPIx, FunctionalState NewState) { }
-void SPI_I2S_ITConfig(SPI_TypeDef* SPIx, uint8_t SPI_I2S_IT, FunctionalState NewState) { }
-void RCC_LSEConfig(uint8_t RCC_LSE) { }
-FlagStatus RCC_GetFlagStatus(uint8_t RCC_FLAG) { return RESET; }
-ErrorStatus RTC_WaitForSynchro(void) { return SUCCESS; }
-void unlockFlash() { }
-void lockFlash() { }
-void writeFlash(uint32_t *address, uint32_t *buffer) { SIMU_SLEEP(100); }
-uint32_t isBootloaderStart(const void *block) { return 1; }
-#if defined(REVPLUS)
-void turnBacklightOn(uint8_t level, uint8_t color)
-{
-  TIM4->CCR4 = (100-level)*color;
-  TIM4->CCR2 = (100-level)*(100-color);
-}
-
-void turnBacklightOff(void)
-{
-  TIM4->CCR4 = 0;
-  TIM4->CCR2 = 0;
-}
-#endif
-
-#endif  // #if defined(PCBTARANIS)
 

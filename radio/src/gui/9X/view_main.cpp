@@ -135,13 +135,6 @@ void displayTrims(uint8_t phase)
         lcd_hline(xm-1, ym,  3);
       }
 #endif
-#if defined(CPUARM)
-      if (g_model.displayTrims != DISPLAY_TRIMS_NEVER && dir != 0) {
-        if (g_model.displayTrims == DISPLAY_TRIMS_ALWAYS || (trimsDisplayTimer > 0 && (trimsDisplayMask & (1<<i)))) {
-          lcd_outdezAtt(dir>0 ? 22 : 54, xm-2, -abs(dir/5), TINSIZE|VERTICAL);
-        }
-      }
-#endif
     }
     else {
       ym = 60;
@@ -159,13 +152,6 @@ void displayTrims(uint8_t phase)
       }
       if (exttrim) {
         lcd_vline(xm, ym-1,  3);
-      }
-#endif
-#if defined(CPUARM)
-      if (g_model.displayTrims != DISPLAY_TRIMS_NEVER && dir != 0) {
-        if (g_model.displayTrims == DISPLAY_TRIMS_ALWAYS || (trimsDisplayTimer > 0 && (trimsDisplayMask & (1<<i)))) {
-          lcd_outdezAtt((stickIndex==0 ? TRIM_LH_X : TRIM_RH_X)+(dir>0 ? -11 : 20), ym-2, -abs(dir/5), TINSIZE);
-        }
       }
 #endif
     }
@@ -187,18 +173,7 @@ void displayTimers()
     LcdFlags att = DBLSIZE | (timerState.val<0 ? BLINK|INVERS : 0);
     putsTimer(12*FW+2+10*FWNUM-4, FH*2, timerState.val, att, att);
     uint8_t xLabel = (timerState.val >= 0 ? MAINTMR_LBL_COL : MAINTMR_LBL_COL-7);
-#if defined(CPUARM)
-    uint8_t len = zlen(g_model.timers[0].name, LEN_TIMER_NAME);
-    if (len > 0) {
-      xLabel += (LEN_TIMER_NAME-len)*FW;
-      lcd_putsnAtt(xLabel, FH*3, g_model.timers[0].name, len, ZCHAR);
-    }
-    else {
-      putsTimerMode(xLabel, FH*3, g_model.timers[0].mode);
-    }
-#else
     putsTimerMode(xLabel, FH*3, g_model.timers[0].mode);
-#endif
   }
 }
 
@@ -220,22 +195,7 @@ void displayBattVoltage()
 #endif
 }
 
-#if defined(PCBSKY9X)
-void displayVoltageOrAlarm()
-{
-  if (g_eeGeneral.temperatureWarn && getTemperature() >= g_eeGeneral.temperatureWarn) {
-    putsValueWithUnit(6*FW-1, 2*FH, getTemperature(), UNIT_TEMPERATURE, BLINK|INVERS|DBLSIZE);
-  }
-  else if (g_eeGeneral.mAhWarn && (g_eeGeneral.mAhUsed + Current_used * (488 + g_eeGeneral.txCurrentCalibration)/8192/36) / 500 >= g_eeGeneral.mAhWarn) {
-    putsValueWithUnit(7*FW-1, 2*FH, (g_eeGeneral.mAhUsed + Current_used*(488 + g_eeGeneral.txCurrentCalibration)/8192/36)/10, UNIT_MAH, BLINK|INVERS|DBLSIZE);
-  }
-  else {
-    displayBattVoltage();
-  }
-}
-#else
   #define displayVoltageOrAlarm() displayBattVoltage()
-#endif
 
 #define EVT_KEY_MODEL_MENU   EVT_KEY_LONG(KEY_RIGHT)
 #define EVT_KEY_GENERAL_MENU EVT_KEY_LONG(KEY_LEFT)
@@ -257,20 +217,6 @@ void onMainViewMenu(const char *result)
     timerReset(2);
   }
 #endif
-#if defined(CPUARM)
-  else if (result == STR_VIEW_NOTES) {
-    pushModelNotes();
-  }
-  else if (result == STR_RESET_SUBMENU) {
-    POPUP_MENU_ADD_ITEM(STR_RESET_FLIGHT);
-    POPUP_MENU_ADD_ITEM(STR_RESET_TIMER1);
-    POPUP_MENU_ADD_ITEM(STR_RESET_TIMER2);
-    POPUP_MENU_ADD_ITEM(STR_RESET_TIMER3);
-#if defined(FRSKY)
-    POPUP_MENU_ADD_ITEM(STR_RESET_TELEMETRY);
-#endif
-  }
-#endif
 #if defined(FRSKY)
   else if (result == STR_RESET_TELEMETRY) {
     telemetryReset();
@@ -282,11 +228,6 @@ void onMainViewMenu(const char *result)
   else if (result == STR_STATISTICS) {
     chainMenu(menuStatisticsView);
   }
-#if defined(CPUARM)
-  else if (result == STR_ABOUT_US) {
-    chainMenu(menuAboutView);
-  }
-#endif
 }
 #endif
 
@@ -317,14 +258,7 @@ void menuMainView(uint8_t event)
     case EVT_KEY_BREAK(KEY_RIGHT):
     case EVT_KEY_BREAK(KEY_LEFT):
       if (view_base <= VIEW_INPUTS) {
-#if defined(PCBSKY9X)
-        if (view_base == VIEW_INPUTS)
-          g_eeGeneral.view ^= ALTERNATE_VIEW;
-        else
-          g_eeGeneral.view = (g_eeGeneral.view + (4*ALTERNATE_VIEW) + ((event==EVT_KEY_BREAK(KEY_LEFT)) ? -ALTERNATE_VIEW : ALTERNATE_VIEW)) % (4*ALTERNATE_VIEW);
-#else
         g_eeGeneral.view ^= ALTERNATE_VIEW;
-#endif
         eeDirty(EE_GENERAL);
         AUDIO_KEYPAD_UP();
       }
@@ -334,27 +268,15 @@ void menuMainView(uint8_t event)
     case EVT_KEY_CONTEXT_MENU:
       killEvents(event);
 
-#if defined(CPUARM)
-      if (modelHasNotes()) {
-        POPUP_MENU_ADD_ITEM(STR_VIEW_NOTES);
-      }
-#endif
 
-#if defined(CPUARM)
-      POPUP_MENU_ADD_ITEM(STR_RESET_SUBMENU);
-#else
       POPUP_MENU_ADD_ITEM(STR_RESET_TIMER1);
       POPUP_MENU_ADD_ITEM(STR_RESET_TIMER2);
 #if defined(FRSKY)
       POPUP_MENU_ADD_ITEM(STR_RESET_TELEMETRY);
 #endif
       POPUP_MENU_ADD_ITEM(STR_RESET_FLIGHT);
-#endif
 
       POPUP_MENU_ADD_ITEM(STR_STATISTICS);
-#if defined(CPUARM)
-      POPUP_MENU_ADD_ITEM(STR_ABOUT_US);
-#endif
       popupMenuHandler = onMainViewMenu;
       break;
 #endif
@@ -452,19 +374,11 @@ void menuMainView(uint8_t event)
   if (view_base < VIEW_INPUTS) {
     // scroll bar
     lcd_hlineStip(38, 34, 54, DOTTED);
-#if defined(PCBSKY9X)
-    lcd_hline(38 + (g_eeGeneral.view / ALTERNATE_VIEW) * 13, 34, 13, SOLID);
-#else
     lcd_hline((g_eeGeneral.view & ALTERNATE_VIEW) ? 64 : 38, 34, 26, SOLID);
-#endif
 
     for (uint8_t i=0; i<8; i++) {
       uint8_t x0,y0;
-#if defined(PCBSKY9X)
-      uint8_t chan = 8*(g_eeGeneral.view / ALTERNATE_VIEW) + i;
-#else
       uint8_t chan = (g_eeGeneral.view & ALTERNATE_VIEW) ? 8+i : i;
-#endif
 
       int16_t val = channelOutputs[chan];
 
@@ -535,14 +449,7 @@ void menuMainView(uint8_t event)
 #endif // PCBGRUVIN9X && ROTARY_ENCODERS
 
       // Logical Switches
-#if defined(PCBSKY9X)
-      for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++) {
-        int8_t len = getSwitch(SWSRC_SW1+i) ? BAR_HEIGHT : 1;
-        uint8_t x = VSWITCH_X(i);
-        lcd_vline(x-1, VSWITCH_Y-len, len);
-        lcd_vline(x,   VSWITCH_Y-len, len);
-      }
-#elif defined(CPUM2560)
+#if   defined(CPUM2560)
       for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++)
         putsSwitches(2*FW-3 + (i/3)*(i/3>2 ? 3*FW+2 : (3*FW-1)) + (i/3>2 ? 2*FW : 0), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
 #elif !defined(PCBSTD)

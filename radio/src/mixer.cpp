@@ -366,11 +366,6 @@ void evalInputs(uint8_t mode)
     if (v < -RESX) v = -RESX;
     if (v >  RESX) v =  RESX;
 
-#if defined(PCBTARANIS)
-    if (i==POT1 || i==SLIDER1) {
-      v = -v;
-    }
-#endif
 
     if (g_model.throttleReversed && ch==THR_STICK) {
       v = -v;
@@ -384,20 +379,7 @@ void evalInputs(uint8_t mode)
 
       // filtering for center beep
       uint8_t tmp = (uint16_t)abs(v) / 16;
-#if defined(CPUARM)
-      if (mode == e_perout_mode_normal) {
-        if (tmp==0 || (tmp==1 && (bpanaCenter & mask))) {
-          anaCenter |= mask;
-          if ((g_model.beepANACenter & mask) && !(bpanaCenter & mask) && !calibrationState) {
-            if (!IS_POT(i) || IS_POT_AVAILABLE(i)) {
-              AUDIO_POT_MIDDLE(i);
-            }
-          }
-        }
-      }
-#else
       if (tmp <= 1) anaCenter |= (tmp==0 ? mask : (bpanaCenter & mask));
-#endif
     }
     else {
       // rotary encoders
@@ -454,10 +436,8 @@ void evalInputs(uint8_t mode)
   evalTrims(); // when no virtual inputs, the trims need the anas array calculated above (when throttle trim enabled)
 
   if (mode == e_perout_mode_normal) {
-#if !defined(CPUARM)
     anaCenter &= g_model.beepANACenter;
     if (((bpanaCenter ^ anaCenter) & anaCenter)) AUDIO_POT_MIDDLE();
-#endif
     bpanaCenter = anaCenter;
   }
 }
@@ -908,10 +888,6 @@ int32_t sum_chans512[NUM_CHNOUT] = {0};
 #define MAX_ACT 0xffff
 uint8_t lastFlightMode = 255; // TODO reinit everything here when the model changes, no???
 
-#if defined(CPUARM)
-tmr10ms_t flightModeTransitionTime;
-uint8_t   flightModeTransitionLast = 255;
-#endif
 
 void evalMixes(uint8_t tick10ms)
 {
@@ -928,9 +904,6 @@ void evalMixes(uint8_t tick10ms)
   uint8_t fm = getFlightMode();
 
   if (lastFlightMode != fm) {
-#if defined(CPUARM)
-    flightModeTransitionTime = get_tmr10ms();
-#endif
 
     if (lastFlightMode == 255) {
       fp_act[fm] = MAX_ACT;
@@ -947,23 +920,10 @@ void evalMixes(uint8_t tick10ms)
         fp_act[lastFlightMode] = 0;
         fp_act[fm] = MAX_ACT;
       }
-#if defined(CPUARM)
-      logicalSwitchesCopyState(lastFlightMode, fm); // push last logical switches state from old to new flight mode
-#endif
     }
     lastFlightMode = fm;
   }
 
-#if defined(CPUARM)
-  if (flightModeTransitionTime && get_tmr10ms() > flightModeTransitionTime+SWITCHES_DELAY()) {
-    flightModeTransitionTime = 0;
-    if (fm != flightModeTransitionLast) {
-      if (flightModeTransitionLast != 255) PLAY_PHASE_OFF(flightModeTransitionLast);
-      PLAY_PHASE_ON(fm);
-      flightModeTransitionLast = fm;
-    }
-  }
-#endif
 
   int32_t weight = 0;
   if (flightModesFade) {
@@ -991,18 +951,8 @@ void evalMixes(uint8_t tick10ms)
   // must be done after mixing because some functions use the inputs/channels values
   // must be done before limits because of the applyLimit function: it checks for safety switches which would be not initialized otherwise
   if (tick10ms) {
-#if defined(CPUARM)
-    requiredSpeakerVolume = g_eeGeneral.speakerVolume + VOLUME_LEVEL_DEF;
-#endif
 
-#if defined(CPUARM)
-    if (!g_model.noGlobalFunctions) {
-      evalFunctions(g_eeGeneral.customFn, globalFunctionsContext);
-    }
-    evalFunctions(g_model.customFn, modelFunctionsContext);
-#else
     evalFunctions();
-#endif
   }
 
   //========== LIMITS ===============

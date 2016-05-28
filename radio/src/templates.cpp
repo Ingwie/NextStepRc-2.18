@@ -56,9 +56,6 @@
 
 #include "opentx.h"
 
-#if defined(PCBTARANIS)
-  #pragma message("Templates with virtual inputs (FrSky Taranis) are not implemented!")
-#endif
 
 MixData* setDest(uint8_t dch, uint8_t src, bool clear=false)
 {
@@ -100,13 +97,9 @@ void mixSetWeight(MixData* md, int8_t weight)
   // MD_SETWEIGHT(md,weight);  doesn't matter here in code cost compiler optimizes this anyway
 }
 
-#if defined(PCBTARANIS)
-  #define TMPL_INPUT(x) (MIXSRC_FIRST_INPUT+channel_order(x)-1)
-#else
   #define clearInputs()
   #define defaultInputs()
   #define TMPL_INPUT(x) (MIXSRC_Rud+x-1)
-#endif
 
 void clearMixes()
 {
@@ -225,13 +218,9 @@ void applyTemplate(uint8_t idx)
         md=setDest(3, MIXSRC_Rud); // md->weight=100;
 
         // throttle
-#if defined(PCBTARANIS)
-        // TODO
-#else
         md=setDest(4, MIXSRC_Thr); md->swtch=SWSRC_ID0; mixSetCurve(md, 0); md->carryTrim=TRIM_OFF;
         md=setDest(4, MIXSRC_Thr); md->swtch=SWSRC_ID1; mixSetCurve(md, 1); md->carryTrim=TRIM_OFF;
         md=setDest(4, MIXSRC_Thr); md->swtch=SWSRC_ID2; mixSetCurve(md, 2); md->carryTrim=TRIM_OFF;
-#endif
         md=setDest(4, MIXSRC_MAX); mixSetWeight(md, -100); md->swtch=SWSRC_THR;  md->mltpx=MLTPX_REP;
 
         // gyro gain
@@ -239,13 +228,9 @@ void applyTemplate(uint8_t idx)
         md=setDest(5, MIXSRC_MAX); mixSetWeight(md, -30); md->swtch= SWSRC_GEA;
    
         // collective
-#if defined(PCBTARANIS)
-        // TODO
-#else
         md=setDest(10, MIXSRC_Thr); /*md->weight= 100;*/ md->swtch=SWSRC_ID0; mixSetCurve(md, 3); md->carryTrim=TRIM_OFF;
         md=setDest(10, MIXSRC_Thr); /*md->weight= 100;*/ md->swtch=SWSRC_ID1; mixSetCurve(md, 4); md->carryTrim=TRIM_OFF;
         md=setDest(10, MIXSRC_Thr); /*md->weight= 100;*/ md->swtch=SWSRC_ID2; mixSetCurve(md, 5); md->carryTrim=TRIM_OFF;
-#endif
 
         g_model.swashR.collectiveSource = MIXSRC_CH11;
         g_model.swashR.type = SWASH_TYPE_120;

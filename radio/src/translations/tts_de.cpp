@@ -57,11 +57,6 @@ enum GermanPrompts {
   DE_PROMPT_SECONDS = DE_PROMPT_UNITS_BASE+UNIT_SECONDS,
   DE_PROMPT_RPMS = DE_PROMPT_UNITS_BASE+UNIT_RPMS,
   DE_PROMPT_G = DE_PROMPT_UNITS_BASE+UNIT_G,
-#if defined(CPUARM)
-  DE_PROMPT_MILLILITERS = DE_PROMPT_UNITS_BASE+UNIT_MILLILITERS,
-  DE_PROMPT_FLOZ = DE_PROMPT_UNITS_BASE+UNIT_FLOZ,
-  DE_PROMPT_FEET_PER_SECOND = DE_PROMPT_UNITS_BASE+UNIT_FEET_PER_SECOND,
-#endif
 
 };
 
@@ -84,7 +79,6 @@ I18N_PLAY_FUNCTION(de, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
 
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -98,17 +92,10 @@ I18N_PLAY_FUNCTION(de, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);
     if (qr.rem > 0) {
       PLAY_NUMBER(qr.quot, 0, 0);

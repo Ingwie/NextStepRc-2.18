@@ -157,35 +157,6 @@ extern DMA_TypeDef dma2;
 #define DMA2_Stream6 (&dma2_stream6)
 #undef DMA2
 #define DMA2 (&dma2)
-#elif defined(PCBSKY9X)
-extern Pio Pioa, Piob, Pioc;
-extern Twi Twio;
-extern Dacc dacc;
-extern Usart Usart0;
-extern Adc Adc0;
-#undef ADC
-#define ADC (&Adc0)
-#undef USART0
-#define USART0 (&Usart0)
-#undef USART1
-#define USART1 (&Usart0)
-#undef USART2
-#define USART2 (&Usart0)
-#undef USART3
-#define USART3 (&Usart0)
-#undef PIOA
-#define PIOA (&Pioa)
-#undef PIOB
-#define PIOB (&Piob)
-#undef PIOC
-#define PIOC (&Pioc)
-#undef TWI0
-#define TWI0 (&Twio)
-#undef DACC
-#define DACC (&dacc)
-extern Pwm pwm;
-#undef PWM
-#define PWM (&pwm)
 #endif
 
 extern sem_t *eeprom_write_sem;
@@ -198,16 +169,9 @@ extern bool eeprom_read_operation;
 extern volatile uint32_t Spi_complete;
 #endif
 
-#if defined(CPUARM)
-extern void startPdcUsartReceive() ;
-extern uint32_t txPdcUsart( uint8_t *buffer, uint32_t size );
-extern uint32_t txPdcPending();
-extern void rxPdcUsart( void (*pChProcess)(uint8_t x) );
-#else
 #define PIOA 0
 #define PIOB 0
 #define PIOC 0
-#endif
 
 #define loop_until_bit_is_set( port, bitnum) \
   while ( 0/*! ( (port) & (1 << (bitnum)) )*/ ) ;
@@ -333,14 +297,6 @@ extern void rxPdcUsart( void (*pChProcess)(uint8_t x) );
 #define ISR(x, ...)  void x()
 #define asm(x)
 
-#if defined(CPUARM)
-extern uint32_t Master_frequency;
-#define NVIC_EnableIRQ(x)
-#define NVIC_DisableIRQ(x)
-#define NVIC_SetPriority(...)
-#define __disable_irq()
-#define __enable_irq()
-#endif
 
 extern volatile unsigned char pina, pinb, pinc, pind, pine, pinf, ping, pinh, pinj, pinl;
 extern uint8_t portb, portc, porth, dummyport;
@@ -363,13 +319,8 @@ void StartMainThread(bool tests=true);
 void StopMainThread();
 void StartEepromThread(const char *filename="eeprom.bin");
 void StopEepromThread();
-#if defined(SIMU_AUDIO) && defined(CPUARM)
-  void StartAudioThread(int volumeGain = 10);
-  void StopAudioThread(void);
-#else
   #define StartAudioThread(dummy)
   #define StopAudioThread()
-#endif
 
 extern const char * eepromFile;
 void eepromReadBlock (uint8_t * pointer_ram, uint32_t address, uint32_t size);

@@ -47,13 +47,6 @@ void menuStatisticsView(uint8_t event)
       chainMenu(menuStatisticsDebug);
       break;
 
-#if defined(CPUARM)
-    case EVT_KEY_LONG(KEY_MENU):
-      g_eeGeneral.globalTimer = 0;
-      eeDirty(EE_GENERAL);
-      sessionTimer = 0;
-      break;
-#endif
     case EVT_KEY_FIRST(KEY_EXIT):
       chainMenu(menuMainView);
       break;
@@ -87,18 +80,7 @@ void menuStatisticsView(uint8_t event)
 #endif
 }
 
-#if defined(PCBSKY9X)
-  #define MENU_DEBUG_COL1_OFS   (11*FW-3)
-  #define MENU_DEBUG_COL2_OFS   (17*FW)
-  #define MENU_DEBUG_Y_CURRENT  (1*FH)
-  #define MENU_DEBUG_Y_MAH      (2*FH)
-  #define MENU_DEBUG_Y_CPU_TEMP (3*FH)
-  #define MENU_DEBUG_Y_COPROC   (4*FH)
-  #define MENU_DEBUG_Y_MIXMAX   (5*FH)
-  #define MENU_DEBUG_Y_RTOS     (6*FH)
-#else
   #define MENU_DEBUG_COL1_OFS   (14*FW)
-#endif
 
 void menuStatisticsDebug(uint8_t event)
 {
@@ -106,24 +88,9 @@ void menuStatisticsDebug(uint8_t event)
 
   switch(event)
   {
-#if defined(CPUARM)
-    case EVT_KEY_LONG(KEY_ENTER):
-      g_eeGeneral.mAhUsed = 0;
-      g_eeGeneral.globalTimer = 0;
-      eeDirty(EE_GENERAL);
-#if defined(PCBSKY9X)
-      Current_used = 0;
-#endif
-      sessionTimer = 0;
-      killEvents(event);
-      AUDIO_KEYPAD_UP();
-      break;
-#endif
     case EVT_KEY_FIRST(KEY_ENTER):
-#if !defined(CPUARM)
       g_tmr1Latency_min = 0xff;
       g_tmr1Latency_max = 0;
-#endif
       maxMixerDuration  = 0;
       AUDIO_KEYPAD_UP();
       break;
@@ -142,14 +109,6 @@ void menuStatisticsDebug(uint8_t event)
       break;
   }
 
-#if defined(PCBSKY9X)
-  if ((ResetReason&RSTC_SR_RSTTYP) == (2<<8)) {
-    lcd_puts(LCD_W-8*FW, 0*FH, "WATCHDOG");
-  }
-  else if (unexpectedShutdown) {
-    lcd_puts(LCD_W-13*FW, 0*FH, "UNEXP.SHTDOWN");
-  }
-#endif
 
 #if defined(TX_CAPACITY_MEASUREMENT)
   // current
@@ -163,12 +122,6 @@ void menuStatisticsDebug(uint8_t event)
   putsValueWithUnit(MENU_DEBUG_COL1_OFS, MENU_DEBUG_Y_MAH, g_eeGeneral.mAhUsed + Current_used*current_scale/8192/36, UNIT_MAH, LEFT|PREC1);
 #endif
 
-#if defined(PCBSKY9X)
-  lcd_putsLeft(MENU_DEBUG_Y_CPU_TEMP, STR_CPU_TEMP);
-  putsValueWithUnit(MENU_DEBUG_COL1_OFS, MENU_DEBUG_Y_CPU_TEMP, getTemperature(), UNIT_TEMPERATURE, LEFT);
-  lcd_putc(MENU_DEBUG_COL2_OFS, MENU_DEBUG_Y_CPU_TEMP, '>');
-  putsValueWithUnit(MENU_DEBUG_COL2_OFS+FW+1, MENU_DEBUG_Y_CPU_TEMP, maxTemperature+g_eeGeneral.temperatureCalib, UNIT_TEMPERATURE, LEFT);
-#endif
 
 #if defined(COPROCESSOR)
   lcd_putsLeft(MENU_DEBUG_Y_COPROC, STR_COPROC_TEMP);
@@ -188,22 +141,8 @@ void menuStatisticsDebug(uint8_t event)
   }
 #endif
 
-#if defined(CPUARM)
-  lcd_putsLeft(MENU_DEBUG_Y_MIXMAX, STR_TMIXMAXMS);
-  lcd_outdezAtt(MENU_DEBUG_COL1_OFS, MENU_DEBUG_Y_MIXMAX, DURATION_MS_PREC2(maxMixerDuration), PREC2|LEFT);
-  lcd_puts(lcdLastPos, MENU_DEBUG_Y_MIXMAX, "ms");
-#endif
 
-#if defined(CPUARM)
-  lcd_putsLeft(MENU_DEBUG_Y_RTOS, STR_FREESTACKMINB);
-  lcd_outdezAtt(MENU_DEBUG_COL1_OFS, MENU_DEBUG_Y_RTOS+2, menusStack.available(), UNSIGN|LEFT|TINSIZE);
-  lcd_puts(lcdLastPos, MENU_DEBUG_Y_RTOS, "/");
-  lcd_outdezAtt(lcdLastPos, MENU_DEBUG_Y_RTOS+2, mixerStack.available(), UNSIGN|LEFT|TINSIZE);
-  lcd_puts(lcdLastPos, MENU_DEBUG_Y_RTOS, "/");
-  lcd_outdezAtt(lcdLastPos, MENU_DEBUG_Y_RTOS+2, audioStack.available(), UNSIGN|LEFT|TINSIZE);
-#endif
 
-#if !defined(CPUARM)
   lcd_putsLeft(1*FH, STR_TMR1LATMAXUS);
   lcd_outdez8(MENU_DEBUG_COL1_OFS , 1*FH, g_tmr1Latency_max/2 );
   lcd_putsLeft(2*FH, STR_TMR1LATMINUS);
@@ -214,7 +153,6 @@ void menuStatisticsDebug(uint8_t event)
   lcd_outdezAtt(MENU_DEBUG_COL1_OFS, 4*FH, DURATION_MS_PREC2(maxMixerDuration), PREC2);
   lcd_putsLeft(5*FH, STR_FREESTACKMINB);
   lcd_outdezAtt(14*FW, 5*FH, stackAvailable(), UNSIGN) ;
-#endif
 
   lcd_puts(4*FW, 7*FH+1, STR_MENUTORESET);
   lcd_status_line();

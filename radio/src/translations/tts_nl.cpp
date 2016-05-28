@@ -69,14 +69,10 @@ enum DutchPrompts {
 
 
 
-#if defined(CPUARM)
-  #define NL_PUSH_UNIT_PROMPT(p, u) en_pushUnitPrompt((p), (u), id)
-#else
   #define NL_PUSH_UNIT_PROMPT(p, u) pushUnitPrompt((p), (u))
 
 
 
-#endif
 
 I18N_PLAY_FUNCTION(nl, pushUnitPrompt, int16_t number, uint8_t unitprompt)
 {
@@ -106,7 +102,6 @@ I18N_PLAY_FUNCTION(nl, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
 
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -120,17 +115,10 @@ I18N_PLAY_FUNCTION(nl, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);
     if (qr.rem) {
       PLAY_NUMBER(qr.quot, 0, 0);

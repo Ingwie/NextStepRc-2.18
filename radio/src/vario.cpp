@@ -37,56 +37,7 @@
 #include "opentx.h"
 
 
-#if defined(CPUARM)
-
-void varioWakeup()
-{
-  if (isFunctionActive(FUNCTION_VARIO)) {
-    int varioFreq, varioDuration, varioPause=0;
-    uint8_t varioFlags;
-
-    int verticalSpeed = 0;
-    if (g_model.frsky.varioSource) {
-      uint8_t item = g_model.frsky.varioSource-1;
-      if (item < MAX_SENSORS) {
-        verticalSpeed = telemetryItems[item].value * g_model.telemetrySensors[item].getPrecMultiplier();
-      }
-    }
-
-    int varioCenterMin = (int)g_model.frsky.varioCenterMin * 10 - 50;
-    int varioCenterMax = (int)g_model.frsky.varioCenterMax * 10 + 50;
-    int varioMax = (10+(int)g_model.frsky.varioMax) * 100;
-    int varioMin = (-10+(int)g_model.frsky.varioMin) * 100;
-
-    if (verticalSpeed > varioMax)
-      verticalSpeed = varioMax;
-    else if (verticalSpeed < varioMin)
-      verticalSpeed = varioMin;
-
-    if (verticalSpeed <= varioCenterMin) {
-      varioFreq = VARIO_FREQUENCY_ZERO + (g_eeGeneral.varioPitch*10) - (((VARIO_FREQUENCY_ZERO+(g_eeGeneral.varioPitch*10)-((VARIO_FREQUENCY_ZERO + (g_eeGeneral.varioPitch*10))/2)) * (verticalSpeed-varioCenterMin)) / varioMin);
-      varioDuration = 80; // continuous beep: we will enter again here before the tone ends
-      varioFlags = PLAY_BACKGROUND|PLAY_NOW;
-    }
-    else if (verticalSpeed >= varioCenterMax || !g_model.frsky.varioCenterSilent) {
-      varioFreq = VARIO_FREQUENCY_ZERO + (g_eeGeneral.varioPitch*10) + (((VARIO_FREQUENCY_RANGE+(g_eeGeneral.varioRange*10)) * (verticalSpeed-varioCenterMin)) / varioMax);
-      int varioPeriod = VARIO_REPEAT_MAX + ((VARIO_REPEAT_ZERO+(g_eeGeneral.varioRepeat*10)-VARIO_REPEAT_MAX) * (varioMax-verticalSpeed) * (varioMax-verticalSpeed)) / ((varioMax-varioCenterMin) * (varioMax-varioCenterMin));
-      if (verticalSpeed >= varioCenterMax || varioCenterMin == varioCenterMax)
-        varioDuration = varioPeriod / 5;
-      else
-        varioDuration = varioPeriod * (85 - (((verticalSpeed-varioCenterMin) * 25) / (varioCenterMax-varioCenterMin))) / 100;
-      varioPause = varioPeriod - varioDuration;
-      varioFlags = PLAY_BACKGROUND;
-    }
-    else {
-      return;
-    }
-
-    AUDIO_VARIO(varioFreq, varioDuration, varioPause, varioFlags);
-  }
-}
-
-#elif defined(FRSKY)
+#if   defined(FRSKY)
 
 void varioWakeup()
 {

@@ -70,11 +70,7 @@
 #define CV(x) (CURVE_BASE+(x)-1)
 #define CC(x) (MIXSRC_Rud - 1 + channel_order(x)) // need to invert this to work with dest
 
-#if defined(PCBTARANIS)
-  #define mixSetCurve(mix, idx) mix->curve.type=CURVE_REF_CUSTOM; mix->curve.value=idx
-#else
   #define mixSetCurve(mix, idx) mix->curveMode=MODE_CURVE; mix->curveParam=CURVE_BASE+idx
-#endif
 
 enum Templates {
   TMPL_CLEAR_MIXES,

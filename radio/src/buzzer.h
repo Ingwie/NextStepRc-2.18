@@ -51,17 +51,10 @@ extern uint8_t hapticTick;
 
 #if defined(BUZZER)
 
-#if defined(CPUARM) && !defined(SIMU)
-inline void _beep(uint8_t b)
-{
-  buzzerSound(b);
-}
-#else /* CPUARM && !SIMU */
 inline void _beep(uint8_t b)
 {
   g_beepCnt = b;
 }
-#endif /* CPUARM && !SIMU */
 
 void beep(uint8_t val);
 #else /* BUZZER */
@@ -149,7 +142,6 @@ void beep(uint8_t val);
   #define START_SILENCE_PERIOD()
 #endif /* !AUDIO */
 
-#if !defined(CPUARM)
 #if defined(BUZZER)
 inline void BUZZER_HEARTBEAT()
 {
@@ -187,6 +179,5 @@ inline void BUZZER_HEARTBEAT()
 #else // BUZZER
 #define BUZZER_HEARTBEAT()
 #endif // BUZZER
-#endif // CPUARM
 
 #endif

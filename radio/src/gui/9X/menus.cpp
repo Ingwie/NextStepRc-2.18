@@ -76,20 +76,3 @@ void pushMenu(MenuHandlerFunc newMenu)
   menuEvent = EVT_ENTRY;
 }
 
-#if defined(CPUARM)
-void menuModelNotes(uint8_t event)
-{
-  if (event == EVT_ENTRY) {
-    strcpy(s_text_file, MODELS_PATH "/");
-    char *buf = strcat_modelname(&s_text_file[sizeof(MODELS_PATH)], g_eeGeneral.currModel);
-    strcpy(buf, TEXT_EXT);
-  }
-
-  menuTextView(event);
-}
-
-void pushModelNotes()
-{
-  pushMenu(menuModelNotes);
-}
-#endif

@@ -74,146 +74,6 @@ int8_t  checkIncDec_Ret;
 #define DBLKEYS_PRESSED_RGT_UP(in)  ((in & (KEYS_GPIO_PIN_RIGHT + KEYS_GPIO_PIN_UP))  == (KEYS_GPIO_PIN_RIGHT + KEYS_GPIO_PIN_UP))
 #define DBLKEYS_PRESSED_LFT_DWN(in) ((in & (KEYS_GPIO_PIN_LEFT + KEYS_GPIO_PIN_DOWN)) == (KEYS_GPIO_PIN_LEFT + KEYS_GPIO_PIN_DOWN))
 
-#if defined(CPUARM)
-INIT_STOPS(stops100, 3, -100, 0, 100)
-INIT_STOPS(stops1000, 3, -1000, 0, 1000)
-INIT_STOPS(stopsSwitch, 15, SWSRC_FIRST, CATEGORY_END(-SWSRC_FIRST_LOGICAL_SWITCH), CATEGORY_END(-SWSRC_FIRST_TRIM), CATEGORY_END(-SWSRC_LAST_SWITCH+1), 0, CATEGORY_END(SWSRC_LAST_SWITCH), CATEGORY_END(SWSRC_FIRST_TRIM-1), CATEGORY_END(SWSRC_FIRST_LOGICAL_SWITCH-1), SWSRC_LAST)
-
-int checkIncDec(unsigned int event, int val, int i_min, int i_max, unsigned int i_flags, IsValueAvailable isValueAvailable, const CheckIncDecStops &stops)
-{
-  int newval = val;
-
-#if defined(DBLKEYS)
-  uint8_t in = KEYS_PRESSED();
-  if (!(i_flags & NO_DBLKEYS) && (EVT_KEY_MASK(event))) {
-    bool dblkey = true;
-    if (DBLKEYS_PRESSED_RGT_LFT(in)) {
-      if (!isValueAvailable || isValueAvailable(-val)) {
-        newval = -val;
-      }
-    }
-    else if (DBLKEYS_PRESSED_RGT_UP(in)) {
-      newval = (i_max > stops.max() ? stops.max() : i_max);
-      while (isValueAvailable && !isValueAvailable(newval) && newval>i_min) {
-    	--newval;
-      }
-    }
-    else if (DBLKEYS_PRESSED_LFT_DWN(in)) {
-      newval = (i_min < stops.min() ? stops.min() : i_min);
-      while (isValueAvailable && !isValueAvailable(newval) && newval<i_max) {
-        ++newval;
-      }
-    }
-    else if (DBLKEYS_PRESSED_UP_DWN(in)) {
-      newval = 0;
-    }
-    else {
-      dblkey = false;
-    }
-
-    if (dblkey) {
-      killEvents(KEY_UP);
-      killEvents(KEY_DOWN);
-      killEvents(KEY_RIGHT);
-      killEvents(KEY_LEFT);
-      event = 0;
-    }
-  }
-#endif
-
-  if (event==EVT_KEY_FIRST(KEY_RIGHT) || event==EVT_KEY_REPT(KEY_RIGHT) || (s_editMode>0 && (IS_ROTARY_RIGHT(event) || event==EVT_KEY_FIRST(KEY_UP) || event==EVT_KEY_REPT(KEY_UP)))) {
-	do {
-	  newval++;
-	} while (isValueAvailable && !isValueAvailable(newval) && newval<=i_max);
-
-	if (newval > i_max) {
-	  newval = val;
-	  killEvents(event);
-	  AUDIO_WARNING2();
-	}
-	else {
-	  AUDIO_KEYPAD_UP();
-	}
-  }
-  else if (event==EVT_KEY_FIRST(KEY_LEFT) || event==EVT_KEY_REPT(KEY_LEFT) || (s_editMode>0 && (IS_ROTARY_LEFT(event) || event==EVT_KEY_FIRST(KEY_DOWN) || event==EVT_KEY_REPT(KEY_DOWN)))) {
-	do {
-	  if (IS_KEY_REPT(event) && (i_flags & INCDEC_REP10)) {
-		newval -= min(10, val-i_min);
-	  }
-	  else {
-		newval--;
-	  }
-	} while (isValueAvailable && !isValueAvailable(newval) && newval>=i_min);
-
-	if (newval < i_min) {
-	  newval = val;
-	  killEvents(event);
-	  AUDIO_WARNING2();
-	}
-	else {
-	  AUDIO_KEYPAD_DOWN();
-	}
-  }
-
-  if (!READ_ONLY() && i_min==0 && i_max==1 && (event==EVT_KEY_BREAK(KEY_ENTER) || IS_ROTARY_BREAK(event))) {
-    s_editMode = 0;
-    newval = !val;
-  }
-
-#if defined(NAVIGATION_POT1)
-  // change values based on P1
-  newval -= p1valdiff;
-  p1valdiff = 0;
-#endif
-
-#if defined(AUTOSWITCH)
-  if (i_flags & INCDEC_SWITCH) {
-    newval = checkIncDecMovedSwitch(newval);
-  }
-#endif
-
-#if defined(AUTOSOURCE)
-  if (i_flags & INCDEC_SOURCE) {
-    if (s_editMode>0) {
-      int8_t source = GET_MOVED_SOURCE(i_min, i_max);
-      if (source) {
-        newval = source;
-      }
-#if defined(AUTOSWITCH)
-      else {
-        uint8_t swtch = abs(getMovedSwitch());
-        if (swtch) {
-          newval = switchToMix(swtch);
-        }
-      }
-#endif
-    }
-  }
-#endif
-
-  if (newval > i_max || newval < i_min) {
-    newval = (newval > i_max ? i_max : i_min);
-    killEvents(event);
-    AUDIO_WARNING2();
-  }
-
-  if (newval != val) {
-    if (!(i_flags & NO_INCDEC_MARKS) && (newval != i_max) && (newval != i_min) && (newval==0 || newval==-100 || newval==+100) && !IS_ROTARY_EVENT(event)) {
-      pauseEvents(event); // delay before auto-repeat continues
-      if (newval>val) // without AUDIO it's optimized, because the 2 sounds are the same
-        AUDIO_KEYPAD_UP();
-      else
-        AUDIO_KEYPAD_DOWN();
-    }
-    eeDirty(i_flags & (EE_GENERAL|EE_MODEL));
-    checkIncDec_Ret = (newval > val ? 1 : -1);
-  }
-  else {
-    checkIncDec_Ret = 0;
-  }
-  return newval;
-}
-#else
 int16_t checkIncDec(uint8_t event, int16_t val, int16_t i_min, int16_t i_max, uint8_t i_flags)
 {
   int16_t newval = val;
@@ -314,7 +174,6 @@ int16_t checkIncDec(uint8_t event, int16_t val, int16_t i_min, int16_t i_max, ui
   }
   return newval;
 }
-#endif
 
 #if defined(CPUM64)
 int8_t checkIncDecModel(uint8_t event, int8_t i_val, int8_t i_min, int8_t i_max)
@@ -336,19 +195,12 @@ int8_t checkIncDecGen(uint8_t event, int8_t i_val, int8_t i_min, int8_t i_max)
 #define SCROLL_TH      64
 #define SCROLL_POT1_TH 32
 
-#if defined(CPUARM)
-  #define CURSOR_NOT_ALLOWED_IN_ROW(row)   ((int8_t)MAXCOL(row) < 0)
-#else
   #define CURSOR_NOT_ALLOWED_IN_ROW(row)   (MAXCOL(row) == TITLE_ROW)
-#endif
 
 #define MAXCOL(row)     (horTab ? pgm_read_byte(horTab+min(row, (vertpos_t)horTabMax)) : (const uint8_t)0)
 #define INC(val, min, max) if (val<max) {val++;} else {val=min;}
 #define DEC(val, min, max) if (val>min) {val--;} else {val=max;}
 
-#if defined(CPUARM)
-tmr10ms_t menuEntryTime;
-#endif
 
 void check(check_event_t event, uint8_t curr, const MenuHandlerFunc *menuTab, uint8_t menuTabSize, const pm_uint8_t *horTab, uint8_t horTabMax, vertpos_t maxrow)
 {
@@ -471,9 +323,6 @@ void check(check_event_t event, uint8_t curr, const MenuHandlerFunc *menuTab, ui
   switch(event)
   {
     case EVT_ENTRY:
-#if defined(CPUARM)
-      menuEntryTime = get_tmr10ms();
-#endif
       l_posVert = POS_VERT_INIT;
       l_posHorz = POS_HORZ_INIT(l_posVert);
       SET_SCROLLBAR_X(LCD_W-1);
@@ -630,59 +479,9 @@ void check(check_event_t event, uint8_t curr, const MenuHandlerFunc *menuTab, ui
 
   uint8_t maxLines = menuTab ? LCD_LINES-1 : LCD_LINES-2;
 
-#if defined(CPUARM)
-  int linesCount = maxrow;
-  if (l_posVert == 0 || (l_posVert==1 && MAXCOL(vertpos_t(0)) >= HIDDEN_ROW) || (l_posVert==2 && MAXCOL(vertpos_t(0)) >= HIDDEN_ROW && MAXCOL(vertpos_t(1)) >= HIDDEN_ROW)) {
-    menuVerticalOffset = 0;
-    if (horTab) {
-      linesCount = 0;
-      for (int i=0; i<maxrow; i++) {
-        if (i>=horTabMax || horTab[i] != HIDDEN_ROW) {
-          linesCount++;
-        }
-      }
-    }
-  }
-  else if (horTab) {
-    if (maxrow > maxLines) {
-      while (1) {
-        vertpos_t firstLine = 0;
-        for (int numLines=0; firstLine<maxrow && numLines<menuVerticalOffset; firstLine++) {
-          if (firstLine>=horTabMax || horTab[firstLine+1] != HIDDEN_ROW) {
-            numLines++;
-          }
-        }
-        if (l_posVert <= firstLine) {
-          menuVerticalOffset--;
-        }
-        else {
-          vertpos_t lastLine = firstLine;
-          for (int numLines=0; lastLine<maxrow && numLines<maxLines; lastLine++) {
-            if (lastLine>=horTabMax || horTab[lastLine+1] != HIDDEN_ROW) {
-              numLines++;
-            }
-          }
-          if (l_posVert > lastLine) {
-            menuVerticalOffset++;
-          }
-          else {
-            linesCount = menuVerticalOffset + maxLines;
-            for (int i=lastLine; i<maxrow; i++) {
-              if (i>=horTabMax || horTab[i] != HIDDEN_ROW) {
-                linesCount++;
-              }
-            }
-            break;
-          }
-        }
-      }
-    }
-  }
-#else
   if (l_posVert<1) {
     menuVerticalOffset=0;
   }
-#endif
   else {
     if (l_posVert>maxLines+menuVerticalOffset) {
       menuVerticalOffset = l_posVert-maxLines;

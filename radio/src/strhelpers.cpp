@@ -60,7 +60,7 @@ char idx2char(int8_t idx)
   return ' ';
 }
 
-#if defined(CPUARM) || defined(SIMU)
+#if defined(SIMU)
 int8_t char2idx(char c)
 {
   if (c == '_') return 37;
@@ -96,69 +96,6 @@ int zchar2str(char *dest, const char *src, int size)
 }
 #endif
 
-#if defined(CPUARM)
-unsigned int effectiveLen(const char *str, unsigned int size)
-{
-  while (size > 0) {
-    if (str[size-1] != ' ')
-      return size;
-    size--;
-  }
-  return 0;
-}
-
-bool zexist(const char *str, uint8_t size)
-{
-  for (int i=0; i<size; i++) {
-    if (str[i] != 0)
-      return true;
-  }
-  return false;
-}
-
-uint8_t zlen(const char *str, uint8_t size)
-{
-  while (size > 0) {
-    if (str[size-1] != 0)
-      return size;
-    size--;
-  }
-  return 0;
-}
-
-char *strcat_zchar(char * dest, const char * name, uint8_t size, const char *defaultName, uint8_t defaultNameSize, uint8_t defaultIdx)
-{
-  int8_t len = 0;
-
-  if (name) {
-    memcpy(dest, name, size);
-    dest[size] = '\0';
-
-    int8_t i = size-1;
-
-    while (i>=0) {
-      if (!len && dest[i])
-        len = i+1;
-      if (len) {
-        if (dest[i])
-          dest[i] = idx2char(dest[i]);
-        else
-          dest[i] = '_';
-      }
-      i--;
-    }
-  }
-
-  if (len == 0 && defaultName) {
-    strcpy(dest, defaultName);
-    dest[defaultNameSize] = (char)((defaultIdx / 10) + '0');
-    dest[defaultNameSize + 1] = (char)((defaultIdx % 10) + '0');
-    len = defaultNameSize + 2;
-  }
-
-  return &dest[len];
-}
-#endif
 #endif
 
 #if defined(COLORLCD)
@@ -172,7 +109,7 @@ char *strAppendDigits(char *dest, int value)
 }
 #endif
 
-#if defined(CPUARM) || defined(SDCARD)
+#if defined(SDCARD)
 char *strAppend(char *dest, const char *source, int len)
 {
   while ((*dest++ = *source++)) {

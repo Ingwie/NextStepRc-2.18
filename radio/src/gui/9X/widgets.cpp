@@ -130,59 +130,7 @@ void display5posSlider(coord_t x, coord_t y, uint8_t value, uint8_t attr)
 }
 #endif
 
-#if defined(GVARS) && defined(CPUARM)
-bool noZero(int val)
-{
-  return val != 0;
-}
-
-int16_t gvarMenuItem(coord_t x, coord_t y, int16_t value, int16_t min, int16_t max, LcdFlags attr, uint8_t editflags, uint8_t event)
-{
-  uint16_t delta = GV_GET_GV1_VALUE(max);
-  bool invers = (attr & INVERS);
-
-  // TRACE("gvarMenuItem(val=%d min=%d max=%d)", value, min, max);
-
-  if (invers && event == EVT_KEY_LONG(KEY_ENTER)) {
-    s_editMode = !s_editMode;
-    if (attr & PREC1)
-      value = (GV_IS_GV_VALUE(value, min, max) ? GET_GVAR(value, min, max, mixerCurrentFlightMode)*10 : delta);
-    else
-      value = (GV_IS_GV_VALUE(value, min, max) ? GET_GVAR(value, min, max, mixerCurrentFlightMode) : delta);
-    eeDirty(EE_MODEL);
-  }
-
-  if (GV_IS_GV_VALUE(value, min, max)) {
-    if (attr & LEFT)
-      attr -= LEFT; /* because of ZCHAR */
-    else
-      x -= 2*FW+FWNUM;
-
-    attr &= ~PREC1;
-
-    int8_t idx = (int16_t) GV_INDEX_CALC_DELTA(value, delta);
-    if (idx >= 0) ++idx;    // transform form idx=0=GV1 to idx=1=GV1 in order to handle double keys invert
-    if (invers) {
-      CHECK_INCDEC_MODELVAR_CHECK(event, idx, -MAX_GVARS, MAX_GVARS, noZero);
-      if (idx == 0) idx = 1;    // handle reset to zero, map to GV1
-    }
-    if (idx < 0) {
-      value = (int16_t) GV_CALC_VALUE_IDX_NEG(idx, delta);
-      idx = -idx;
-      lcd_putcAtt(x-6, y, '-', attr);
-    }
-    else {
-      value = (int16_t) GV_CALC_VALUE_IDX_POS(idx-1, delta);
-    }
-    putsStrIdx(x, y, STR_GV, idx, attr);
-  }
-  else {
-    lcd_outdezAtt(x, y, value, attr);
-    if (invers) value = checkIncDec(event, value, min, max, EE_MODEL | editflags);
-  }
-  return value;
-}
-#elif defined(GVARS)
+#if   defined(GVARS)
 int16_t gvarMenuItem(coord_t x, coord_t y, int16_t value, int16_t min, int16_t max, LcdFlags attr, uint8_t event)
 {
   uint16_t delta = GV_GET_GV1_VALUE(max);

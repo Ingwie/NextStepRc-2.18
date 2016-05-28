@@ -275,26 +275,13 @@ void menuGeneralSetup(uint8_t event)
           CHECK_INCDEC_GENVAR(event, b, 0, VOLUME_LEVEL_MAX);
           if (checkIncDec_Ret) {
             g_eeGeneral.speakerVolume = (int8_t)b-VOLUME_LEVEL_DEF;
-#if !defined(CPUARM)
             setVolume(b);
-#endif
           }
         }
         break;
       }
 #endif
 
-#if defined(CPUARM)
-      case ITEM_SETUP_BEEP_VOLUME:
-        SLIDER_5POS(y, g_eeGeneral.beepVolume, STR_BEEP_VOLUME, event, attr);
-        break;
-      case ITEM_SETUP_WAV_VOLUME:
-        SLIDER_5POS(y, g_eeGeneral.wavVolume, STR_WAV_VOLUME, event, attr);
-        break;
-      case ITEM_SETUP_BACKGROUND_VOLUME:
-        SLIDER_5POS(y, g_eeGeneral.backgroundVolume, STR_BG_VOLUME, event, attr);
-        break;
-#endif
 
       case ITEM_SETUP_BEEP_LENGTH:
         SLIDER_5POS(y, g_eeGeneral.beepLength, STR_BEEP_LENGTH, event, attr);
@@ -303,45 +290,13 @@ void menuGeneralSetup(uint8_t event)
 #if defined(AUDIO)
       case ITEM_SETUP_SPEAKER_PITCH:
         lcd_putsLeft( y, STR_SPKRPITCH);
-#if defined(CPUARM)
-        lcd_putcAtt(RADIO_SETUP_2ND_COLUMN, y, '+', attr);
-        lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN+FW, y, g_eeGeneral.speakerPitch*15, attr|LEFT);
-        lcd_putsAtt(lcdLastPos, y, "Hz", attr);
-#else
         lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN, y, g_eeGeneral.speakerPitch, attr|LEFT);
-#endif
         if (attr) {
           CHECK_INCDEC_GENVAR(event, g_eeGeneral.speakerPitch, 0, 20);
         }
         break;
 #endif
 
-#if defined(CPUARM) && defined(VARIO)
-      case ITEM_SETUP_VARIO_LABEL:
-        lcd_putsLeft(y, STR_VARIO);
-        break;
-      case ITEM_SETUP_VARIO_VOLUME:
-        SLIDER_5POS(y, g_eeGeneral.varioVolume, TR_SPEAKER_VOLUME, event, attr);
-        break;
-      case ITEM_SETUP_VARIO_PITCH:
-        lcd_putsLeft(y, STR_PITCH_AT_ZERO);
-        lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN, y, VARIO_FREQUENCY_ZERO+(g_eeGeneral.varioPitch*10), attr|LEFT);
-        lcd_putsAtt(lcdLastPos, y, "Hz", attr);
-        if (attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.varioPitch, -40, 40);
-        break;
-      case ITEM_SETUP_VARIO_RANGE:
-        lcd_putsLeft(y, STR_PITCH_AT_MAX);
-        lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN, y, VARIO_FREQUENCY_ZERO+(g_eeGeneral.varioPitch*10)+VARIO_FREQUENCY_RANGE+(g_eeGeneral.varioRange*10), attr|LEFT);
-        lcd_putsAtt(lcdLastPos, y, "Hz", attr);
-        if (attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.varioRange, -80, 80);
-        break;
-      case ITEM_SETUP_VARIO_REPEAT:
-        lcd_putsLeft(y, STR_REPEAT_AT_ZERO);
-        lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN, y, VARIO_REPEAT_ZERO+(g_eeGeneral.varioRepeat*10), attr|LEFT);
-        lcd_putsAtt(lcdLastPos, y, STR_MS, attr);
-        if (attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.varioRepeat, -30, 50);
-        break;
-#endif
 
 #if defined(HAPTIC)
       case ITEM_SETUP_HAPTIC_LABEL:
@@ -402,13 +357,6 @@ void menuGeneralSetup(uint8_t event)
         break;
 #endif
 
-#if defined(PCBSKY9X)
-      case ITEM_SETUP_TEMPERATURE_WARNING:
-        lcd_putsLeft(y, STR_TEMPWARNING);
-        putsValueWithUnit(RADIO_SETUP_2ND_COLUMN, y, g_eeGeneral.temperatureWarn, UNIT_TEMPERATURE, attr|LEFT) ;
-        if(attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.temperatureWarn, 0, 120); // 0 means no alarm
-        break;
-#endif
 
       case ITEM_SETUP_INACTIVITY_ALARM:
         lcd_putsLeft( y,STR_INACTIVITYALARM);
@@ -445,17 +393,6 @@ void menuGeneralSetup(uint8_t event)
         if (attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.lightAutoOff, 0, 600/5);
         break;
 
-#if defined(CPUARM)
-      case ITEM_SETUP_BRIGHTNESS:
-        lcd_putsLeft(y, STR_BRIGHTNESS);
-        lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN, y, 100-g_eeGeneral.backlightBright, attr|LEFT) ;
-        if (attr) {
-          uint8_t b = 100 - g_eeGeneral.backlightBright;
-          CHECK_INCDEC_GENVAR(event, b, 0, 100);
-          g_eeGeneral.backlightBright = 100 - b;
-        }
-        break;
-#endif
 
 #if defined(PWM_BACKLIGHT)
       case ITEM_SETUP_BACKLIGHT_BRIGHTNESS_OFF:
@@ -498,23 +435,6 @@ void menuGeneralSetup(uint8_t event)
         break;
 #endif
 
-#if defined(CPUARM)
-      case ITEM_SETUP_LANGUAGE:
-        lcd_putsLeft(y, STR_VOICELANG);
-        lcd_putsAtt(RADIO_SETUP_2ND_COLUMN, y, currentLanguagePack->name, attr);
-        if (attr) {
-          currentLanguagePackIdx = checkIncDec(event, currentLanguagePackIdx, 0, DIM(languagePacks)-2, EE_GENERAL);
-          if (checkIncDec_Ret) {
-            currentLanguagePack = languagePacks[currentLanguagePackIdx];
-            strncpy(g_eeGeneral.ttsLanguage, currentLanguagePack->id, 2);
-          }
-        }
-        break;
-
-      case ITEM_SETUP_IMPERIAL:
-        g_eeGeneral.imperial = selectMenuItem(RADIO_SETUP_2ND_COLUMN, y, STR_UNITSSYSTEM, STR_VUNITSSYSTEM, g_eeGeneral.imperial, 0, 1, attr, event);
-        break;
-#endif
 
 #if defined(FAI_CHOICE)
       case ITEM_SETUP_FAI:
@@ -534,14 +454,6 @@ void menuGeneralSetup(uint8_t event)
         break;
 #endif
 
-#if defined(CPUARM)
-      case ITEM_SETUP_SWITCHES_DELAY:
-        lcd_putsLeft(y, STR_SWITCHES_DELAY);
-        lcd_outdezAtt(RADIO_SETUP_2ND_COLUMN, y, 10*SWITCHES_DELAY(), attr|LEFT);
-        lcd_putsAtt(lcdLastPos, y, STR_MS, attr);
-        if (attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.switchesDelay, -15, +15);
-        break;
-#endif
 
       case ITEM_SETUP_RX_CHANNEL_ORD:
         lcd_putsLeft(y, STR_RXCHANNELORD); // RAET->AETR

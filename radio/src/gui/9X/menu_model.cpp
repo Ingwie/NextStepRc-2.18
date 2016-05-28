@@ -78,11 +78,7 @@ void menuModelExpoOne(uint8_t event);
 
 extern uint8_t s_curveChan;
 
-#if defined(CPUARM)
-  #define FlightModesType uint16_t
-#else
   #define FlightModesType uint8_t
-#endif
 
 #if LCD_W >= 212
   #define MIXES_2ND_COLUMN  (18*FW)

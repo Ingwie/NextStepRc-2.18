@@ -53,11 +53,6 @@ enum ItalianPrompts {
   IT_PROMPT_WATTS = IT_PROMPT_UNITS_BASE+(UNIT_WATTS*2),
   IT_PROMPT_FEET = IT_PROMPT_UNITS_BASE+(UNIT_FEET*2),
   IT_PROMPT_KTS = IT_PROMPT_UNITS_BASE+(UNIT_KTS*2),
-#if defined(CPUARM)
-  IT_PROMPT_MILLILITERS = IT_PROMPT_UNITS_BASE+(UNIT_MILLILITERS*2),
-  IT_PROMPT_FLOZ = IT_PROMPT_UNITS_BASE+(UNIT_FLOZ*2),
-  IT_PROMPT_FEET_PER_SECOND = IT_PROMPT_UNITS_BASE+(UNIT_FEET_PER_SECOND*2),
-#endif
 
 };
 
@@ -80,7 +75,6 @@ I18N_PLAY_FUNCTION(it, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
   orignumber=number;
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -94,17 +88,10 @@ I18N_PLAY_FUNCTION(it, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);
     if (qr.rem > 0) {
       PLAY_NUMBER(qr.quot, 0, 0);

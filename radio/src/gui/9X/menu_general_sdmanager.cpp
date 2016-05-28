@@ -94,21 +94,6 @@ void onSdManagerMenu(const char *result)
     if ((uint16_t)menuVerticalPosition == reusableBuffer.sdmanager.count) menuVerticalPosition--;
     reusableBuffer.sdmanager.offset = menuVerticalOffset-1;
   }
-#if defined(CPUARM)
-  /* TODO else if (result == STR_LOAD_FILE) {
-    f_getcwd(lfn, _MAX_LFN);
-    strcat(lfn, "/");
-    strcat(lfn, reusableBuffer.sdmanager.lines[index]);
-    POPUP_WARNING(eeLoadModelSD(lfn));
-  } */
-  else if (result == STR_PLAY_FILE) {
-    f_getcwd(lfn, _MAX_LFN);
-    strcat(lfn, "/");
-    strcat(lfn, reusableBuffer.sdmanager.lines[index]);
-    audioQueue.stopAll();
-    audioQueue.playFile(lfn, 0, ID_PLAY_FROM_SD_MANAGER);
-  }
-#endif
 }
 
 void menuGeneralSdManager(uint8_t _event)
@@ -125,12 +110,6 @@ void menuGeneralSdManager(uint8_t _event)
     warningResult = 0;
     displayPopup(STR_FORMATTING);
     closeLogs();
-#if defined(PCBSKY9X)
-    Card_state = SD_ST_DATA;
-#endif
-#if defined(CPUARM)
-    audioQueue.stopSD();
-#endif
     if (f_mkfs(0, 1, 0) == FR_OK) {
       f_chdir("/");
       reusableBuffer.sdmanager.offset = -1;
@@ -181,19 +160,6 @@ void menuGeneralSdManager(uint8_t _event)
       }
       else
       {
-#if defined(CPUARM)
-        uint8_t index = menuVerticalPosition-1-menuVerticalOffset;
-        // TODO duplicated code for finding extension
-        char * ext = reusableBuffer.sdmanager.lines[index];
-        int len = strlen(ext) - 4;
-        ext += len;
-        /* TODO if (!strcasecmp(ext, MODELS_EXT)) {
-          popupMenuItems[popupMenuNoItems++] = STR_LOAD_FILE;
-        }
-        else */ if (!strcasecmp(ext, SOUNDS_EXT)) {
-          POPUP_MENU_ADD_ITEM(STR_PLAY_FILE);
-        }
-#endif
         if (!READ_ONLY()) {
           POPUP_MENU_ADD_ITEM(STR_DELETE_FILE);
           // POPUP_MENU_ADD_ITEM(STR_RENAME_FILE);  TODO: Implement

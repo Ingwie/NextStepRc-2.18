@@ -90,13 +90,7 @@ inline const pm_char *SDCARD_ERROR(FRESULT result)
 }
 #endif
 
-#if defined(PCBTARANIS)
-  #define O9X_FOURCC 0x3378396F // o9x for Taranis
-#elif defined(PCBSKY9X)
-  #define O9X_FOURCC 0x3278396F // o9x for sky9x
-#else
   #define O9X_FOURCC 0x3178396F // o9x for gruvin9x/MEGA2560
-#endif
 
 const char *fileCopy(const char *filename, const char *srcDir, const char *destDir);
 

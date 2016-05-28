@@ -81,11 +81,6 @@ enum SpanishPrompts {
   ES_PROMPT_SECONDS = ES_PROMPT_UNITS_BASE+UNIT_SECONDS,
   ES_PROMPT_RPMS = ES_PROMPT_UNITS_BASE+UNIT_RPMS,
   ES_PROMPT_G = ES_PROMPT_UNITS_BASE+UNIT_G,
-#if defined(CPUARM)
-  ES_PROMPT_MILLILITERS = ES_PROMPT_UNITS_BASE+UNIT_MILLILITERS,
-  ES_PROMPT_FLOZ = ES_PROMPT_UNITS_BASE+UNIT_FLOZ,
-  ES_PROMPT_FEET_PER_SECOND = ES_PROMPT_UNITS_BASE+UNIT_FEET_PER_SECOND,
-#endif
 
 };
 
@@ -108,7 +103,6 @@ I18N_PLAY_FUNCTION(es, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
 
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -122,17 +116,10 @@ I18N_PLAY_FUNCTION(es, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);
     if (qr.rem > 0) {
       PLAY_NUMBER(qr.quot, 0, 0);

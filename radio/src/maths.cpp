@@ -36,7 +36,6 @@
 
 #include "opentx.h"
 
-#if !defined(CPUARM)
 // #define CORRECT_NEGATIVE_SHIFTS
 // open.20.fsguruh; shift right operations do the rounding different for negative values compared to positive values
 // so all negative divisions round always further down, which give absolute values bigger compared to a usual division
@@ -114,9 +113,8 @@ int8_t calcRESXto100(int16_t x)
 {
   return (x*25) >> 8;
 }
-#endif
 
-#if defined(HELI) || defined(FRSKY_HUB) || defined(CPUARM)
+#if defined(HELI) || defined(FRSKY_HUB) 
 uint16_t isqrt32(uint32_t n)
 {
   uint16_t c = 0x8000;
@@ -166,7 +164,7 @@ getvalue_t div100_and_round(getvalue_t value)
 }
 
 
-#if defined(FRSKY_HUB) && !defined(CPUARM)
+#if defined(FRSKY_HUB) 
 void extractLatitudeLongitude(uint32_t * latitude, uint32_t * longitude)
 {
   div_t qr = div(frskyData.hub.gpsLatitude_bp, 100);

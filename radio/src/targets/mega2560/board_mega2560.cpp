@@ -25,16 +25,16 @@ inline void boardInit()
 {
   // Set up I/O port data directions and initial states (unused pin setting : input, pull-up on)
   DDRA = 0b11111111;  PORTA = 0b00000000; // LCD data
-  DDRB = 0b01110111;  PORTB = 0b00101111; // 7:SOMOBusy, 6:PPM_OUT, 5:SimCTRL, 4:Buzzer, SDCARD[3:MISO 2:MOSI 1:SCK 0:CS]
+  DDRB = 0b01110111;  PORTB = 0b00101111; // 7:WTV20SDBusy, 6:PPM_OUT, 5:SimCTRL, 4:Buzzer, SDCARD[3:MISO 2:MOSI 1:SCK 0:CS]
   DDRC = 0b11111100;  PORTC = 0b00000011; // 7-3:LCD, 2:BackLight, 1:ID2_SW, 0:ID1_SW
   DDRD = 0b00000000;  PORTD = 0b11111100; // 7:AilDR_SW, 6:N/A, 5:N/A, 4:N/A, 3:RENC2_B, 2:RENC2_A, 1:I2C_SDA, 0:I2C_SCL
-  DDRE = 0b00001010;  PORTE = 0b01110100; // 7:PPM_IN, 6:N/A, 5:RENC1_B, 4:RENC1_A, 3:SOMOData, 2:N/A, 1:TELEM_TX, 0:TELEM_RX
+  DDRE = 0b00001010;  PORTE = 0b01110100; // 7:PPM_IN, 6:N/A, 5:RENC1_B, 4:RENC1_A, 3:WTV20SDData, 2:N/A, 1:TELEM_TX, 0:TELEM_RX
   DDRF = 0b00000000;  PORTF = 0b11111111; // 7-0:Trim switch inputs
-  DDRG = 0b00100000;  PORTG = 0b11011111; // 7:N/A, 6:N/A, 5:SOMOClock, 4:N/A, 3:N/A, 2:TCut_SW, 1:Gear_SW, 0: RudDr_SW
+  DDRG = 0b00100000;  PORTG = 0b11011111; // 7:N/A, 6:N/A, 5:WTV20SDClock, 4:N/A, 3:N/A, 2:TCut_SW, 1:Gear_SW, 0: RudDr_SW
 #if defined(DEBUG)  
-  DDRH = 0b01011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:SOMOReset, 0:Haptic
+  DDRH = 0b01011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
 #else
-  DDRH = 0b00011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:SOMOReset, 0:Haptic
+  DDRH = 0b00011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
 #endif  
   DDRJ = 0b00000000;  PORTJ = 0b11111111; // 7:N/A, 6:N/A, 5:N/A, 4:N/A, 3:N/A, 2:N/A, 1:RENC2_push, 0:RENC1_push
   DDRK = 0b00000000;  PORTK = 0b00000000; // Analogic input (no pull-ups)
@@ -57,7 +57,7 @@ inline void boardInit()
   #endif
   
   #if defined(VOICE)
-  // SOMO set-up, with TIMER5
+  // WTV20SD set-up, with TIMER5
   OCR5A = 0x1F4; //2ms
   TCCR5B = (1 << WGM52) | (0b011 << CS50); // CTC OCR5A
   TIMSK5 |= (1<<OCIE5A); // Start the interrupt so the unit reset can occur
@@ -89,7 +89,7 @@ void pwrOff()
   PORTH &= ~0x10;   // PortH-4 set to 0
 }
 
-FORCEINLINE uint8_t keyDown()
+uint8_t keyDown()
 {
   return ((~PINL) & 0x3F) || ROTENC_DOWN();
 }
@@ -167,7 +167,7 @@ uint8_t trimDown(uint8_t idx)
   return (in & pgm_read_byte(crossTrim+idx));
 }
 
-FORCEINLINE void readKeysAndTrims()
+void readKeysAndTrims()
 {
   uint8_t enuk = KEY_MENU;
 
@@ -197,7 +197,7 @@ FORCEINLINE void readKeysAndTrims()
 ISR(INT4_vect)     // Arduino2560 IO02 (portE pin4)    
 {
   uint8_t input = (PINE & 0x30);
-#if defined (ROTENC_DIV2)//(Bracame) : rotenc resolution:=2 !
+#if defined (ROTENC_DIV2)// Rotenc resolution/2
   if (input == 0) incRotaryEncoder(0, -1);
 #else
   if (input == 0 || input == 0x30) incRotaryEncoder(0, -1);
@@ -207,7 +207,7 @@ ISR(INT4_vect)     // Arduino2560 IO02 (portE pin4)
 ISR(INT5_vect)     // Arduino2560 IO03 (portE pin5)
 {
   uint8_t input = (PINE & 0x30);
-#if defined (ROTENC_DIV2)//(Bracame) : rotenc resolution:=2 !
+#if defined (ROTENC_DIV2)// Rotenc resolution/2
   if (input == 0) incRotaryEncoder(0, +1);
 #else
   if (input == 0 || input == 0x30) incRotaryEncoder(0, +1);
@@ -217,7 +217,7 @@ ISR(INT5_vect)     // Arduino2560 IO03 (portE pin5)
 ISR(INT2_vect)     // Arduino2560 IO19 (portD pin2)
 {
   uint8_t input = (PIND & 0x0C);
-#if defined (ROTENC_DIV2)//(Bracame) : rotenc resolution:=2 !
+#if defined (ROTENC_DIV2)// Rotenc resolution/2
   if (input == 0) incRotaryEncoder(1, -1);
 #else
   if (input == 0 || input == 0x0C) incRotaryEncoder(1, -1);
@@ -227,7 +227,7 @@ ISR(INT2_vect)     // Arduino2560 IO19 (portD pin2)
 ISR(INT3_vect)     // Arduino2560 IO18 (portD pin3)
 {
   uint8_t input = (PIND & 0x0C);
-#if defined (ROTENC_DIV2)//(Bracame) : rotenc resolution:=2 !
+#if defined (ROTENC_DIV2)// Rotenc resolution/2
   if (input == 0) incRotaryEncoder(1, +1);
 #else
   if (input == 0 || input == 0x0C) incRotaryEncoder(1, +1);

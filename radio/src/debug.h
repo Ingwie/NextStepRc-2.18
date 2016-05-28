@@ -42,8 +42,6 @@
 #include "dump.h"
 #if defined(CLI)
 #include "cli.h"
-#elif defined(CPUARM)
-#include "serial.h"
 #endif
 
 #if defined(__cplusplus)
@@ -62,8 +60,6 @@ void debugPrintf(const char * format, ...);
 #define debugPrintf(...) do { if (cliTracesEnabled) serialPrintf(__VA_ARGS__); } while(0)
 #elif defined(DEBUG) && defined(CLI)
 #define debugPrintf(...) do { if (serial2TracesEnabled() && cliTracesEnabled) serialPrintf(__VA_ARGS__); } while(0)
-#elif defined(DEBUG) && defined(CPUARM)
-#define debugPrintf(...) do { if (serial2TracesEnabled()) serialPrintf(__VA_ARGS__); } while(0)
 #else
 #define debugPrintf(...)
 #endif

@@ -37,10 +37,6 @@
 #ifndef _GUI_H_
 #define _GUI_H_
 
-#if defined(PCBTARANIS)
-  #include "Taranis/gui.h"
-#else
   #include "9X/gui.h"
-#endif
 
 #endif // _GUI_H_

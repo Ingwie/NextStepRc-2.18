@@ -47,13 +47,8 @@
 #define CONTRAST_MIN  10
 #define CONTRAST_MAX  45
 
-#if defined(CPUARM)
-  #define lcdint_t      int32_t
-  #define lcduint_t     uint32_t
-#else
   #define lcdint_t      int16_t
   #define lcduint_t     uint16_t
-#endif
 
 #define FW              6
 #define FWNUM           5
@@ -79,11 +74,7 @@
 /* lcd puts flags */
 /* no 0x80 here because of "GV"1 which is aligned LEFT */
 /* no 0x10 here because of "MODEL"01 which uses LEADING0 */
-#if defined(CPUARM)
-  #define BSS           0x00
-#else
   #define BSS           0x20
-#endif
 #define ZCHAR           0x80
 
 /* lcd outdez flags */
@@ -102,37 +93,16 @@
 /* telemetry flags */
 #define NO_UNIT         0x40
 
-#if defined(CPUARM)
-  #define FONTSIZE(x)   ((x) & 0x0700)
-  #define TINSIZE       0x0100
-  #define SMLSIZE       0x0200
-  #define MIDSIZE       0x0300
-  #define DBLSIZE       0x0400
-  #define XXLSIZE       0x0500
-  #define ERASEBG       0x8000
-  #define VERTICAL      0x0800
-#else
   #define DBLSIZE       0x04
   #define MIDSIZE       DBLSIZE
   #define SMLSIZE       0x00
   #define TINSIZE       0x00
   #define XXLSIZE       0x00
   #define ERASEBG       0x00
-#endif
 
-#if defined(CPUARM)
-  #define TIMEBLINK     0x1000
-  #define TIMEHOUR      0x2000
-  #define STREXPANDED   0x4000
-#else
   #define STREXPANDED   0x00
-#endif
 
-#if defined(CPUARM)
-  #define LcdFlags             uint32_t
-#else
   #define LcdFlags             uint8_t
-#endif
 
 #define display_t            uint8_t
 #define DISPLAY_BUF_SIZE     (LCD_W*((LCD_H+7)/8))
@@ -152,10 +122,6 @@ extern coord_t lcdNextPos;
   extern volatile uint8_t LcdLock ;
 #endif
 
-#if defined(PCBSKY9X)
-  extern volatile uint8_t lcdLock ;
-  extern volatile uint32_t lcdInputs ;
-#endif
 
 #if defined(BOOT)
 // TODO quick & dirty :(
@@ -178,11 +144,7 @@ void lcd_putsLeft(coord_t y, const pm_char * s);
   #define lcd_putsCenter(y, s) lcd_puts((LCD_W-sizeof(TR_##s)*FW+FW+1)/2, y, STR_##s)
 #endif
 
-#if defined(CPUARM)
-  void lcd_outhex4(coord_t x, coord_t y, uint32_t val, LcdFlags mode=0);
-#else
   void lcd_outhex4(coord_t x, coord_t y, uint16_t val);
-#endif
 
 void lcd_outdezNAtt(coord_t x, coord_t y, lcdint_t val, LcdFlags mode=0, uint8_t len=0);
 void lcd_outdezAtt(coord_t x, coord_t y, lcdint_t val, LcdFlags mode=0);
@@ -212,11 +174,7 @@ void putsChannel(coord_t x, coord_t y, source_t channel, LcdFlags att=0);
 void putsTelemetryChannelValue(coord_t x, coord_t y, uint8_t channel, lcdint_t val, LcdFlags att=0);
 #endif
 
-#if defined(CPUARM)
-  #define putstime_t int32_t
-#else
   #define putstime_t int16_t
-#endif
 
 void putsRtcTime(coord_t x, coord_t y, LcdFlags att);
 void putsTimer(coord_t x, coord_t y, putstime_t tme, LcdFlags att, LcdFlags att2);
@@ -235,9 +193,6 @@ void lcd_vline(coord_t x, scoord_t y, scoord_t h);
   void lcd_vlineStip(coord_t x, scoord_t y, scoord_t h, uint8_t pat, LcdFlags att=0);
 #endif
 
-#if defined(CPUARM)
-  void lcd_line(coord_t x1, coord_t y1, coord_t x2, coord_t y2, uint8_t pat=SOLID, LcdFlags att=0);
-#endif
 
 void drawFilledRect(coord_t x, scoord_t y, coord_t w, coord_t h, uint8_t pat=SOLID, LcdFlags att=0);
 void lcd_rect(coord_t x, coord_t y, coord_t w, coord_t h, uint8_t pat=SOLID, LcdFlags att=0);
@@ -254,7 +209,7 @@ void lcdDrawTelemetryTopBar();
   lcd_vline(xx+1,yy-ll,ll)
 
 #if defined(PCBMEGA2560)
-void lcd_imgfar(coord_t x, coord_t y, uint_farptr_t * img, uint8_t idx, LcdFlags att); // progmem "far"
+void lcd_imgfar(coord_t x, coord_t y, uint_farptr_t img, uint8_t idx, LcdFlags att); // progmem "far"
 #endif
 void lcd_img(coord_t x, coord_t y, const pm_uchar * img, uint8_t idx, LcdFlags att=0);
 
@@ -265,6 +220,10 @@ void lcdInit();
 #define lcdOff()
 
 void lcdRefresh();
+
+#if defined(LCD_KS108)
+void lcdRefreshSide();
+#endif
 
 #if defined(LCD_ST7920)
 uint8_t	lcdRefresh_ST7920(uint8_t full);

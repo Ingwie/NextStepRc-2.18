@@ -58,20 +58,11 @@ enum PolishPrompts {
   PL_PROMPT_SECONDS = PL_PROMPT_UNITS_BASE+(UNIT_SECONDS*4),
   PL_PROMPT_RPMS = PL_PROMPT_UNITS_BASE+(UNIT_RPMS*4),
   PL_PROMPT_G = PL_PROMPT_UNITS_BASE+(UNIT_G*4),
-#if defined(CPUARM)
-  PL_PROMPT_MILLILITERS = PL_PROMPT_UNITS_BASE+(UNIT_MILLILITERS*4),
-  PL_PROMPT_FLOZ = PL_PROMPT_UNITS_BASE+(UNIT_FLOZ*4),
-  PL_PROMPT_FEET_PER_SECOND = PL_PROMPT_UNITS_BASE+(UNIT_FEET_PER_SECOND*4),
-#endif
 };
 
 #if defined(VOICE)
 
-#if defined(CPUARM)
-  #define PL_PUSH_UNIT_PROMPT(p, u) pl_pushUnitPrompt((p), (u), id)
-#else
   #define PL_PUSH_UNIT_PROMPT(p, u) pushUnitPrompt((p), (u))
-#endif
 
 #define MESKI 0x80
 #define ZENSKI 0x81
@@ -103,7 +94,6 @@ I18N_PLAY_FUNCTION(pl, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
 
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -117,17 +107,10 @@ I18N_PLAY_FUNCTION(pl, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);   
     if (qr.rem) {
       PLAY_NUMBER(qr.quot, 0, ZENSKI);

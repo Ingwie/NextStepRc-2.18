@@ -219,35 +219,18 @@ long Open9xSim::onTimeout(FXObject*, FXSelector, void*)
 {
   if(hasFocus()) {
     static int keys1[]={
-#if defined(PCBTARANIS)
-      KEY_Page_Up,   KEY_MENU,
-      KEY_Page_Down, KEY_PAGE,
-      KEY_Return,    KEY_ENTER,
-      KEY_BackSpace, KEY_EXIT,
-      KEY_Up,        KEY_PLUS,
-      KEY_Down,      KEY_MINUS,
-#else
       KEY_Return,    KEY_MENU,
       KEY_BackSpace, KEY_EXIT,
       KEY_Right,     KEY_RIGHT,
       KEY_Left,      KEY_LEFT,
       KEY_Up,        KEY_UP,
       KEY_Down,      KEY_DOWN,
-#endif
 #if defined(ROTARY_ENCODER_NAVIGATION)
       KEY_F,  BTN_REa,
 #endif
     };
 
-#if defined(PCBSKY9X) && !defined(REVX)
-    Coproc_temp = 23;
-    Coproc_maxtemp = 28;
-#endif
 
-#if defined(PCBSKY9X)
-    temperature = 31;
-    maxTemperature = 42;
-#endif
 
     for (unsigned int i=0; i<DIM(keys1); i+=2) {
       simuSetKey(keys1[i+1], getApp()->getKeyState(keys1[i]));
@@ -299,35 +282,6 @@ long Open9xSim::onTimeout(FXObject*, FXSelector, void*)
     } \
     simuSetSwitch(swtch, state_##swtch-states);
 
-#if defined(PCBTARANIS) && defined(REV9E)
-    SWITCH_KEY(A, 0, 3);
-    SWITCH_KEY(B, 1, 3);
-    SWITCH_KEY(C, 2, 3);
-    SWITCH_KEY(D, 3, 3);
-    SWITCH_KEY(E, 4, 3);
-    SWITCH_KEY(F, 5, 2);
-    SWITCH_KEY(G, 6, 3);
-    SWITCH_KEY(H, 7, 2);
-    SWITCH_KEY(I, 8, 3);
-    SWITCH_KEY(J, 9, 3);
-    SWITCH_KEY(K, 10, 3);
-    SWITCH_KEY(L, 11, 3);
-    SWITCH_KEY(M, 12, 3);
-    SWITCH_KEY(N, 13, 3);
-    SWITCH_KEY(O, 14, 3);
-    SWITCH_KEY(P, 15, 3);
-    SWITCH_KEY(Q, 16, 3);
-    SWITCH_KEY(R, 17, 3);
-#elif defined(PCBTARANIS)
-    SWITCH_KEY(A, 0, 3);
-    SWITCH_KEY(B, 1, 3);
-    SWITCH_KEY(C, 2, 3);
-    SWITCH_KEY(D, 3, 3);
-    SWITCH_KEY(E, 4, 3);
-    SWITCH_KEY(F, 5, 2);
-    SWITCH_KEY(G, 6, 3);
-    SWITCH_KEY(H, 7, 2);
-#else
     SWITCH_KEY(1, 0, 2);
     SWITCH_KEY(2, 1, 2);
     SWITCH_KEY(3, 2, 2);
@@ -335,7 +289,6 @@ long Open9xSim::onTimeout(FXObject*, FXSelector, void*)
     SWITCH_KEY(5, 4, 2);
     SWITCH_KEY(6, 5, 2);
     SWITCH_KEY(7, 6, 2);
-#endif
   }
 
   per10ms();
@@ -344,11 +297,7 @@ long Open9xSim::onTimeout(FXObject*, FXSelector, void*)
   return 0;
 }
 
-#if defined(PCBTARANIS)
-  #define BL_COLOR FXRGB(47, 123, 227)
-#else
   #define BL_COLOR FXRGB(150, 200, 152)
-#endif
 
 void Open9xSim::setPixel(int x, int y, FXColor color)
 {
@@ -369,22 +318,9 @@ void Open9xSim::refreshDisplay()
 #endif
     for (int x=0; x<LCD_W; x++) {
       for (int y=0; y<LCD_H; y++) {
-#if defined(PCBTARANIS)
-        display_t * p = &lcd_buf[y / 2 * LCD_W + x];
-        uint8_t z = (y & 1) ? (*p >> 4) : (*p & 0x0F);
-        if (z) {
-          FXColor color;
-          if (isBacklightEnable())
-            color = FXRGB(47-(z*47)/15, 123-(z*123)/15, 227-(z*227)/15);
-          else
-            color = FXRGB(200-(z*200)/15, 200-(z*200)/15, 200-(z*200)/15);
-          setPixel(x, y, color);
-        }
-#else
         if (lcd_buf[x+(y/8)*LCD_W] & (1<<(y%8))) {
           setPixel(x, y, onColor);
         }
-#endif
         else {
           setPixel(x, y, offColor);
         }
@@ -459,15 +395,7 @@ uint16_t anaIn(uint8_t chan)
     return th9xSim->sliders[chan]->getValue();
   else if (chan<NUM_STICKS+NUM_POTS)
     return th9xSim->knobs[chan-NUM_STICKS]->getValue();
-#if defined(PCBTARANIS)
-  else if (chan == TX_VOLTAGE)
-    return 1000;
-#elif defined(PCBSKY9X)
-  else if (chan == TX_VOLTAGE)
-    return 5.1*1500/11.3;
-  else if (chan == TX_CURRENT)
-    return 100;
-#elif defined(PCBGRUVIN9X)
+#if   defined(PCBGRUVIN9X)
   else if (chan == TX_VOLTAGE)
     return 150;
 #else

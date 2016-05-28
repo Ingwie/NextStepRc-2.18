@@ -76,11 +76,6 @@ enum PortuguesePrompts {
   PT_PROMPT_WATTS = PT_PROMPT_UNITS_BASE+UNIT_WATTS,
   PT_PROMPT_FEET = PT_PROMPT_UNITS_BASE+UNIT_FEET,
   PT_PROMPT_KTS = PT_PROMPT_UNITS_BASE+UNIT_KTS,
-#if defined(CPUARM)
-  PT_PROMPT_MILLILITERS = PT_PROMPT_UNITS_BASE+UNIT_MILLILITERS,
-  PT_PROMPT_FLOZ = PT_PROMPT_UNITS_BASE+UNIT_FLOZ,
-  PT_PROMPT_FEET_PER_SECOND = PT_PROMPT_UNITS_BASE+UNIT_FEET_PER_SECOND,
-#endif
 };
 
 #if defined(VOICE)
@@ -92,7 +87,6 @@ I18N_PLAY_FUNCTION(pt, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     number = -number;
   }
 
-#if !defined(CPUARM)
   if (unit) {
     unit--;
     convertUnit(number, unit);
@@ -106,17 +100,10 @@ I18N_PLAY_FUNCTION(pt, playNumber, getvalue_t number, uint8_t unit, uint8_t att)
     }
     unit++;
   }
-#endif
 
   int8_t mode = MODE(att);
   if (mode > 0) {
-#if defined(CPUARM)
-    if (mode == 2) {
-      number /= 10;
-    }
-#else
     // we assume that we are PREC1
-#endif
     div_t qr = div(number, 10);
     if (qr.rem > 0) {
       PLAY_NUMBER(qr.quot, 0, 0);

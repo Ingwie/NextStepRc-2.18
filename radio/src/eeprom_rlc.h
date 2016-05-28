@@ -44,21 +44,7 @@
 #define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
 #endif
 
-#if defined(PCBTARANIS)
-  #define blkid_t    uint16_t
-  #if !defined(EESIZE)
-    #if defined(REV4a)
-      #define EESIZE    (64*1024)
-    #else
-      #define EESIZE    (32*1024)
-    #endif
-  #else
-    #define EESIZE_SIMU (64*1024)
-  #endif
-  #define EEFS_VERS  5
-  #define MAXFILES   62
-  #define BS         64
-#elif defined(CPUM2560) || defined(CPUM2561) || defined(CPUM128)
+#if   defined(CPUM2560) || defined(CPUM2561) || defined(CPUM128)
   #define blkid_t    uint8_t
   #define EESIZE     4096
   #define EEFS_VERS  5
@@ -78,11 +64,7 @@ PACK(struct DirEnt {
   uint16_t typ:4;
 });
 
-#if defined(CPUARM)
-  #define EEFS_EXTRA_FIELDS uint8_t  spare[2];
-#else
   #define EEFS_EXTRA_FIELDS
-#endif
 
 PACK(struct EeFs {
   uint8_t  version;
@@ -119,9 +101,7 @@ extern EeFs eeFs;
 void eepromFormat();
 uint16_t EeFsGetFree();
 
-#if !defined(CPUARM)
 extern volatile int8_t eeprom_buffer_size;
-#endif
 
 class EFile
 {
@@ -238,15 +218,9 @@ inline void eepromWriteProcess()
 #define DISPLAY_PROGRESS_BAR(x)
 #endif
 
-#if defined(CPUARM)
-bool eeCopyModel(uint8_t dst, uint8_t src);
-void eeSwapModels(uint8_t id1, uint8_t id2);
-void eeDeleteModel(uint8_t idx);
-#else
 #define eeCopyModel(dst, src) theFile.copy(FILE_MODEL(dst), FILE_MODEL(src))
 #define eeSwapModels(id1, id2) EFile::swap(FILE_MODEL(id1), FILE_MODEL(id2))
 #define eeDeleteModel(idx) EFile::rm(FILE_MODEL(idx))
-#endif
 
 #if defined(SDCARD)
 const pm_char * eeBackupModel(uint8_t i_fileSrc);
@@ -254,37 +228,11 @@ const pm_char * eeRestoreModel(uint8_t i_fileDst, char *model_name);
 #endif
 
 // For conversions
-#if defined(CPUARM)
-void loadGeneralSettings();
-void loadModel(int index);
-#endif
 
 bool eepromOpen();
 void eeLoadModelName(uint8_t id, char *name);
 bool eeLoadGeneral();
 
 // For EEPROM backup/restore
-#if defined(CPUARM)
-inline bool isEepromStart(const void * buffer)
-{
-  // OpenTX EEPROM
-  {
-    const EeFs * eeprom = (const EeFs *)buffer;
-    if (eeprom->version==EEFS_VERS && eeprom->mySize==sizeof(eeFs) && eeprom->bs==BS)
-      return true;
-  }
-
-  // ersky9x EEPROM
-  {
-    const uint8_t * eeprom = (const uint8_t *)buffer;
-    uint8_t size = eeprom[1] ;
-    uint8_t bs = eeprom[3] ;
-    if (size==0x80 && bs==0x80)
-      return true;
-  }
-
-  return false;
-}
-#endif
 
 #endif

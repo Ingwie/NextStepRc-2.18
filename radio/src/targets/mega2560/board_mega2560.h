@@ -23,9 +23,10 @@
 
 #include "../common_avr/board_avr.h"
 
-//My mods (Bracame)
-#define FATFSTINY // Reduce Fatfs buffer size for tests
-#define ROTENC_DIV2 // rotenc resolution:=2 !
+
+//Mods 
+#define ROTENC_DIV2 // rotenc resolution/2
+#define FATFSTINY // Reduce SDdriver buffer size
 
 // Keys
 #define KEYS_GPIO_REG_MENU        pinl                          
@@ -99,21 +100,21 @@ void sdPoll10ms(void);
 
 // Servitudes driver
 #define INP_E_PPM_IN              7    //not used (reserved)
-#define INP_B_14DBUSY             7    //somo14d, not used (reserved)
+#define INP_B_WTV_BUSY            7    //WTV20SD, not used (reserved)
 #define OUT_B_PPM                 6    
 #define OUT_B_SIM_CTL             5    
 #define OUT_B_BUZZER              4
 #define INP_D_I2C_SCL             1
 #define INP_D_I2C_SDA             0
-#define OUT_E_14DDATA             3    //somo14d
+#define OUT_E_WTV_DATA            3    //WTV20SD
 #define INP_E_TELEM_RX            1
 #define OUT_E_TELEM_TX            0    
-#define OUT_G_14DCLK              5    //somo14d
+#define OUT_G_WTV_CLK             5    //WTV20SD
 #define INP_H_RF_Activated        6    
 #define INP_H_DSC_Activated       5    //not used, reserved for pwrCheck()                                                                         
 #define INP_H_Hold_Power          4    //not used, reserved for pwrCheck() 
 #define OUT_H_Speaker             3
-#define OUT_H_14DRESET            1    //somo14d
+#define OUT_H_WTV_RESET           1    //WTV20SD
 #define OUT_H_HAPTIC              0
   
 // Rotary encoders driver
@@ -130,8 +131,8 @@ void sdPoll10ms(void);
 // LCD driver
 #define PORTA_LCD_DAT            PORTA    
 #define PORTC_LCD_CTRL           PORTC 
-#if defined(LCD_KS108)				// (Bracame) MEGA R/W pin always at 0 state in Opentx then
-#define OUT_C_LCD_CS2            6	//Use this pin to control second KS108
+#if defined(LCD_KS108)				// (For KS108 LCd only) MEGA R/W pin always at 0 state in Opentx then
+#define OUT_C_LCD_CS2            6	// Use this pin to control second KS108
 #else								// And connect LCD R/W pin to ground via a 1k resistor
 #define OUT_C_LCD_RnW            6        
 #endif
@@ -172,14 +173,14 @@ void pwrOff();
 
 // Voice driver
 #if defined(VOICE)
-#define SOMOClock_on              PORTG |=  (1<<OUT_G_14DCLK)
-#define SOMOClock_off             PORTG &= ~(1<<OUT_G_14DCLK)
-#define SOMOData_on               PORTE |=  (1<<OUT_E_14DDATA)
-#define SOMOData_off              PORTE &= ~(1<<OUT_E_14DDATA)
-#define SOMOReset_on              PORTH |=  (1<<OUT_H_14DRESET)
-#define SOMOReset_off             PORTH &= ~(1<<OUT_H_14DRESET)
-#define	SOMOBUSY                  (PINB & 0x80)
-#define	SOMOCLK                   (PING & 0x20)
+#define WTV20SD_Clock_on              PORTG |=  (1<<OUT_G_WTV_CLK)
+#define WTV20SD_Clock_off             PORTG &= ~(1<<OUT_G_WTV_CLK)
+#define WTV20SD_Data_on               PORTE |=  (1<<OUT_E_WTV_DATA)
+#define WTV20SD_Data_off              PORTE &= ~(1<<OUT_E_WTV_DATA)
+#define WTV20SD_Reset_on              PORTH |=  (1<<OUT_H_WTV_RESET)
+#define WTV20SD_Reset_off             PORTH &= ~(1<<OUT_H_WTV_RESET)
+#define	WTV20SD_BUSY                  (PINB & 0x80)
+#define	WTV20SD_CLK                   (PING & 0x20)
 #endif
 
 // EEPROM driver

@@ -131,13 +131,11 @@ void closeLogs()
   lastLogTime = 0;
 }
 
-#if !defined(CPUARM)
 getvalue_t getConvertedTelemetryValue(getvalue_t val, uint8_t unit)
 {
   convertUnit(val, unit);
   return val;
 }
-#endif
 
 void writeHeader()
 {
@@ -148,7 +146,6 @@ void writeHeader()
 #endif
 
 #if defined(FRSKY)
-#if !defined(CPUARM)
   f_puts("Buffer,RX,TX,A1,A2,", &g_oLogFile);
 #if defined(FRSKY_HUB)
   if (IS_USR_PROTO_FRSKY_HUB()) {
@@ -161,7 +158,6 @@ void writeHeader()
   if (IS_USR_PROTO_WS_HOW_HIGH()) {
     f_puts("WSHH Alt,", &g_oLogFile);
   }
-#endif
 #endif
 #endif
 
@@ -204,7 +200,6 @@ void writeLogs()
 #endif
 
 #if defined(FRSKY)
-#if !defined(CPUARM)
       f_printf(&g_oLogFile, "%d,%d,%d,", frskyStreaming, RAW_FRSKY_MINMAX(frskyData.rssi[0]), RAW_FRSKY_MINMAX(frskyData.rssi[1]));
       for (uint8_t i=0; i<MAX_FRSKY_A_CHANNELS; i++) {
         int16_t converted_value = applyChannelRatio(i, RAW_FRSKY_MINMAX(frskyData.analog[i]));
@@ -253,7 +248,6 @@ void writeLogs()
       if (IS_USR_PROTO_WS_HOW_HIGH()) {
         f_printf(&g_oLogFile, "%d,", TELEMETRY_RELATIVE_BARO_ALT_BP);
       }
-#endif
 #endif
 #endif
 

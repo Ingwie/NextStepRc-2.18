@@ -182,19 +182,19 @@ PLAY_FUNCTION(playValue, source_t idx)
     }
 #endif
   }
-#endif
 }
+#endif
+
+
 
 #define functions g_model.customFn
 #define functionsContext modelFunctionsContext
 void evalFunctions()
-
 {
   MASK_FUNC_TYPE newActiveFunctions  = 0;
   MASK_CFN_TYPE  newActiveSwitches = 0;
 
   #define PLAY_INDEX   (i+1)
-
 
 #if defined(ROTARY_ENCODERS) && defined(GVARS)
   static rotenc_t rePreviousValues[ROTARY_ENCODERS];
@@ -334,6 +334,38 @@ void evalFunctions()
 #endif
 
 
+#if   defined(VOICE)
+          case FUNC_PLAY_SOUND:
+          case FUNC_PLAY_TRACK:
+          case FUNC_PLAY_BOTH:
+          case FUNC_PLAY_VALUE:
+          {
+            tmr10ms_t tmr10ms = get_tmr10ms();
+            uint8_t repeatParam = CFN_PLAY_REPEAT(cfn);
+            if (!functionsContext.lastFunctionTime[i] || (CFN_FUNC(cfn)==FUNC_PLAY_BOTH && active!=(bool)(functionsContext.activeSwitches&switch_mask)) || (repeatParam && (signed)(tmr10ms-functionsContext.lastFunctionTime[i])>=1000*repeatParam)) {
+              functionsContext.lastFunctionTime[i] = tmr10ms;
+              uint8_t param = CFN_PARAM(cfn);
+              if (CFN_FUNC(cfn) == FUNC_PLAY_SOUND) {
+                AUDIO_PLAY(AU_FRSKY_FIRST+param);
+              }
+              else if (CFN_FUNC(cfn) == FUNC_PLAY_VALUE) {
+                PLAY_VALUE(param, PLAY_INDEX);
+              }
+              else {
+#if defined(GVARS)
+                if (CFN_FUNC(cfn) == FUNC_PLAY_TRACK && param > 250)
+                  param = GVAR_VALUE(param-251, getGVarFlightPhase(mixerCurrentFlightMode, param-251));
+#endif
+                PUSH_CUSTOM_PROMPT(active ? param : param+1, PLAY_INDEX);
+              }
+            }
+            if (!active) {
+              // PLAY_BOTH would change activeFnSwitches otherwise
+              switch_mask = 0;
+            }
+            break;
+          }
+#else
           case FUNC_PLAY_SOUND:
           {
             tmr10ms_t tmr10ms = get_tmr10ms();
@@ -344,6 +376,7 @@ void evalFunctions()
             }
             break;
           }
+#endif
 
 #if defined(FRSKY) && defined(VARIO)
           case FUNC_VARIO:
@@ -351,7 +384,7 @@ void evalFunctions()
             break;
 #endif
 
-#if defined(HAPTIC) && !defined(CPUARM)
+#if defined(HAPTIC) 
           case FUNC_HAPTIC:
           {
             tmr10ms_t tmr10ms = get_tmr10ms();
@@ -418,7 +451,5 @@ void evalFunctions()
 #endif
 }
 
-#if !defined(CPUARM)
 #undef functions
 #undef functionsContext
-#endif

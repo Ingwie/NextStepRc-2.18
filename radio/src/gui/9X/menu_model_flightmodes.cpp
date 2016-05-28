@@ -61,12 +61,6 @@ enum menuModelPhaseItems {
   ITEM_MODEL_PHASE_GV3,
   ITEM_MODEL_PHASE_GV4,
   ITEM_MODEL_PHASE_GV5,
-#if defined(CPUARM)
-  ITEM_MODEL_PHASE_GV6,
-  ITEM_MODEL_PHASE_GV7,
-  ITEM_MODEL_PHASE_GV8,
-  ITEM_MODEL_PHASE_GV9,
-#endif
 #endif
   ITEM_MODEL_PHASE_MAX
 };
@@ -243,12 +237,7 @@ void menuModelFlightModesAll(uint8_t event)
 
   uint8_t att;
   for (uint8_t i=0; i<MAX_FLIGHT_MODES; i++) {
-#if defined(CPUARM)
-    int8_t y = 1 + (1+i-menuVerticalOffset)*FH;
-    if (y<1*FH+1 || y>(LCD_LINES-1)*FH+1) continue;
-#else
     uint8_t y = 1 + (i+1)*FH;
-#endif
     att = (i==sub ? INVERS : 0);
     FlightModeData *p = flightModeAddress(i);
     putsFlightMode(0, y, i+1, att|(getFlightMode()==i ? BOLD : 0));
@@ -274,9 +263,6 @@ void menuModelFlightModesAll(uint8_t event)
     }
   }
 
-#if defined(CPUARM)
-  if (menuVerticalOffset != MAX_FLIGHT_MODES-(LCD_LINES-2)) return;
-#endif
 
   lcd_putsLeft((LCD_LINES-1)*FH+1, STR_CHECKTRIMS);
   putsFlightMode(OFS_CHECKTRIMS, (LCD_LINES-1)*FH+1, mixerCurrentFlightMode+1);

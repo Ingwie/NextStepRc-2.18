@@ -40,8 +40,6 @@ void menuGeneralDiagAna(uint8_t event)
 {
 #if defined(TX_CAPACITY_MEASUREMENT)
   #define ANAS_ITEMS_COUNT 4
-#elif defined(PCBSKY9X)
-  #define ANAS_ITEMS_COUNT 3
 #else
   #define ANAS_ITEMS_COUNT 2
 #endif
@@ -67,20 +65,11 @@ void menuGeneralDiagAna(uint8_t event)
     lcd_outdez8(x+10*FW-1, y, (int16_t)calibratedStick[CONVERT_MODE(i)]*25/256);
   }
 
-#if !defined(CPUARM)
   // Display raw BandGap result (debug)
   lcd_puts(64+5, MENU_HEADER_HEIGHT+1+3*FH, STR_BG);
   lcd_outdezAtt(64+5+6*FW-3, 1+4*FH, BandGap, 0);
-#endif
 
-#if defined(PCBSKY9X)
-  lcd_putsLeft(MENU_HEADER_HEIGHT+1+4*FH, STR_BATT_CALIB);
-  static int32_t adcBatt;
-  adcBatt = ((adcBatt * 7) + anaIn(TX_VOLTAGE)) / 8;
-  uint32_t batCalV = (adcBatt + adcBatt*(g_eeGeneral.txVoltageCalibration)/128) * 4191;
-  batCalV /= 55296;
-  putsVolts(LEN_CALIB_FIELDS*FW+4*FW, MENU_HEADER_HEIGHT+1+4*FH, batCalV, (menuVerticalPosition==1 ? INVERS : 0));
-#elif defined(PCBGRUVIN9X)
+#if   defined(PCBGRUVIN9X)
   lcd_putsLeft(6*FH-2, STR_BATT_CALIB);
   // Gruvin wants 2 decimal places and instant update of volts calib field when button pressed
   static uint16_t adcBatt;
@@ -99,17 +88,4 @@ void menuGeneralDiagAna(uint8_t event)
   if (menuVerticalPosition==2) CHECK_INCDEC_GENVAR(event, g_eeGeneral.txCurrentCalibration, -49, 49);
 #endif
 
-#if defined(PCBSKY9X)
-  #if defined(TX_CAPACITY_MEASUREMENT)
-    #define TEMP_CALIB_POS 7*FH+1
-    #define TEMP_CALIB_MENU_POS 3
-  #else
-    #define TEMP_CALIB_POS 6*FH+1
-    #define TEMP_CALIB_MENU_POS 2
-  #endif
-
-  lcd_putsLeft(TEMP_CALIB_POS, STR_TEMP_CALIB);
-  putsValueWithUnit(LEN_CALIB_FIELDS*FW+4*FW, TEMP_CALIB_POS, getTemperature(), UNIT_TEMPERATURE, (menuVerticalPosition==TEMP_CALIB_MENU_POS ? INVERS : 0)) ;
-  if (menuVerticalPosition==TEMP_CALIB_MENU_POS) CHECK_INCDEC_GENVAR(event, g_eeGeneral.temperatureCalib, -100, 100);
-#endif
 }

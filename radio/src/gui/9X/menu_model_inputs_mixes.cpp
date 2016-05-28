@@ -46,15 +46,8 @@ FlightModesType editFlightModes(coord_t x, coord_t y, uint8_t event, FlightModes
 
   uint8_t posHorz = menuHorizontalPosition;
 
-#if defined(CPUARM)
-  bool expoMenu = (x==EXPO_ONE_2ND_COLUMN-5*FW);
-#endif
 
   for (uint8_t p=0; p<MAX_FLIGHT_MODES; p++) {
-#if defined(CPUARM)
-    if (expoMenu && ((attr && p < posHorz-4) || (x > EXPO_ONE_2ND_COLUMN-FW)))
-      continue;
-#endif
     lcd_putcAtt(x, y, '0'+p, ((posHorz==p) && attr) ? BLINK|INVERS : ((value & (1<<p)) ? 0 : INVERS));
     x += FW;
   }
@@ -309,11 +302,6 @@ void menuModelExpoOne(uint8_t event)
     uint8_t attr = (sub==i ? (s_editMode>0 ? BLINK|INVERS : INVERS) : 0);
     switch(i)
     {
-#if defined(CPUARM)
-      case EXPO_FIELD_NAME:
-        editSingleName(EXPO_ONE_2ND_COLUMN-sizeof(ed->name)*FW, y, STR_EXPONAME, ed->name, sizeof(ed->name), event, attr);
-        break;
-#endif
 
       case EXPO_FIELD_WEIGHT:
         lcd_putsLeft(y, STR_WEIGHT);
@@ -375,13 +363,8 @@ void menuModelExpoOne(uint8_t event)
   int16_t y512 = expoFn(x512);
   lcd_outdezAtt(LCD_W-8-6*FW, 1*FH, calcRESXto100(y512), 0);
 
-#if defined(CPUARM)
-  x512 = X0+x512/(RESX/WCHART);
-  y512 = (LCD_H-1) - ((y512+RESX)/2) * (LCD_H-1) / RESX;
-#else
   x512 = X0+x512/(RESXu/WCHART);
   y512 = (LCD_H-1) - (uint16_t)((y512+RESX)/2) * (LCD_H-1) / RESX;
-#endif
 
   lcd_vline(x512, y512-3, 3*2+1);
   lcd_hline(x512-3, y512, 3*2+1);
@@ -423,13 +406,8 @@ void drawOffsetBar(uint8_t x, uint8_t y, MixData * md)
   int barMin = offset - weight;
   int barMax = offset + weight;
   if (y > 15) {
-#if defined(CPUARM)
-    lcd_outdezAtt(x-((barMin >= 0) ? 2 : 3), y-6, barMin, TINSIZE|LEFT);
-    lcd_outdezAtt(x+GAUGE_WIDTH+1, y-6, barMax, TINSIZE);
-#else
     lcd_outdezAtt(x-((barMin >= 0) ? 2 : 3), y-8, barMin, LEFT);
     lcd_outdezAtt(x+GAUGE_WIDTH+1, y-8, barMax);
-#endif
   }
   if (barMin < -101)
     barMin = -101;
@@ -509,11 +487,6 @@ void menuModelMixOne(uint8_t event)
 
     uint8_t attr = (sub==i ? (editMode>0 ? BLINK|INVERS : INVERS) : 0);
     switch(i) {
-#if defined(CPUARM)
-      case MIX_FIELD_NAME:
-        editSingleName(COLUMN_X+MIXES_2ND_COLUMN, y, STR_MIXNAME, md2->name, sizeof(md2->name), event, attr);
-        break;
-#endif
       case MIX_FIELD_SOURCE:
         lcd_putsColumnLeft(COLUMN_X, y, NO_INDENT(STR_SOURCE));
         putsMixerSource(COLUMN_X+MIXES_2ND_COLUMN, y, md2->srcRaw, STREXPANDED|attr);
@@ -630,20 +603,6 @@ static uint8_t s_copySrcCh;
 #define _STR_MAX(x) PSTR("/" #x)
 #define STR_MAX(x) _STR_MAX(x)
 
-#if defined(CPUARM)
-  #define EXPO_LINE_WEIGHT_POS 7*FW+1
-  #define EXPO_LINE_EXPO_POS   10*FW+5
-  #define EXPO_LINE_SWITCH_POS 11*FW+2
-  #define EXPO_LINE_SIDE_POS   14*FW+2
-  #define EXPO_LINE_SELECT_POS 24
-  #define EXPO_LINE_FM_POS
-  #define EXPO_LINE_NAME_POS   LCD_W-LEN_EXPOMIX_NAME*FW-MENUS_SCROLLBAR_WIDTH
-  #define MIX_LINE_SRC_POS     4*FW-1
-  #define MIX_LINE_WEIGHT_POS  11*FW+3
-  #define MIX_LINE_CURVE_POS   12*FW+2
-  #define MIX_LINE_SWITCH_POS  16*FW
-  #define MIX_LINE_DELAY_POS   19*FW+7
-#else
   #define EXPO_LINE_WEIGHT_POS 7*FW+1
   #define EXPO_LINE_EXPO_POS   11*FW
   #define EXPO_LINE_SWITCH_POS 11*FW+4
@@ -659,7 +618,6 @@ static uint8_t s_copySrcCh;
   #define MIX_LINE_CURVE_POS   12*FW+2
   #define MIX_LINE_SWITCH_POS  16*FW
   #define MIX_LINE_DELAY_POS   19*FW+7
-#endif
 
 #if defined(NAVIGATION_MENUS)
 void onExpoMixMenu(const char *result)
@@ -704,19 +662,7 @@ void displayMixInfos(coord_t y, MixData *md)
   }
 }
 
-#if defined(CPUARM)
-void displayMixLine(coord_t y, MixData *md)
-{
-  if (md->name[0]) {
-    lcd_putsnAtt(EXPO_LINE_NAME_POS, y, md->name, sizeof(md->name), ZCHAR);
-  }
-  else {
-    displayMixInfos(y, md);
-  }
-}
-#else
 #define displayMixLine(y, md) displayMixInfos(y, md)
-#endif
 
 void displayExpoInfos(coord_t y, ExpoData *ed)
 {
@@ -728,20 +674,9 @@ void displayExpoInfos(coord_t y, ExpoData *ed)
   putsSwitches(EXPO_LINE_SWITCH_POS, y, ed->swtch, 0);
 }
 
-#if defined(CPUARM)
-void displayExpoLine(coord_t y, ExpoData *ed)
-{
-  displayExpoInfos(y, ed);
-
-  if (ed->name[0]) {
-    lcd_putsnAtt(EXPO_LINE_NAME_POS, y, ed->name, sizeof(ed->name), ZCHAR);
-  }
-}
-#else
 #define displayExpoLine(y, ed) \
   displayExpoInfos(y, ed); \
   displayFlightModes(EXPO_LINE_FM_POS, y, ed->flightModes)
-#endif
 
 void menuModelExpoMix(uint8_t expo, uint8_t event)
 {

@@ -754,7 +754,7 @@ ifeq ($(PCB), MEGA2560)
 
   ifeq ($(VOICE), YES)
     CPPDEFS += -DVOICE
-    CPPSRC += targets/mega2560/somo14dmega.cpp
+    CPPSRC += targets/mega2560/voice.cpp
   endif
   
   ifeq ($(HAPTIC), YES)
