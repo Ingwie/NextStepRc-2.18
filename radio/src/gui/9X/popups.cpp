@@ -67,10 +67,6 @@ void displayPopup(const pm_char * pstr)
   displayBox();
   warningText = NULL;
   lcdRefresh();
-#if defined(LCD_KS108)
-  lcdRefresh(); // For the other side
-#endif
-
 }
 
 void message(const pm_char *title, const pm_char *t, const char *last MESSAGE_SOUND_ARG)
@@ -98,9 +94,6 @@ void message(const pm_char *title, const pm_char *t, const char *last MESSAGE_SO
 #undef MESSAGE_LCD_OFFSET
 
   lcdRefresh();
-#if defined(LCD_KS108)
-  lcdRefresh(); // For the other side
-#endif
   lcdSetContrast();
   clearKeyEvents();
 }
