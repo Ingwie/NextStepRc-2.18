@@ -1,37 +1,19 @@
 /*
- * Authors (alphabetical order)
- * - Andre Bernet <bernet.andre@gmail.com>
- * - Andreas Weitl
- * - Bertrand Songis <bsongis@gmail.com>
- * - Bryan J. Rentoul (Gruvin) <gruvin@gmail.com>
- * - Cameron Weeks <th9xer@gmail.com>
- * - Erez Raviv
- * - Gabriel Birkus
- * - Gerard Valade <gerard.valade@gmail.com>
- * - Jean-Pierre Parisy
- * - Karl Szmutny
- * - Michael Blandford
- * - Michal Hlavinka
- * - Pat Mackenzie
- * - Philip Moss
- * - Rienk de Jong
- * - Rob Thomson
- * - Romolo Manfredini <romolo.manfredini@gmail.com>
- * - Thomas Husterer
- *
- * Adapted from mavlink for ardupilot
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
- *
+ *************************************************************
+ *                      NEXTSTEPRC                           *
+ *                                                           *
+ *             -> Build your DIY MEGA 2560 TX                *
+ *                                                           *
+ *      Based on code named                                  *
+ *      OpenTx - https://github.com/opentx/opentx            *
+ *                                                           *
+ *         Only avr code here for lisibility ;-)             *
+ *                                                           *
+ *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+ *                                                           *
+ *************************************************************
  */
- 
+
 /*!	\file mavlink.h
  *	Mavlink include file
  */

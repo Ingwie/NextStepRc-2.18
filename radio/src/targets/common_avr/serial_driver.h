@@ -1,17 +1,17 @@
 /*
- * Authors - Gerard Valade <gerard.valade@gmail.com>
- *
- * Adapted from frsky
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
- *
+ *************************************************************
+ *                      NEXTSTEPRC                           *
+ *                                                           *
+ *             -> Build your DIY MEGA 2560 TX                *
+ *                                                           *
+ *      Based on code named                                  *
+ *      OpenTx - https://github.com/opentx/opentx            *
+ *                                                           *
+ *         Only avr code here for lisibility ;-)             *
+ *                                                           *
+ *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+ *                                                           *
+ *************************************************************
  */
 
 #ifndef _SERIAL_H_
