@@ -1,4 +1,13 @@
-# NextStepRc-2.18
-Opentx for mega2560 diy
-with audio,voice ;-)
-Waiting 2.2 .....
+ *************************************************************
+ *                      NEXTSTEPRC                           *
+ *                                                           *
+ *             -> Build your DIY MEGA 2560 TX                *
+ *                                                           *
+ *      Based on code named                                  *
+ *      OpenTx - https://github.com/opentx/opentx            *
+ *                                                           *
+ *         Only avr code here for lisibility ;-)             *
+ *                                                           *
+ *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+ *                                                           *
+ *************************************************************

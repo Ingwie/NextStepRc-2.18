@@ -1,0 +1,280 @@
+256;0;0
+257;1;1
+258;2;2
+259;3;3
+260;4;4
+261;5;5
+262;6;6
+263;7;7
+264;8;8
+265;9;9
+266;10;10
+267;11;11
+268;12;12
+269;13;13
+270;14;14
+271;15;15
+272;16;16
+273;17;17
+274;18;18
+275;19;19
+276;20;20
+277;21;21
+278;22;22
+279;23;23
+280;24;24
+281;25;25
+282;26;26
+283;27;27
+284;28;28
+285;29;29
+286;30;30
+287;31;31
+288;32;32
+289;33;33
+290;34;34
+291;35;35
+292;36;36
+293;37;37
+294;38;38
+295;39;39
+296;40;40
+297;41;41
+298;42;42
+299;43;43
+300;44;44
+301;45;45
+302;46;46
+303;47;47
+304;48;48
+305;49;49
+306;50;50
+307;51;51
+308;52;52
+309;53;53
+310;54;54
+311;55;55
+312;56;56
+313;57;57
+314;58;58
+315;59;59
+316;60;60
+317;61;61
+318;62;62
+319;63;63
+320;64;64
+321;65;65
+322;66;66
+323;67;67
+324;68;68
+325;69;69
+326;70;70
+327;71;71
+328;72;72
+329;73;73
+330;74;74
+331;75;75
+332;76;76
+333;77;77
+334;78;78
+335;79;79
+336;80;80
+337;81;81
+338;82;82
+339;83;83
+340;84;84
+341;85;85
+342;86;86
+343;87;87
+344;88;88
+345;89;89
+346;90;90
+347;91;91
+348;92;92
+349;93;93
+350;94;94
+351;95;95
+352;96;96
+353;97;97
+354;98;98
+355;99;99
+356;100;100
+357;200;200
+358;300;300
+359;400;400
+360;500;500
+361;600;600
+362;700;700
+363;800;800
+364;900;900
+365;1000;mille
+366;une;une
+367;onze;onze
+368;vingt et une;vingt et une
+369;trente et une;trente et une
+370;quarante et une;quarante et une
+371;cinquante et une;cinquante et une
+372;soixante et une;soixante et une
+373;soixante et onze;soixante et onze
+374;quatre vingt une;quatre vingt une
+375;.;virgule
+376;&;et
+377;-;moins
+378;minuit;minuit
+379;midi;midi
+380;libre;libre 380
+381;V;volts
+382;A;ampères
+383;ms;mètres par seconde
+384;libre;libre 384
+385;kmh;kilomètre heure
+386;m;mètres
+387;deg;degrés
+388;%;pourcent
+389;mA;milliampère
+390;mAH;milliampères heure
+391;W;watt
+392;dB;db
+393;;pied
+394;;noeud
+395;h;heure
+396;min;minute
+397;sec;secondes
+398;;tour par minute
+399;G;g
+400;libre;libre 400
+401;libre;libre 401
+402;timer;libre 402
+403;libre;libre 403
+404;libre;libre 404
+405;libre;libre 405
+406;libre;libre 406
+407;libre;libre 407
+408;libre;libre 408
+409;libre;libre 409
+410;libre;libre 410
+411;libre;libre 411
+412;libre;libre 412
+413;libre;libre 413
+414;libre;libre 414
+415;libre;libre 415
+416;libre;libre 416
+417;libre;libre 417
+418;libre;libre 418
+419;libre;libre 419
+420;libre;libre 420
+421;libre;libre 421
+422;libre;libre 422
+423;libre;libre 423
+424;libre;libre 424
+425;libre;libre 425
+426;libre;libre 426
+427;libre;libre 427
+428;libre;libre 428
+429;libre;libre 429
+430;libre;libre 430
+431;libre;libre 431
+432;libre;libre 432
+433;libre;libre 433
+434;libre;libre 434
+435;libre;libre 435
+436;.0;virgule 0
+437;.1;virgule 1
+438;.2;virgule 2
+439;.3;virgule 3
+440;.4;virgule 4
+441;.5;virgule 5
+442;.6;virgule 6
+443;.7;virgule 7
+444;.8;virgule 8
+445;.9;virgule 9
+446;libre;libre 446
+447;libre;libre 447
+448;libre;libre 448
+449;libre;libre 449
+450;libre;libre 450
+451;libre;libre 451
+452;libre;libre 452
+453;libre;libre 453
+454;libre;libre 454
+455;libre;libre 455
+456;libre;libre 456
+457;libre;libre 457
+458;libre;libre 458
+459;libre;libre 459
+460;libre;libre 460
+461;libre;libre 461
+462;libre;libre 462
+463;libre;libre 463
+464;libre;libre 464
+465;libre;libre 465
+466;libre;libre 466
+467;libre;libre 467
+468;libre;libre 468
+469;libre;libre 469
+470;libre;libre 470
+471;libre;libre 471
+472;libre;libre 472
+473;libre;libre 473
+474;libre;libre 474
+475;libre;libre 475
+476;libre;libre 476
+477;libre;libre 477
+478;libre;libre 478
+479;libre;libre 479
+480;Bienvenue sur Open TI X!;Bienvenue sur Open TI X!
+481;Alerte manche des gaz;Alerte manche des gaz
+482;Alerte inters;Alerte inters
+483;Antenne défectueuse;Antenne défectueuse
+484;éprome corrompue;éprome corrompue
+485;Batterie radio faible !;Batterie radio faible !
+486;Radio inactive !;Radio inactive !
+487;libre;libre 487
+488;libre;libre 488
+489;libre;libre 489
+490;libre;libre 490
+491;libre;libre 491
+492;libre;libre 492
+493;libre;libre 493
+494;libre;libre 494
+495;libre;libre 495
+496;libre;libre 496
+497;libre;libre 497
+498;libre;libre 498
+499;libre;libre 499
+500;libre;libre 500
+501;libre;libre 501
+502;vingt secondes;vingt secondes
+503;trente secondes;trente secondes
+504;libre;libre 504
+505;libre;libre 505
+506;libre;libre 506
+507;libre;libre 507
+508;libre;libre 508
+509;libre;libre 509
+510;libre;libre 510
+511;libre;libre 511
+;;
+;;
+;;
+a1 low;a1 bas;a1_org
+a1 critical;a1 critique;a1_red
+a2 low;a2 bas;a2_org
+a2 critical;a2 critique;a2_red
+memoire basse;niveau mémoire bas;eebad
+trim maximum atteint;trim maximum atteint;endtrim
+inactivity alarm;alarme d'innactivité;inact
+radio battery low;batterie transmetteur faible;lowbat
+trim center;trim centré;midtrim
+rf signal low;signal recepteur faible;rssi_org
+rf signal critical;signal recepteur critique;rssi_red
+switch warning;interupteur mal positionné;swalert
+radio antenna defective;antenne emeteur defectueuse;swr_red
+welcome to opentx;Bienvenue sur Open tx;tada
+telemetry lost;télémétrie perdue;telemko
+telemetry recover;télémétrie retrouvée;telemok
+throttle warning;mettre les gaz a 0;thralert
+10 seconds;10 secondes;timer10
+20 seconds;20 secondes;timer20
+30 seconds;30 secondes;timer30
+3 seconds;3 secondes;timerlt3
