@@ -882,6 +882,10 @@ ifeq ($(BOLD), YES)
   CPPDEFS += -DBOLD_FONT
 endif
 
+ifeq ($(BATTGRAPH), YES)
+  CPPDEFS += -DBATTGRAPH
+endif
+
 ifneq ($(FONT), STD)
   FONTDIR = $(shell sh -c "echo $(FONT) | tr '[:upper:]' '[:lower:]'")
   FONTS += $(patsubst %.png,%.lbm,$(wildcard fonts/$(FONTDIR)/*.png))
