@@ -973,12 +973,7 @@ endif
 
 ifeq ($(EXT), $(filter $(EXT), FRSKY FRSKY_SPORT TELEMETREZ))
   CPPDEFS += -DFRSKY
-
-  ifeq ($(ARCH), ARM)
-    CPPSRC += telemetry/frsky.cpp telemetry/frsky_d_arm.cpp
-  else
-    CPPSRC += telemetry/frsky.cpp telemetry/frsky_d.cpp
-  endif
+  CPPSRC += telemetry/frsky.cpp telemetry/frsky_d.cpp
 
   ifeq ($(EXT), FRSKY_SPORT)
     CPPSRC += telemetry/frsky_sport.cpp
