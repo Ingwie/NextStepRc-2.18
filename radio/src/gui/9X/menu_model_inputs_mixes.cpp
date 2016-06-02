@@ -27,7 +27,6 @@ FlightModesType editFlightModes(coord_t x, coord_t y, uint8_t event, FlightModes
 
   uint8_t posHorz = menuHorizontalPosition;
 
-
   for (uint8_t p=0; p<MAX_FLIGHT_MODES; p++) {
     lcd_putcAtt(x, y, '0'+p, ((posHorz==p) && attr) ? BLINK|INVERS : ((value & (1<<p)) ? 0 : INVERS));
     x += FW;
@@ -352,7 +351,7 @@ void menuModelExpoOne(uint8_t event)
 }
 
 enum MixFields {
-  CASE_CPUARM(MIX_FIELD_NAME)
+  //CASE_CPUARM(MIX_FIELD_NAME)   //FA: to remove ?
   MIX_FIELD_SOURCE,
   MIX_FIELD_WEIGHT,
   MIX_FIELD_OFFSET,
@@ -384,8 +383,18 @@ void drawOffsetBar(uint8_t x, uint8_t y, MixData * md)
 {
   int offset = GET_GVAR(MD_OFFSET(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
   int weight = abs(GET_GVAR(MD_WEIGHT(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode));
-  int barMin = offset - weight;
-  int barMax = offset + weight;
+  int barMin = 0;
+  int barMax = 0;
+  if (OffsetOnInput) {
+    //Trim on input (before weight)
+    barMin = (-100 + offset) * weight / 100;
+    barMax = (+100 + offset) * weight / 100;
+  }
+  else {
+    //Trim on output (after weight)
+    barMin = offset - weight;  
+    barMax = offset + weight;
+  }
   if (y > 15) {
     lcd_outdezAtt(x-((barMin >= 0) ? 2 : 3), y-8, barMin, LEFT);
     lcd_outdezAtt(x+GAUGE_WIDTH+1, y-8, barMax);
@@ -468,6 +477,9 @@ void menuModelMixOne(uint8_t event)
 
     uint8_t attr = (sub==i ? (editMode>0 ? BLINK|INVERS : INVERS) : 0);
     switch(i) {
+    /*  case MIX_FIELD_NAME:      //FA: to remove ?
+        editSingleName(COLUMN_X+MIXES_2ND_COLUMN, y, STR_MIXNAME, md2->name, sizeof(md2->name), event, attr);
+        break;    */
       case MIX_FIELD_SOURCE:
         lcd_putsColumnLeft(COLUMN_X, y, NO_INDENT(STR_SOURCE));
         putsMixerSource(COLUMN_X+MIXES_2ND_COLUMN, y, md2->srcRaw, STREXPANDED|attr);

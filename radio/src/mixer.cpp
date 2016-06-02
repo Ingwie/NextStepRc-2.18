@@ -17,6 +17,8 @@
 #include "opentx.h"
 #include "timers.h"
 
+bool OffsetOnInput = true;       //temporary, this bool could be link to a checkbox in mixer screen or to a option in makefile 
+
 #if defined(VIRTUALINPUTS)
   int8_t  virtualInputsTrims[NUM_INPUTS];
 #else
@@ -219,7 +221,7 @@ getvalue_t getValue(mixsrc_t i)
   }
 #endif
 
-#if defined(LUAINPUTS)
+#if defined(LUAINPUTS)       //FA: should we keep this as we don't use LUA in 9x - NexStepRC ??
   else if (i<MIXSRC_LAST_LUA) {
 #if defined(LUA_MODEL_SCRIPTS)
     div_t qr = div(i-MIXSRC_FIRST_LUA, MAX_SCRIPT_OUTPUTS);
@@ -230,13 +232,13 @@ getvalue_t getValue(mixsrc_t i)
   }
 #endif
 
-#if defined(LUAINPUTS)
+#if defined(LUAINPUTS)       //FA: should we keep this as we don't use LUA in 9x - NexStepRC ??
   else if (i<=MIXSRC_LAST_POT) return calibratedStick[i-MIXSRC_Rud];
 #else
   else if (i>=MIXSRC_FIRST_STICK && i<=MIXSRC_LAST_POT) return calibratedStick[i-MIXSRC_Rud];
 #endif
 
-#if defined(PCBGRUVIN9X) || defined(PCBMEGA2560) || defined(ROTARY_ENCODERS)
+#if defined(CPU2560) || defined(ROTARY_ENCODERS)
   else if (i<=MIXSRC_LAST_ROTARY_ENCODER) return getRotaryEncoder(i-MIXSRC_REa);
 #endif
 
@@ -346,7 +348,6 @@ void evalInputs(uint8_t mode)
     if (v < -RESX) v = -RESX;
     if (v >  RESX) v =  RESX;
 
-
     if (g_model.throttleReversed && ch==THR_STICK) {
       v = -v;
     }
@@ -394,7 +395,6 @@ void evalInputs(uint8_t mode)
         }
       }
 
-
 #if defined(VIRTUALINPUTS)
       calibratedStick[ch] = v;
 #else
@@ -427,7 +427,7 @@ int getStickTrimValue(int stick, int stickValue)
 {
   if (stick < 0)
     return 0;
-    
+
   int trim = trims[stick];
   if (stick == THR_STICK) {
     if (g_model.thrTrim) {
@@ -545,7 +545,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 
   memclear(chans, sizeof(chans));        // All outputs to 0
 
-  //========== MIXER LOOP ===============
+  //========== MIXER LOOP ===================
   uint8_t lv_mixWarning = 0;
 
   uint8_t pass = 0;
@@ -575,7 +575,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         chans[md->destCh] = 0;
       }
 
-      //========== PHASE && SWITCH =====
+      //========== PHASE && SWITCH ==========
       bool mixCondition = (md->flightModes != 0 || md->swtch);
       delayval_t mixEnabled = (!(md->flightModes & (1 << mixerCurrentFlightMode)) && getSwitch(md->swtch)) ? DELAY_POS_MARGIN+1 : 0;
 
@@ -595,7 +595,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       }
 #endif
 
-      //========== VALUE ===============
+      //========== VALUE ====================
       getvalue_t v = 0;
       if (mode > e_perout_mode_inactive_flight_mode) {
 #if defined(VIRTUALINPUTS)
@@ -639,7 +639,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 
       bool apply_offset_and_curve = true;
 
-      //========== DELAYS ===============
+      //========== DELAYS ===================
       delayval_t _swOn = swOn[i].now;
       delayval_t _swPrev = swOn[i].prev;
       bool swTog = (mixEnabled > _swOn+DELAY_POS_MARGIN || mixEnabled < _swOn-DELAY_POS_MARGIN);
@@ -680,13 +680,20 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 #endif
       }
 
-      if (apply_offset_and_curve) {
+      //========== OFFSET BEFORE ============
+      if (apply_offset_and_curve && OffsetOnInput) {
+        int16_t offset = GET_GVAR(MD_OFFSET(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
+        if (offset) v += calc100toRESX_16Bits(offset);
+      }
 
-        //========== TRIMS ================
+      //========== TRIMS ====================
+      int16_t trim = 0;
+      if (apply_offset_and_curve) {
         if (!(mode & e_perout_mode_notrims)) {
 #if defined(VIRTUALINPUTS)
           if (md->carryTrim == 0) {
-            v += getSourceTrimValue(md->srcRaw, v);
+            trim = getSourceTrimValue(md->srcRaw, v);
+            v += trim;  
           }
 #else
           int8_t mix_trim = md->carryTrim;
@@ -697,7 +704,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
           else
             mix_trim = -1;
           if (mix_trim >= 0) {
-            int16_t trim = trims[mix_trim];
+            trim = trims[mix_trim];
             if (mix_trim == THR_STICK && g_model.throttleReversed)
               v -= trim;
             else
@@ -707,11 +714,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         }
       }
 
-      // saves 12 bytes code if done here and not together with weight; unknown reason
-      int16_t weight = GET_GVAR(MD_WEIGHT(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
-      weight = calc100to256_16Bits(weight);
-
-      //========== SPEED ===============
+      //========== SPEED ====================
       // now its on input side, but without weight compensation. More like other remote controls
       // lower weight causes slower movement
 
@@ -752,41 +755,73 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         }
       }
 
-      //========== CURVES ===============
+      //========== WEIGHT ===================
+      int16_t weight = GET_GVAR(MD_WEIGHT(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
+      weight = calc100to256_16Bits(weight);
+      int32_t dv = (int32_t) v * weight;
+      int32_t dtrim = (int32_t) trim * weight;
+     
+      //========== CURVE & DIFFERENTIAL =====
 #if defined(XCURVES)
       if (apply_offset_and_curve && md->curve.type != CURVE_REF_DIFF && md->curve.value) {
-        v = applyCurve(v, md->curve);
+        dv = applyCurve(dv, md->curve);
       }
-#else
-      if (apply_offset_and_curve && md->curveParam && md->curveMode == MODE_CURVE) {
-        v = applyCurve(v, md->curveParam);
-      }
-#endif
-
-      //========== WEIGHT ===============
-      int32_t dv = (int32_t) v * weight;
-
-      //========== OFFSET / AFTER ===============
-      if (apply_offset_and_curve) {
-        int16_t offset = GET_GVAR(MD_OFFSET(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
-        if (offset) dv += int32_t(calc100toRESX_16Bits(offset)) << 8;
-      }
-
-      //========== DIFFERENTIAL =========
-#if defined(XCURVES)
-      if (md->curve.type == CURVE_REF_DIFF && md->curve.value) {
+      else if (md->curve.type == CURVE_REF_DIFF && md->curve.value) {
         dv = applyCurve(dv, md->curve);
       }
 #else
-      if (md->curveMode == MODE_DIFFERENTIAL) {
+      if (apply_offset_and_curve && md->curveParam && md->curveMode == MODE_CURVE) {
+        dv = applyCurve(dv, md->curveParam);
+      }
+      else if (md->curveMode == MODE_DIFFERENTIAL) {
+      //Revert trim    
+        if (apply_offset_and_curve) {
+          if (!(mode & e_perout_mode_notrims)) {
+#if defined(VIRTUALINPUTS)
+            if (md->carryTrim == 0) {
+              dv -= dtrim;  
+            }
+#else
+            int8_t mix_trim = md->carryTrim;
+            if (mix_trim == THR_STICK && g_model.throttleReversed)
+              dv += dtrim;
+            else
+              dv -= dtrim;
+#endif
+          }
+        }
+        //Value and trim are computed separatly              
         // @@@2 also recalculate curveParam to a 256 basis which ease the calculation later a lot
-        int16_t curveParam = calc100to256(GET_GVAR(md->curveParam, -100, 100, mixerCurrentFlightMode));
-        if (curveParam > 0 && dv < 0)
+        int16_t curveParam = calc100to256(GET_GVAR(md->curveParam, -100, 100, mixerCurrentFlightMode));          
+        if (curveParam > 0 && dv < 0) {
           dv = (dv * (256 - curveParam)) >> 8;
-        else if (curveParam < 0 && dv > 0)
+        }
+        else if (curveParam < 0 && dv > 0) {
           dv = (dv * (256 + curveParam)) >> 8;
+        }
+        if (curveParam > 0 && dtrim < 0) {
+          dtrim = (dtrim * (256 - curveParam)) >> 8;
+        }
+        else if (curveParam < 0 && dtrim > 0) {
+          dtrim = (dtrim * (256 + curveParam)) >> 8;      
+        }
+        dv += dtrim;
       }
 #endif
+
+      //========== OFFSET AFTER ============= 
+      if (apply_offset_and_curve && !OffsetOnInput) {
+        int16_t offset = GET_GVAR(MD_OFFSET(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode); 
+        if (offset) dv += int32_t(calc100toRESX_16Bits(offset)) << 8; 
+      }
+      
+      //Output with offset before 
+      //    Curve((stick + offset + trim) * weight)
+      //    Diff((stick + offset) * weight) + Diff(trim * weight)
+
+      //Output with offset after 
+      //    Curve((stick + trim) * weight) + offset
+      //    Diff(stick * weight) + Diff(trim * weight) + offset
 
       int32_t *ptr = &chans[md->destCh]; // Save calculating address several times
 
@@ -820,7 +855,6 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         // this devices by 64 which should give a good balance between still over 100% but lower then 32x100%; should be OK
         *ptr >>= 6;  // this is quite tricky, reduces the value a lot but should be still over 100% and reduces flash need
       } */
-
 
       PACK( union u_int16int32_t {
         struct {
@@ -868,10 +902,9 @@ int32_t sum_chans512[NUM_CHNOUT] = {0};
 #define MAX_ACT 0xffff
 uint8_t lastFlightMode = 255; // TODO reinit everything here when the model changes, no???
 
-
 void evalMixes(uint8_t tick10ms)
 {
-#if defined(PCBMEGA2560) && defined(DEBUG) && !defined(VOICE)
+#if defined(PCBMEGA2560) && defined(DEBUG) && !defined(VOICE)   //FA: why not CPU2560 to include Gruvin9x ? why voice ?
   PORTH |= 0x40; // PORTH:6 LOW->HIGH signals start of mixer interrupt
 #endif
 
@@ -884,7 +917,6 @@ void evalMixes(uint8_t tick10ms)
   uint8_t fm = getFlightMode();
 
   if (lastFlightMode != fm) {
-
     if (lastFlightMode == 255) {
       fp_act[fm] = MAX_ACT;
     }
@@ -903,7 +935,6 @@ void evalMixes(uint8_t tick10ms)
     }
     lastFlightMode = fm;
   }
-
 
   int32_t weight = 0;
   if (flightModesFade) {
@@ -931,7 +962,7 @@ void evalMixes(uint8_t tick10ms)
   // must be done after mixing because some functions use the inputs/channels values
   // must be done before limits because of the applyLimit function: it checks for safety switches which would be not initialized otherwise
   if (tick10ms) {
-
+    //requiredSpeakerVolume = g_eeGeneral.speakerVolume + VOLUME_LEVEL_DEF;  //FA: was not in 2.18 original file ?
     evalFunctions();
   }
 
