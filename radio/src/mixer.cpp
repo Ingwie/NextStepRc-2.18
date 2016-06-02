@@ -693,7 +693,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 #if defined(VIRTUALINPUTS)
           if (md->carryTrim == 0) {
             trim = getSourceTrimValue(md->srcRaw, v);
-            v += trim;  
+            v += trim;
           }
 #else
           int8_t mix_trim = md->carryTrim;
@@ -774,12 +774,12 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         dv = applyCurve(dv, md->curveParam);
       }
       else if (md->curveMode == MODE_DIFFERENTIAL) {
-      //Revert trim    
+      //Revert trim
         if (apply_offset_and_curve) {
           if (!(mode & e_perout_mode_notrims)) {
 #if defined(VIRTUALINPUTS)
             if (md->carryTrim == 0) {
-              dv -= dtrim;  
+              dv -= dtrim;
             }
 #else
             int8_t mix_trim = md->carryTrim;
@@ -790,9 +790,9 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 #endif
           }
         }
-        //Value and trim are computed separatly              
+        //Value and trim are computed separatly
         // @@@2 also recalculate curveParam to a 256 basis which ease the calculation later a lot
-        int16_t curveParam = calc100to256(GET_GVAR(md->curveParam, -100, 100, mixerCurrentFlightMode));          
+        int16_t curveParam = calc100to256(GET_GVAR(md->curveParam, -100, 100, mixerCurrentFlightMode));
         if (curveParam > 0 && dv < 0) {
           dv = (dv * (256 - curveParam)) >> 8;
         }
@@ -803,7 +803,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
           dtrim = (dtrim * (256 - curveParam)) >> 8;
         }
         else if (curveParam < 0 && dtrim > 0) {
-          dtrim = (dtrim * (256 + curveParam)) >> 8;      
+          dtrim = (dtrim * (256 + curveParam)) >> 8;
         }
         dv += dtrim;
       }
