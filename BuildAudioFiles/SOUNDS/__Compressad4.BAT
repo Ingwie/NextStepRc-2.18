@@ -5,7 +5,7 @@ for /r %%a in ("*.aif") do CALL tools\sox %%a %%~na.wav silence 1 0.1 0.1% rever
 REM Convert to ADPCM 4 bits
 for %%a in ("*.wav") do CALL tools\AD4CONVERTER -E4 %%a
 del *.aif /s
-rem del *.wav /s
+del *.wav /s
 rem del *.AD4 /s
 pause
 :end
