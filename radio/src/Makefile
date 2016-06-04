@@ -258,6 +258,10 @@ UNITS = METRIC
 # Values = NO / 1 / 2 / 3 / 4
 DEFAULT_MODE = NO
 
+# Toggle trim usage 
+# -> Left trim for right stick and right trim for left stick
+TOGGLETRIM = NO
+
 # EEPROM_PROGRESS_BAR
 # Values = YES, NO
 EEPROM_PROGRESS_BAR = NO
@@ -810,6 +814,10 @@ endif
 
 ifneq ($(DEFAULT_MODE), NO)
   CPPDEFS += -DDEFAULT_MODE=$(DEFAULT_MODE)
+endif
+
+ifeq ($(TOGGLETRIM), YES)
+  CPPDEFS += -DTOGGLETRIM
 endif
 
 # If POTS are used for fields modification

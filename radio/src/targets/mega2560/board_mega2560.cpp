@@ -146,6 +146,18 @@ bool switchState(EnumKeys enuk)
 }
 
 // Trim switches
+#if defined(TOGGLETRIM) //Toggle trim usage -> Left trim for right stick and right trim for left stick 
+static const pm_uchar crossTrim[] PROGMEM = {
+  TRIMS_GPIO_PIN_RHL,
+  TRIMS_GPIO_PIN_RHR,
+  TRIMS_GPIO_PIN_RVD,
+  TRIMS_GPIO_PIN_RVU,
+  TRIMS_GPIO_PIN_LVD,
+  TRIMS_GPIO_PIN_LVU,
+  TRIMS_GPIO_PIN_LHL,
+  TRIMS_GPIO_PIN_LHR
+};
+#else
 static const pm_uchar crossTrim[] PROGMEM = {
   TRIMS_GPIO_PIN_LHL,
   TRIMS_GPIO_PIN_LHR,
@@ -156,6 +168,7 @@ static const pm_uchar crossTrim[] PROGMEM = {
   TRIMS_GPIO_PIN_RHL,
   TRIMS_GPIO_PIN_RHR
 };
+#endif
      
 uint8_t trimDown(uint8_t idx)
 {
