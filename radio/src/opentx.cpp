@@ -17,12 +17,9 @@
 #include "opentx.h"
 #include "timers.h"
 
-#if defined(COLORLCD)
-#else
   const pm_uchar asterisk_lbm[] PROGMEM = {
     #include "bitmaps/9X/asterisk.lbm"
   };
-#endif
 
 EEGeneral  g_eeGeneral;
 ModelData  g_model;
@@ -300,12 +297,6 @@ void modelDefault(uint8_t id)
 
   applyDefaultTemplate();
 
-#if defined(LUA)
-  if (isFileAvailable(WIZARD_PATH "/" WIZARD_NAME)) {
-    f_chdir(WIZARD_PATH);
-    luaExec(WIZARD_NAME);
-  }
-#endif
 
 
 
@@ -1491,9 +1482,6 @@ void opentxClose()
   // TODO needed? telemetryEnd();
 #endif
 
-#if defined(LUA)
-  luaClose();
-#endif
 
 #if defined(SDCARD)
   closeLogs();
@@ -1598,7 +1586,7 @@ uint8_t getSticksNavigationEvent()
 void checkBattery()
 {
   static uint8_t counter = 0;
-#if defined(GUI) && !defined(COLORLCD)
+#if defined(GUI) 
   // TODO not the right menu I think ...
   if (menuHandlers[menuLevel] == menuGeneralDiagAna) {
     g_vbat100mV = 0;

@@ -36,11 +36,7 @@
 
   #define CASE_VARIO_CPUARM(x)
 
-#if defined(LUA)
-  #define CASE_LUA(x) x,
-#else
   #define CASE_LUA(x)
-#endif
 
 #if defined(CPUM2560)
   #define CASE_PERSISTENT_TIMERS(x) x,
@@ -776,14 +772,7 @@ extern int16_t calc1000toRESX(int16_t x);
 extern int16_t calcRESXto1000(int16_t x);
 extern int8_t  calcRESXto100(int16_t x);
 
-#if defined(COLORLCD)
 extern const char vers_stamp[];
-extern const char date_stamp[];
-extern const char time_stamp[];
-extern const char eeprom_stamp[];
-#else
-extern const char vers_stamp[];
-#endif
 
 extern uint8_t              g_vbat100mV;
   #define GET_TXBATT_BARS() (limit<int8_t>(2, 20 * (g_vbat100mV - g_eeGeneral.vBatMin - 90) / (30 + g_eeGeneral.vBatMax - g_eeGeneral.vBatMin), 20))

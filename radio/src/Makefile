@@ -1117,7 +1117,7 @@ endif
 CPPFLAGS = -g$(DBGFMT)
 CPPFLAGS += $(CPPDEFS)
 CPPFLAGS += -Wall
-CPPFLAGS += -mrelax 
+CPPFLAGS += -mrelax
 CPPFLAGS += -fno-exceptions
 CPPFLAGS += -Wno-strict-aliasing
 CPPFLAGS += -Wformat -Wreturn-type -Wunused -Wuninitialized -Wunknown-pragmas -Wno-switch -Wtype-limits

@@ -78,16 +78,6 @@ int zchar2str(char *dest, const char *src, int size)
 
 #endif
 
-#if defined(COLORLCD)
-char *strAppendDigits(char *dest, int value)
-{
-  div_t qr = div(value, 10);
-  *dest++ = '0' + qr.quot;
-  *dest++ = '0' + qr.rem;
-  *dest = '\0';
-  return dest;
-}
-#endif
 
 #if defined(SDCARD)
 char *strAppend(char *dest, const char *source, int len)

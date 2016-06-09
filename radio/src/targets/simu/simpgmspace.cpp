@@ -255,9 +255,6 @@ void *main_thread(void *)
       sleep(10/*ms*/);
     }
 
-#if defined(LUA)
-    luaClose();
-#endif
 
 #ifdef SIMU_EXCEPTIONS
   }

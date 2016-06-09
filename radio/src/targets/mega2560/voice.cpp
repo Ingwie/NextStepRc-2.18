@@ -25,6 +25,8 @@
 
 enum WTV20SD_State
 {
+  RESET,
+  RESETPAUSE,
   PAUSE,
   SENDSTART,
   SENDDATA,
@@ -34,10 +36,10 @@ enum WTV20SD_State
 #define QUEUE_LENGTH 10
 uint16_t WTV20SD_playlist[QUEUE_LENGTH] = {0};
 volatile uint8_t WTV20SD_InputIndex = 0;
-uint8_t WTV20SD_PlayIndex = 0;
+uint8_t WTV20SD_PlayIndex = 4; // Also used for reset, resetpause (save 2 static uint8_t) 
 uint8_t Startstop = WTV20SD_START_TIME;
 uint16_t WTV20SD_current = 0;
-uint8_t state = PAUSE;
+uint8_t state = RESET;
 
 void WTV20SD_sendstart()
 {
@@ -57,7 +59,7 @@ void WTV20SD_senddata()
     if (WTV20SD_current & 0x8000) {
       WTV20SD_Data_on; // Data high
     }
-    WTV20SD_current = (WTV20SD_current<<1);
+    WTV20SD_current = (WTV20SD_current << 1);
     ++i;
     _delay_us(1); // Data setup delay
     WTV20SD_Clock_on; // CLK high
@@ -88,7 +90,7 @@ void pushPrompt(uint16_t prompt)
   /* Load playlist and activate interrupt */
   WTV20SD_playlist[WTV20SD_InputIndex] = prompt;
   ++WTV20SD_InputIndex;
-  WTV20SD_InputIndex %= QUEUE_LENGTH;
+  if (WTV20SD_InputIndex == QUEUE_LENGTH) WTV20SD_InputIndex = 0;
 
   if (!isPlaying()) {
     TIMSK5 |= (1<<OCIE5A); // enable interrupts on Output Compare A Match
@@ -108,53 +110,62 @@ uint8_t isPlaying()
 #if !defined(SIMU)
 ISR(TIMER5_COMPA_vect) // every 0.5ms normally, every 2ms during startup reset
 {
-  static uint8_t reset_dly=4;
-  static uint8_t reset_pause=150;
 
-  if (reset_dly) {
-    OCR5A=0x1f4;
-    reset_dly--;
-    WTV20SD_Reset_off;
-    WTV20SD_Data_off;
-    WTV20SD_Clock_on;
-  } // RESET low
-  else if (reset_pause) {
-    OCR5A=0x1f4;
-    reset_pause--;
-    WTV20SD_Reset_on;
-  } // RESET high
-  else {
-    OCR5A = 0x7d; // another 0.5ms
-
-    if (state == PAUSE) {
-      if (WTV20SD_PlayIndex == WTV20SD_InputIndex) {
-        TIMSK5 &= ~(1<<OCIE5A); // stop reentrance
-        TCNT5=0; // reset timer
-        return; // nothing else to play
-      }
-      else {
-        WTV20SD_current = WTV20SD_playlist[WTV20SD_PlayIndex];
-        ++WTV20SD_PlayIndex;
-        WTV20SD_PlayIndex %= QUEUE_LENGTH;
-        Startstop = WTV20SD_START_TIME;
-        state = SENDSTART;
-      }
-    } // end PAUSE
-
-    if (state == SENDSTART) {
-      WTV20SD_sendstart();
-      return;
+  if (state == PAUSE) {
+    if (WTV20SD_PlayIndex == WTV20SD_InputIndex) {
+      TIMSK5 &= ~(1<<OCIE5A); // stop reentrance
+      TCNT5=0; // reset timer
+      return; // nothing else to play
     }
-
-    if (state == SENDDATA) {
-      WTV20SD_senddata();
-      return;
+    else {
+      WTV20SD_current = WTV20SD_playlist[WTV20SD_PlayIndex];
+      ++WTV20SD_PlayIndex;
+	  if (WTV20SD_PlayIndex == QUEUE_LENGTH) WTV20SD_PlayIndex = 0;
+      Startstop = WTV20SD_START_TIME;
+      state = SENDSTART;
     }
+  } // end PAUSE
 
-    if (state == SENDSTOP) {
-      WTV20SD_sendstop();
-      return;
-    }
+  if (state == SENDSTART) {
+    WTV20SD_sendstart();
+    return;
+  }
+
+  if (state == SENDDATA) {
+    WTV20SD_senddata();
+    return;
+  }
+
+  if (state == SENDSTOP) {
+    WTV20SD_sendstop();
+   return;
+  }
+
+  if (state == RESET) {
+	if (WTV20SD_PlayIndex) { // WTV20SD_PlayIndex used as reset counter
+		// OCR5A=0x1f4; setted in board_mega2560.cpp
+		WTV20SD_Reset_off;
+		WTV20SD_Data_off;
+		WTV20SD_Clock_on;
+		--WTV20SD_PlayIndex;
+	} // RESET low
+	else {
+		state = RESETPAUSE;
+		WTV20SD_PlayIndex = 150;
+		return;
+	}
+  }
+
+  if (state == RESETPAUSE) {
+    if (WTV20SD_PlayIndex) {
+		WTV20SD_Reset_on;
+		--WTV20SD_PlayIndex;
+	} // RESET high
+	else {
+		state = PAUSE;
+		OCR5A = 0x7d; // 0.5 ms after init
+		return;
+	}
   }
 }
 #endif

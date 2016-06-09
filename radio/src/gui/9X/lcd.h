@@ -118,11 +118,7 @@ void lcd_puts(coord_t x, coord_t y, const pm_char * s);
 void lcd_putsn(coord_t x, coord_t y, const pm_char * s, unsigned char len);
 void lcd_putsLeft(coord_t y, const pm_char * s);
 
-#if defined(COLORLCD)
-  void lcd_putsCenter(coord_t y, const pm_char * s, LcdFlags attr=0);
-#else
   #define lcd_putsCenter(y, s) lcd_puts((LCD_W-sizeof(TR_##s)*FW+FW+1)/2, y, STR_##s)
-#endif
 
   void lcd_outhex4(coord_t x, coord_t y, uint16_t val);
 
