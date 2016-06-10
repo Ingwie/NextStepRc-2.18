@@ -10,7 +10,7 @@
 /---------------------------------------------------------------------------*/
 
 #if defined (FATFSTINY)
-						#define	_FS_TINY		1 //test Bracame reduce ram usage
+						#define	_FS_TINY		1 // Bracame : reduce ram usage
 #else
 						#define	_FS_TINY		0
 #endif
