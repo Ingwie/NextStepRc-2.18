@@ -1236,10 +1236,10 @@ enum ClipboardType {
 #if defined(SIMU)
   #define CLIPBOARD_PATH_LEN 1024
 #else
-  #define CLIPBOARD_PATH_LEN 32
+ // #define CLIPBOARD_PATH_LEN 32
 #endif
 
-struct Clipboard {
+/*struct Clipboard { bracame not used ? why
   ClipboardType type;
   union {
     LogicalSwitchData csw;
@@ -1251,7 +1251,7 @@ struct Clipboard {
   } data;
 };
 
-extern Clipboard clipboard;
+extern Clipboard clipboard; */
 #endif
 
 #if !defined(SIMU)

@@ -25,7 +25,7 @@ EEGeneral  g_eeGeneral;
 ModelData  g_model;
 
 #if defined(SDCARD)
-Clipboard clipboard;
+// Clipboard clipboard; bracame not used ? why
 #endif
 
 
@@ -1241,10 +1241,10 @@ FORCEINLINE void evalTrims()
   }
 }
 
-#if !defined(PCBSTD)
+/*#if !defined(PCBSTD) bracame not used ? why
 uint8_t mSwitchDuration[1+NUM_ROTARY_ENCODERS] = { 0 };
 #define CFN_PRESSLONG_DURATION   100
-#endif
+#endif*/
 
 
 uint8_t s_mixer_first_run_done = false;

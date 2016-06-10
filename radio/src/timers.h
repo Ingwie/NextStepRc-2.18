@@ -26,7 +26,7 @@ typedef int16_t tmrval_t;
 typedef uint16_t tmrstart_t;
 #define TIMER_MAX     (0xffff/2)
 
-#define TIMER_MIN     (-TIMER_MAX-1)
+#define TIMER_MIN     (tmrval_t(-TIMER_MAX-1))
 
 struct TimerState {
   uint16_t cnt;

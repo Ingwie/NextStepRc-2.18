@@ -262,7 +262,7 @@ DEFAULT_MODE = NO
 # -> Left trim for right stick and right trim for left stick
 TOGGLETRIM = NO
 
-# Prompt time with "and" seconds or not (fr only)
+# Prompt time with "and" seconds or not
 # Values = YES, NO
 NOANDSECONDE = NO
 
