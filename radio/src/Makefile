@@ -262,6 +262,10 @@ DEFAULT_MODE = NO
 # -> Left trim for right stick and right trim for left stick
 TOGGLETRIM = NO
 
+# Prompt time with "and" seconds or not (fr only)
+# Values = YES, NO
+NOANDSECONDE = NO
+
 # EEPROM_PROGRESS_BAR
 # Values = YES, NO
 EEPROM_PROGRESS_BAR = NO
@@ -818,6 +822,10 @@ endif
 
 ifeq ($(TOGGLETRIM), YES)
   CPPDEFS += -DTOGGLETRIM
+endif
+
+ifeq ($(NOANDSECONDE), YES)
+  CPPDEFS += -DNOANDSECONDE
 endif
 
 # If POTS are used for fields modification
