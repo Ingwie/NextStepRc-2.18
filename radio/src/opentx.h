@@ -28,16 +28,6 @@
   #define SWITCH_SIMU(a, b)  (b)
 #endif
 
-  #define IS_PCBSKY9X        false
-  #define CASE_PCBSKY9X(x)
-
-  #define CASE_CPUARM(x)
-  #define IF_CPUARM(x)
-
-  #define CASE_VARIO_CPUARM(x)
-
-  #define CASE_LUA(x)
-
 #if defined(CPUM2560)
   #define CASE_PERSISTENT_TIMERS(x) x,
 #else
@@ -122,12 +112,6 @@
   #define CASE_SDCARD(x)
 #endif
 
-#if defined(BLUETOOTH)
-  #define CASE_BLUETOOTH(x) x,
-#else
-  #define CASE_BLUETOOTH(x)
-#endif
-
 #if defined(HELI)
   #define CASE_HELI(x) x,
 #else
@@ -157,10 +141,6 @@
 #else
   #define CASE_GVARS(x)
 #endif
-
-  #define CASE_REVPLUS(x)
-
-  #define CASE_REV9E(x)
 
   #define CASE_CAPACITY(x)
 

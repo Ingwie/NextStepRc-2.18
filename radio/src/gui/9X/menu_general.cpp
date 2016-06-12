@@ -30,24 +30,20 @@ void menuGeneralCalib(uint8_t event);
 enum EnumTabDiag {
   e_Setup,
   CASE_SDCARD(e_Sd)
-  CASE_CPUARM(e_GeneralCustomFunctions)
   e_Trainer,
   e_Vers,
   e_Keys,
   e_Ana,
-  CASE_CPUARM(e_Hardware)
   e_Calib
 };
 
 const MenuFuncP_PROGMEM menuTabGeneral[] PROGMEM = {
   menuGeneralSetup,
   CASE_SDCARD(menuGeneralSdManager)
-  CASE_CPUARM(menuGeneralCustomFunctions)
   menuGeneralTrainer,
   menuGeneralVersion,
   menuGeneralDiagKeys,
   menuGeneralDiagAna,
-  CASE_CPUARM(menuGeneralHardware)
   menuGeneralCalib
 };
 

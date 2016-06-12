@@ -546,9 +546,9 @@
 #define TR_BLOFFBRIGHTNESS     INDENT "Luminosité OFF"
 #define TR_BLCOLOR             INDENT "Couleur"
 #define TR_SPLASHSCREEN        "Logo d'accueil"
-#define TR_THROTTLEWARNING     TR(IF_CPUARM(INDENT) "Alerte gaz", INDENT "Alerte gaz")
-#define TR_SWITCHWARNING       TR(IF_CPUARM(INDENT) "Alerte int", INDENT "Pos. interrupteurs")
-#define TR_POTWARNING          TR(IF_CPUARM(INDENT) "Alerte pot", INDENT "Pos. potentios")
+#define TR_THROTTLEWARNING     TR("Alerte gaz", INDENT "Alerte gaz")
+#define TR_SWITCHWARNING       TR("Alerte int", INDENT "Pos. interrupteurs")
+#define TR_POTWARNING          TR("Alerte pot", INDENT "Pos. potentios")
 #define TR_TIMEZONE            "Fuseau horaire"
 #define TR_ADJUST_RTC          INDENT "Ajust. heure auto"
 #define TR_GPS                 "GPS"

@@ -24,14 +24,13 @@ enum menuGeneralHwItems {
   ITEM_SETUP_HW_STICK_RV_GAIN,
   ITEM_SETUP_HW_STICK_RH_GAIN,
   IF_ROTARY_ENCODERS(ITEM_SETUP_HW_ROTARY_ENCODER)
-  CASE_BLUETOOTH(ITEM_SETUP_HW_BT_BAUDRATE)
   ITEM_SETUP_HW_MAX
 };
 
 #define GENERAL_HW_PARAM_OFS (2+(15*FW))
 void menuGeneralHardware(uint8_t event)
 {
-  MENU(STR_HARDWARE, menuTabGeneral, e_Hardware, ITEM_SETUP_HW_MAX+1, {0, 0, (uint8_t)-1, 0, 0, 0, IF_ROTARY_ENCODERS(0) CASE_BLUETOOTH(0)});
+  MENU(STR_HARDWARE, menuTabGeneral, e_Hardware, ITEM_SETUP_HW_MAX+1, {0, 0, (uint8_t)-1, 0, 0, 0, IF_ROTARY_ENCODERS(0)});
 
   uint8_t sub = menuVerticalPosition - 1;
 
