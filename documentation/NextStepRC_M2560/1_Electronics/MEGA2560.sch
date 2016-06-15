@@ -29,14 +29,13 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:MEGA2560-cache
 EELAYER 27 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "OpenTX board based on Arduino MEGA2560"
-Date "27 feb 2016"
+Date "15 jun 2016"
 Rev "0"
 Comp "Copyright F. Aguerre"
 Comment1 ""
@@ -41110,7 +41109,7 @@ CA 3B B1 B4 D6 FB 76 3A 4D 11 32 4D 1E A1 3D 78 1C 8B 1E 14 74 10 57 46 8C 97 FB
 33 B3 93 2C A5 90 EC 7D 2B A5 BC 7A F5 EA E1 E1 5E 44 C8 BD 2E 90 84 08 60 87 C2 BB D7 FD 40 85 
 4A 52 6F 3D D0 6D 9E 6E 41 36 CA 77 04 97 99 83 92 6E D1 7C 20 6D 2C 33 D2 7F 5B 16 F2 83 51 39 
 A0 3F CF F3 A7 9F 7E FA CB 5F FE F5 EB D7 AF 45 64 59 96 6D DB F6 23 3E B3 52 CA B3 1B C5 00 F7 
-08 C0 CC FE 1F 15 4F 30 6D 3D C2 80 DE 00 00 00 00 49 45 4E 44 AE 42 60 82 00 $EndBitmap
+08 C0 CC FE 1F 15 4F 30 6D 3D C2 80 DE 00 00 00 00 49 45 4E 44 AE 42 60 82 0C $EndBitmap
 EndData
 $EndBitmap
 $Comp
@@ -41696,7 +41695,7 @@ F 3 "" H 1750 7050 60  0000 C CNN
 	-1   0    0    1   
 $EndComp
 Text Notes 4850 6650 0    42   ~ 0
-LCD supported : ST7565P, ST7565R, ERC12864FSF, ST7920\nProtocol = 6800, 8 bits parallel mode\n\nLCD pinout labels (may differ, depending of brand) :\nRD = Read or Enable on ST7920\nWR = Write or Write(0)/Read(1) on ST7920\nA0 = R/S (register select) or D/I (data/instruction select)\nRST = RES (reset)\nCS = Chip Select (not used on ST7920)
+LCD supported : ST7565P, ST7565R, ERC12864FSF, ST7920, KS108\nProtocol = 6800, 8 bits parallel mode\n\nLCD pinout labels (may differ, depending of brand) :\nRD = Read or Enable on ST7920\nWR = Write or Write(0)/Read(1) on ST7920 or CS2 on KS108\nA0 = R/S (register select) or D/I (data/instruction select)\nRST = RES (reset)\nCS = Chip Select (not used on ST7920), CS1 on KS108
 Text Label 2250 3400 2    42   ~ 0
 M2560 input
 Text GLabel 1050 3400 2    42   Input ~ 0
