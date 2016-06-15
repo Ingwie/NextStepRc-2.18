@@ -127,9 +127,9 @@ void sdPoll10ms(void);
 // LCD driver
 #define PORTA_LCD_DAT            PORTA    
 #define PORTC_LCD_CTRL           PORTC 
-#if defined(LCD_KS108)              // (For KS108 LCd only) MEGA R/W pin always at 0 state in Opentx then
-#define OUT_C_LCD_CS2            6	// use this pin to control second KS108
-#else                               // or connect LCD R/W pin to ground via a 1k resistor with others LCD
+#if defined(LCD_KS108)              // (For KS108 LCD only) MEGA R/W pin always at 0 state in Opentx then
+#define OUT_C_LCD_CS2            6	// use this pin to control second KS108 (CS2)
+#else                               // and connect KS108 R/W pin to ground via a 1k resistor
 #define OUT_C_LCD_RnW            6        
 #endif
 #define OUT_C_LCD_E              7        
