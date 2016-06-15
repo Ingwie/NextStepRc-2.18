@@ -385,13 +385,10 @@ PACK(typedef struct {
   ModelHeader_v216 header;
   TimerData_v216 timers[2];
   AVR_FIELD(uint8_t   protocol:3)
-  ARM_FIELD(uint8_t   telemetryProtocol:3)
   uint8_t   thrTrim:1;            // Enable Throttle Trim
   AVR_FIELD(int8_t    ppmNCH:4)
-  ARM_FIELD(int8_t    spare2:4)
   int8_t    trimInc:3;            // Trim Increments
   uint8_t   disableThrottleWarning:1;
-  ARM_FIELD(uint8_t displayChecklist:1)
   AVR_FIELD(uint8_t pulsePol:1)
   uint8_t   extendedLimits:1;
   uint8_t   extendedTrims:1;
@@ -550,48 +547,6 @@ int ConvertTelemetrySource_216_to_217(int source)
   return source;
 }
 
-#if defined(PCBTARANIS)
-int ConvertSource_215_to_216(int source, bool insertZero=false)
-{
-  if (insertZero)
-    source += 1;
-  // Virtual Inputs and Lua Outputs added
-  if (source > 0)
-    source += MAX_INPUTS + MAX_SCRIPTS*MAX_SCRIPT_OUTPUTS;
-  // S3 added
-  if (source > MIXSRC216_POT2)
-    source += 1;
-  // PPM9-PPM16 added
-  if (source > MIXSRC216_FIRST_TRAINER+7)
-    source += 8;
-  // 4 GVARS added
-  if (source > MIXSRC216_GVAR1+4)
-    source += 4;
-  // Telemetry conversions
-  if (source >= MIXSRC216_FIRST_TELEM)
-    source = MIXSRC216_FIRST_TELEM + ConvertTelemetrySource_215_to_216(source-MIXSRC216_FIRST_TELEM+1) - 1;
-
-  return source;
-}
-
-int ConvertSwitch_215_to_216(int swtch)
-{
-  if (swtch < 0)
-    return -ConvertSwitch_215_to_216(-swtch);
-  else if (swtch <= SWSRC_LAST_SWITCH)
-    return swtch;
-  else if (swtch > SWSRC_LAST_SWITCH + 32 + 1) {
-    swtch -= (SWSRC_LAST_SWITCH + 32 + 1);
-    if (swtch > SWSRC_ON)
-      swtch = 0;
-    return swtch;
-  }
-  else {
-    swtch += (2*4) + (3*6); // 4 trims and 2 * 6-pos added as switches
-    return swtch;
-  }
-}
-#else
 int ConvertSource_215_to_216(int source, bool insertZero=false)
 {
   if (insertZero)
@@ -624,7 +579,6 @@ int ConvertSwitch_215_to_216(int swtch)
     return swtch;
   }
 }
-#endif
 
 int ConvertSwitch_216_to_217(int swtch)
 {
