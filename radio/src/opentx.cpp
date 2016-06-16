@@ -499,7 +499,7 @@ void incRotaryEncoder(uint8_t idx, int8_t inc)
 {
   g_rotenc[idx] += inc;
   int16_t *value = &(flightModeAddress(getRotaryEncoderFlightPhase(idx))->rotaryEncoders[idx]);
-  *value = limit((int16_t)-1024, (int16_t)(*value + (inc * 8)), (int16_t)+1024);
+  *value = limit((int16_t)-ROTARY_ENCODER_MAX, (int16_t)(*value + (inc * 8)), (int16_t)+ROTARY_ENCODER_MAX);
   eeDirty(EE_MODEL);
 }
 #endif

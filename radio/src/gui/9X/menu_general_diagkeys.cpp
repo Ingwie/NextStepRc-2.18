@@ -54,7 +54,9 @@ void menuGeneralDiagKeys(uint8_t event)
   for(uint8_t i=0; i<DIM(g_rotenc); i++) {
     coord_t y = MENU_HEADER_HEIGHT /* ??? + 1 ??? */ + i*FH;
     lcd_putsiAtt(14*FW, y, STR_VRENCODERS, i, 0);
-    lcd_outdezNAtt(18*FW, y, g_rotenc[i], LEFT|(switchState((EnumKeys)(BTN_REa+i)) ? INVERS : 0));
+    int16_t rex = getRotaryEncoder(i);
+    rex /= 8; 
+    lcd_outdezNAtt(18*FW, y, rex, LEFT|(switchState((EnumKeys)(BTN_REa+i)) ? INVERS : 0));
   }
 #endif
 
