@@ -814,15 +814,15 @@ bool eeConvert()
   s_eeDirtyMsk = EE_GENERAL;
   eeCheck(true);
 
-  lcd_rect(10, 6*FH+4, 102, 3);
+  lcdDrawRect(10, 6*FH+4, 102, 3);
 
   // Models conversion
   for (uint8_t id=0; id<MAX_MODELS; id++) {
 #if defined(COLORLCD)
 #elif LCD_W >= 212
-    lcd_hline(61, 6*FH+5, 10+id*2, FORCE);
+    lcdDrawSolidHorizontalLine(61, 6*FH+5, 10+id*2, FORCE);
 #else
-    lcd_hline(11, 6*FH+5, 10+(id*3)/2, FORCE);
+    lcdDrawSolidHorizontalLine(11, 6*FH+5, 10+(id*3)/2, FORCE);
 #endif
     lcdRefresh();
     if (eeModelExists(id)) {

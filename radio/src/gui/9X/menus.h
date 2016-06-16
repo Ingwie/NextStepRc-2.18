@@ -20,7 +20,7 @@
 #define MENUS_SCROLLBAR_WIDTH  0
 #define MENU_COLUMNS           1
 #define COLUMN_X               0
-#define lcd_putsColumnLeft(x, y, str) lcd_putsLeft(y, str)
+#define lcdDrawTextColumnLeft(x, y, str) lcdDrawTextLeft(y, str)
 
 // Menus related stuff ...
 #if defined(SDCARD)
@@ -96,9 +96,9 @@ void menuTraceBuffer(uint8_t event);
   void displaySlider(coord_t x, coord_t y, uint8_t value, uint8_t max, uint8_t attr);
 #elif defined(GRAPHICS)
   void display5posSlider(coord_t x, coord_t y, uint8_t value, uint8_t attr);
-  #define displaySlider(x, y, value, max, attr) lcd_outdezAtt(x, y, value, attr|LEFT)
+  #define displaySlider(x, y, value, max, attr) lcdDrawNumberAttUnit(x, y, value, attr|LEFT)
 #else
-  #define displaySlider(x, y, value, max, attr) lcd_outdezAtt(x, y, value, attr|LEFT)
+  #define displaySlider(x, y, value, max, attr) lcdDrawNumberAttUnit(x, y, value, attr|LEFT)
 #endif
 
 #if defined(NAVIGATION_POT1)

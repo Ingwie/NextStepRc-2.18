@@ -25,9 +25,9 @@ uint8_t         warningResult = 0;
 
 void displayBox()
 {
-  drawFilledRect(10, 16, LCD_W-20, 40, SOLID, ERASE);
-  lcd_rect(10, 16, LCD_W-20, 40);
-  lcd_puts(WARNING_LINE_X, WARNING_LINE_Y, warningText);
+  lcdDrawFilledRect(10, 16, LCD_W-20, 40, SOLID, ERASE);
+  lcdDrawRect(10, 16, LCD_W-20, 40);
+  lcdDrawText(WARNING_LINE_X, WARNING_LINE_Y, warningText);
   // could be a place for a warningInfoText
 }
 
@@ -41,23 +41,23 @@ void displayPopup(const pm_char * pstr)
 
 void message(const pm_char *title, const pm_char *t, const char *last MESSAGE_SOUND_ARG)
 {
-  lcd_clear();
+  lcdClear();
   lcd_img(2, 0, asterisk_lbm, 0, 0);
 
 #define MESSAGE_LCD_OFFSET   6*FW
 
 #if defined(TRANSLATIONS_FR) || defined(TRANSLATIONS_IT) || defined(TRANSLATIONS_CZ)
-  lcd_putsAtt(MESSAGE_LCD_OFFSET, 0, STR_WARNING, DBLSIZE);
-  lcd_putsAtt(MESSAGE_LCD_OFFSET, 2*FH, title, DBLSIZE);
+  lcdDrawTextAtt(MESSAGE_LCD_OFFSET, 0, STR_WARNING, DBLSIZE);
+  lcdDrawTextAtt(MESSAGE_LCD_OFFSET, 2*FH, title, DBLSIZE);
 #else
-  lcd_putsAtt(MESSAGE_LCD_OFFSET, 0, title, DBLSIZE);
-  lcd_putsAtt(MESSAGE_LCD_OFFSET, 2*FH, STR_WARNING, DBLSIZE);
+  lcdDrawTextAtt(MESSAGE_LCD_OFFSET, 0, title, DBLSIZE);
+  lcdDrawTextAtt(MESSAGE_LCD_OFFSET, 2*FH, STR_WARNING, DBLSIZE);
 #endif
 
-  drawFilledRect(0, 0, LCD_W, 32);
-  if (t) lcd_putsLeft(5*FH, t);
+  lcdDrawFilledRect(0, 0, LCD_W, 32);
+  if (t) lcdDrawTextLeft(5*FH, t);
   if (last) {
-    lcd_putsLeft(7*FH, last);
+    lcdDrawTextLeft(7*FH, last);
     AUDIO_ERROR_MESSAGE(sound);
   }
 
@@ -73,9 +73,9 @@ void displayWarning(uint8_t event)
   warningResult = false;
   displayBox();
   if (warningInfoText) {
-    lcd_putsnAtt(WARNING_LINE_X, WARNING_LINE_Y+FH, warningInfoText, warningInfoLength, WARNING_INFO_FLAGS);
+    lcdDrawSizedTextAtt(WARNING_LINE_X, WARNING_LINE_Y+FH, warningInfoText, warningInfoLength, WARNING_INFO_FLAGS);
   }
-  lcd_puts(WARNING_LINE_X, WARNING_LINE_Y+2*FH, warningType == WARNING_TYPE_ASTERISK ? STR_EXIT : STR_POPUPS);
+  lcdDrawText(WARNING_LINE_X, WARNING_LINE_Y+2*FH, warningType == WARNING_TYPE_ASTERISK ? STR_EXIT : STR_POPUPS);
   switch (event) {
 #if defined(ROTARY_ENCODER_NAVIGATION)
     case EVT_ROTARY_BREAK:
@@ -110,12 +110,12 @@ const char * displayPopupMenu(uint8_t event)
 
   uint8_t display_count = min<uint8_t>(popupMenuNoItems, POPUP_MENU_MAX_LINES);
   uint8_t y = (display_count >= 5 ? MENU_Y - FH - 1 : MENU_Y);
-  drawFilledRect(MENU_X, y, MENU_W, display_count * (FH+1) + 2, SOLID, ERASE);
-  lcd_rect(MENU_X, y, MENU_W, display_count * (FH+1) + 2);
+  lcdDrawFilledRect(MENU_X, y, MENU_W, display_count * (FH+1) + 2, SOLID, ERASE);
+  lcdDrawRect(MENU_X, y, MENU_W, display_count * (FH+1) + 2);
 
   for (uint8_t i=0; i<display_count; i++) {
-    lcd_putsAtt(MENU_X+6, i*(FH+1) + y + 2, popupMenuItems[i], popupMenuFlags);
-    if (i == s_menu_item) drawFilledRect(MENU_X+1, i*(FH+1) + y + 1, MENU_W-2, 9);
+    lcdDrawTextAtt(MENU_X+6, i*(FH+1) + y + 2, popupMenuItems[i], popupMenuFlags);
+    if (i == s_menu_item) lcdDrawFilledRect(MENU_X+1, i*(FH+1) + y + 1, MENU_W-2, 9);
   }
 
   if (popupMenuNoItems > display_count) {

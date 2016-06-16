@@ -288,9 +288,9 @@ void menuModelSelect(uint8_t event)
         break;
   }
 
-  lcd_puts(9*FW-(LEN_FREE-4)*FW, 0, STR_FREE);
+  lcdDrawText(9*FW-(LEN_FREE-4)*FW, 0, STR_FREE);
   if (event) reusableBuffer.modelsel.eepromfree = EeFsGetFree();
-  lcd_outdezAtt(17*FW, 0, reusableBuffer.modelsel.eepromfree, 0);
+  lcdDrawNumberAttUnit(17*FW, 0, reusableBuffer.modelsel.eepromfree, 0);
 
 #if defined(ROTARY_ENCODER_NAVIGATION)
   displayScreenIndex(e_ModelSelect, DIM(menuTabModel), (sub == g_eeGeneral.currModel) ? ((IS_RE_NAVIGATION_ENABLE() && s_editMode < 0) ? INVERS|BLINK : INVERS) : 0);
@@ -304,13 +304,13 @@ void menuModelSelect(uint8_t event)
     coord_t y = MENU_HEADER_HEIGHT + 1 + i*FH;
     uint8_t k = i+menuVerticalOffset;
 
-    lcd_outdezNAtt(3*FW+2, y, k+1, LEADING0+((!s_copyMode && sub==k) ? INVERS : 0), 2);
+    lcdDrawNumberNAtt(3*FW+2, y, k+1, LEADING0+((!s_copyMode && sub==k) ? INVERS : 0), 2);
 
     if (s_copyMode == MOVE_MODE || (s_copyMode == COPY_MODE && s_copySrcRow >= 0)) {
       if (k == sub) {
         if (s_copyMode == COPY_MODE) {
           k = s_copySrcRow;
-          lcd_putc(MODELSEL_W-FW, y, '+');
+          lcdDrawChar(MODELSEL_W-FW, y, '+');
         }
         else {
           k = sub + s_copyTgtOfs;
@@ -328,14 +328,14 @@ void menuModelSelect(uint8_t event)
       char * name = reusableBuffer.modelsel.listnames[i];
       if (event) eeLoadModelName(k, name);
       putsModelName(4*FW, y, name, k, 0);
-      lcd_outdezAtt(20*FW, y, eeModelSize(k), 0);
+      lcdDrawNumberAttUnit(20*FW, y, eeModelSize(k), 0);
       if (k==g_eeGeneral.currModel && (s_copyMode!=COPY_MODE || s_copySrcRow<0 || i+menuVerticalOffset!=(vertpos_t)sub))
-        lcd_putc(1, y, '*');
+        lcdDrawChar(1, y, '*');
     }
 
     if (s_copyMode && (vertpos_t)sub==i+menuVerticalOffset) {
-      drawFilledRect(9, y, MODELSEL_W-1-9, 7);
-      lcd_rect(8, y-1, MODELSEL_W-1-7, 9, s_copyMode == COPY_MODE ? SOLID : DOTTED);
+      lcdDrawFilledRect(9, y, MODELSEL_W-1-9, 7);
+      lcdDrawRect(8, y-1, MODELSEL_W-1-7, 9, s_copyMode == COPY_MODE ? SOLID : DOTTED);
     }
   }
 }

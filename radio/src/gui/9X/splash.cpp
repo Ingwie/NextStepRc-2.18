@@ -49,7 +49,7 @@ const pm_uchar * const splash_lbm = splashdata+4;
   
 void displaySplash()
 {
-  lcd_clear();
+  lcdClear();
 #if defined(PCBMEGA2560)
   lcd_imgfar(0, 0, (GET_FAR_ADDRESS(splashdata)+4), 0, 0); //use progmem "far" for splash working with all other options enabled
 #else

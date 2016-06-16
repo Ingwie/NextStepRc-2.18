@@ -2089,10 +2089,10 @@ int main(void)
 
 #if defined(CPUM2560)
   // Time to switch off
-  lcd_clear();
+  lcdClear();
   displayPopup(STR_SHUTDOWN);
   opentxClose();
-  lcd_clear() ;
+  lcdClear() ;
   lcdRefresh() ;
   boardOff(); // Only turn power off if necessary
   wdt_disable();

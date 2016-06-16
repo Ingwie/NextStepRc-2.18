@@ -86,10 +86,10 @@ void menuModelLimits(uint8_t event)
 
   if (sub < NUM_CHNOUT) {
 #if defined(PPM_CENTER_ADJUSTABLE) || defined(PPM_UNIT_US)
-    lcd_outdezAtt(13*FW, 0, PPM_CH_CENTER(sub)+channelOutputs[sub]/2, 0);
-    lcd_puts(13*FW, 0, STR_US);
+    lcdDrawNumberAttUnit(13*FW, 0, PPM_CH_CENTER(sub)+channelOutputs[sub]/2, 0);
+    lcdDrawText(13*FW, 0, STR_US);
 #else
-    lcd_outdezAtt(13*FW, 0, calcRESXto1000(channelOutputs[sub]), PREC1);
+    lcdDrawNumberAttUnit(13*FW, 0, calcRESXto1000(channelOutputs[sub]), PREC1);
 #endif
   }
 
@@ -109,7 +109,7 @@ void menuModelLimits(uint8_t event)
     if (k==NUM_CHNOUT) {
       // last line available - add the "copy trim menu" line
       uint8_t attr = (sub==NUM_CHNOUT) ? INVERS : 0;
-      lcd_putsAtt(CENTER_OFS, y, STR_TRIMS2OFFSETS, NO_HIGHLIGHT() ? 0 : attr);
+      lcdDrawTextAtt(CENTER_OFS, y, STR_TRIMS2OFFSETS, NO_HIGHLIGHT() ? 0 : attr);
       if (attr) {
         s_editMode = 0;
         if (event==EVT_KEY_LONG(KEY_ENTER)) {
@@ -129,7 +129,7 @@ void menuModelLimits(uint8_t event)
     if ((channelOutputs[k] - v) > 50) swVal = (ld->revert ? 127 : 126); // Switch to raw inputs?  - remove trim!
     if ((channelOutputs[k] - v) < -50) swVal = (ld->revert ? 126 : 127);
     putsChn(0, y, k+1, 0);
-    lcd_putc(LIMITS_DIRECTION_POS, y, swVal);
+    lcdDrawChar(LIMITS_DIRECTION_POS, y, swVal);
 #endif
 
     int8_t limit = (g_model.extendedLimits ? LIMIT_EXT_MAX : 100);
@@ -144,9 +144,9 @@ void menuModelLimits(uint8_t event)
       {
         case ITEM_LIMITS_OFFSET:
 #if defined(PPM_UNIT_US)
-          lcd_outdezAtt(LIMITS_OFFSET_POS, y, ((int32_t)ld->offset*128) / 25, attr|PREC1);
+          lcdDrawNumberAttUnit(LIMITS_OFFSET_POS, y, ((int32_t)ld->offset*128) / 25, attr|PREC1);
 #else
-          lcd_outdezAtt(LIMITS_OFFSET_POS, y, ld->offset, attr|PREC1);
+          lcdDrawNumberAttUnit(LIMITS_OFFSET_POS, y, ld->offset, attr|PREC1);
 #endif
           if (active) {
             ld->offset = checkIncDec(event, ld->offset, -1000, 1000, EE_MODEL|NO_INCDEC_MARKS);
@@ -158,12 +158,12 @@ void menuModelLimits(uint8_t event)
           break;
 
         case ITEM_LIMITS_MIN:
-          lcd_outdezAtt(LIMITS_MIN_POS, y, MIN_MAX_DISPLAY(ld->min-LIMITS_MIN_MAX_OFFSET), MIN_MAX_ATTR);
+          lcdDrawNumberAttUnit(LIMITS_MIN_POS, y, MIN_MAX_DISPLAY(ld->min-LIMITS_MIN_MAX_OFFSET), MIN_MAX_ATTR);
           if (active) ld->min = LIMITS_MIN_MAX_OFFSET + checkIncDec(event, ld->min-LIMITS_MIN_MAX_OFFSET, -limit, 0, EE_MODEL);
           break;
 
         case ITEM_LIMITS_MAX:
-          lcd_outdezAtt(LIMITS_MAX_POS, y, MIN_MAX_DISPLAY(ld->max+LIMITS_MIN_MAX_OFFSET), MIN_MAX_ATTR);
+          lcdDrawNumberAttUnit(LIMITS_MAX_POS, y, MIN_MAX_DISPLAY(ld->max+LIMITS_MIN_MAX_OFFSET), MIN_MAX_ATTR);
           if (active) ld->max = -LIMITS_MIN_MAX_OFFSET + checkIncDec(event, ld->max+LIMITS_MIN_MAX_OFFSET, 0, +limit, EE_MODEL);
           break;
 
@@ -171,9 +171,9 @@ void menuModelLimits(uint8_t event)
         {
           uint8_t revert = ld->revert;
 #if defined(PPM_CENTER_ADJUSTABLE)
-          lcd_putcAtt(LIMITS_REVERT_POS, y, revert ? 127 : 126, attr);
+          lcdDrawCharAtt(LIMITS_REVERT_POS, y, revert ? 127 : 126, attr);
 #else
-          lcd_putsiAtt(LIMITS_REVERT_POS, y, STR_MMMINV, revert, attr);
+          lcdDrawTextAtIndex(LIMITS_REVERT_POS, y, STR_MMMINV, revert, attr);
 #endif
           if (active) {
             uint8_t revert_new = checkIncDecModel(event, revert, 0, 1);
@@ -189,7 +189,7 @@ void menuModelLimits(uint8_t event)
 
 #if defined(PPM_CENTER_ADJUSTABLE)
         case ITEM_LIMITS_PPM_CENTER:
-          lcd_outdezAtt(LIMITS_PPM_CENTER_POS, y, PPM_CENTER+ld->ppmCenter, attr);
+          lcdDrawNumberAttUnit(LIMITS_PPM_CENTER_POS, y, PPM_CENTER+ld->ppmCenter, attr);
           if (active) {
             CHECK_INCDEC_MODELVAR(event, ld->ppmCenter, -PPM_CENTER_MAX, +PPM_CENTER_MAX);
           }
@@ -198,7 +198,7 @@ void menuModelLimits(uint8_t event)
 
 #if defined(PPM_LIMITS_SYMETRICAL)
         case ITEM_LIMITS_SYMETRICAL:
-          lcd_putcAtt(LCD_W-FW-MENUS_SCROLLBAR_WIDTH, y, ld->symetrical ? '=' : '^', attr);
+          lcdDrawCharAtt(LCD_W-FW-MENUS_SCROLLBAR_WIDTH, y, ld->symetrical ? '=' : '^', attr);
           if (active) {
             CHECK_INCDEC_MODELVAR_ZERO(event, ld->symetrical, 1);
           }

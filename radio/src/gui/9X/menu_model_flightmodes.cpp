@@ -23,7 +23,7 @@ void displayFlightModes(coord_t x, coord_t y, FlightModesType value)
   do {
     --p;
     if (!(value & (1<<p)))
-      lcd_putc(x, y, '0'+p);
+      lcdDrawChar(x, y, '0'+p);
     x -= FWNUM;
   } while (p!=0);
 }
@@ -89,9 +89,9 @@ void menuModelPhaseOne(uint8_t event)
         fm->swtch = switchMenuItem(MIXES_2ND_COLUMN, y, fm->swtch, attr, event);
         break;
       case ITEM_MODEL_PHASE_TRIMS:
-        lcd_putsLeft(y, STR_TRIMS);
+        lcdDrawTextLeft(y, STR_TRIMS);
         for (uint8_t t=0; t<NUM_STICKS; t++) {
-          putsTrimMode(MIXES_2ND_COLUMN+(t*FW), y, s_currIdx, t, menuHorizontalPosition==t ? attr : 0);
+          lcdPutsTrimMode(MIXES_2ND_COLUMN+(t*FW), y, s_currIdx, t, menuHorizontalPosition==t ? attr : 0);
           if (attr && menuHorizontalPosition==t && ((editMode>0) || p1valdiff)) {
             int16_t v = getRawTrimValue(s_currIdx, t);
             if (v < TRIM_EXTENDED_MAX) v = TRIM_EXTENDED_MAX;
@@ -106,9 +106,9 @@ void menuModelPhaseOne(uint8_t event)
 
 #if ROTARY_ENCODERS > 0
       case ITEM_MODEL_PHASE_ROTARY_ENCODERS:
-        lcd_putsLeft(y, STR_ROTARY_ENCODER);
+        lcdDrawTextLeft(y, STR_ROTARY_ENCODER);
         for (uint8_t t=0; t<NUM_ROTARY_ENCODERS; t++) {
-          putsRotaryEncoderMode(MIXES_2ND_COLUMN+(t*FW), y, s_currIdx, t, menuHorizontalPosition==t ? attr : 0);
+          lcdPutsRotaryEncoderMode(MIXES_2ND_COLUMN+(t*FW), y, s_currIdx, t, menuHorizontalPosition==t ? attr : 0);
           if (attr && menuHorizontalPosition==t && ((editMode>0) || p1valdiff)) {
             int16_t v = flightModeAddress(s_currIdx)->rotaryEncoders[t];
             if (v < ROTARY_ENCODER_MAX) v = ROTARY_ENCODER_MAX;
@@ -132,7 +132,7 @@ void menuModelPhaseOne(uint8_t event)
 
 #if defined(GVARS) && !defined(PCBSTD)
       case ITEM_MODEL_PHASE_GVARS_LABEL:
-        lcd_putsLeft(y, STR_GLOBAL_VARS);
+        lcdDrawTextLeft(y, STR_GLOBAL_VARS);
         break;
 
       default:
@@ -141,7 +141,7 @@ void menuModelPhaseOne(uint8_t event)
         uint8_t posHorz = menuHorizontalPosition;
         if (attr && posHorz > 0 && s_currIdx==0) posHorz++;
 
-        putsStrIdx(INDENT_WIDTH, y, STR_GV, idx+1);
+        lcdDrawStringWithIndex(INDENT_WIDTH, y, STR_GV, idx+1);
 
         editName(4*FW, y, g_model.gvars[idx].name, LEN_GVAR_NAME, event, posHorz==0 ? attr : 0);
 
@@ -152,7 +152,7 @@ void menuModelPhaseOne(uint8_t event)
           putsFlightMode(11*FW, y, p+1, posHorz==1 ? attr : 0);
         }
         else {
-          lcd_putsAtt(11*FW, y, STR_OWN, posHorz==1 ? attr : 0);
+          lcdDrawTextAtt(11*FW, y, STR_OWN, posHorz==1 ? attr : 0);
         }
         if (attr && s_currIdx>0 && posHorz==1 && (editMode>0 || p1valdiff)) {
           if (v < GVAR_MAX) v = GVAR_MAX;
@@ -164,7 +164,7 @@ void menuModelPhaseOne(uint8_t event)
         }
 
         uint8_t p = getGVarFlightPhase(s_currIdx, idx);
-        lcd_outdezAtt(21*FW, y, GVAR_VALUE(idx, p), posHorz==2 ? attr : 0);
+        lcdDrawNumberAttUnit(21*FW, y, GVAR_VALUE(idx, p), posHorz==2 ? attr : 0);
         if (attr && posHorz==2 && ((editMode>0) || p1valdiff)) {
           GVAR_VALUE(idx, p) = checkIncDec(event, GVAR_VALUE(idx, p), -GVAR_LIMIT, GVAR_LIMIT, EE_MODEL);
         }
@@ -223,29 +223,29 @@ void menuModelFlightModesAll(uint8_t event)
     FlightModeData *p = flightModeAddress(i);
     putsFlightMode(0, y, i+1, att|(getFlightMode()==i ? BOLD : 0));
 
-    lcd_putsnAtt(4*FW+NAME_OFS, y, p->name, sizeof(p->name), ZCHAR);
+    lcdDrawSizedTextAtt(4*FW+NAME_OFS, y, p->name, sizeof(p->name), ZCHAR);
     if (i == 0) {
-      lcd_puts((5+LEN_FLIGHT_MODE_NAME)*FW+SWITCH_OFS, y, STR_DEFAULT);
+      lcdDrawText((5+LEN_FLIGHT_MODE_NAME)*FW+SWITCH_OFS, y, STR_DEFAULT);
     }
     else {
-      putsSwitches((5+LEN_FLIGHT_MODE_NAME)*FW+SWITCH_OFS, y, p->swtch, 0);
+      lcdPutsSwitches((5+LEN_FLIGHT_MODE_NAME)*FW+SWITCH_OFS, y, p->swtch, 0);
       for (uint8_t t=0; t<NUM_STICKS; t++) {
-        putsTrimMode((9+LEN_FLIGHT_MODE_NAME+t)*FW+TRIMS_OFS, y, i, t, 0);
+        lcdPutsTrimMode((9+LEN_FLIGHT_MODE_NAME+t)*FW+TRIMS_OFS, y, i, t, 0);
       }
 #if defined(CPUM2560)
       for (uint8_t t=0; t<NUM_ROTARY_ENCODERS; t++) {
-        putsRotaryEncoderMode((13+LEN_FLIGHT_MODE_NAME+t)*FW+TRIMS_OFS+ROTARY_ENC_OFS, y, i, t, 0);
+        lcdPutsRotaryEncoderMode((13+LEN_FLIGHT_MODE_NAME+t)*FW+TRIMS_OFS+ROTARY_ENC_OFS, y, i, t, 0);
       }
 #endif
     }
 
     if (p->fadeIn || p->fadeOut) {
-      lcd_putc(LCD_W-FW-MENUS_SCROLLBAR_WIDTH, y, (p->fadeIn && p->fadeOut) ? '*' : (p->fadeIn ? 'I' : 'O'));
+      lcdDrawChar(LCD_W-FW-MENUS_SCROLLBAR_WIDTH, y, (p->fadeIn && p->fadeOut) ? '*' : (p->fadeIn ? 'I' : 'O'));
     }
   }
 
 
-  lcd_putsLeft((LCD_LINES-1)*FH+1, STR_CHECKTRIMS);
+  lcdDrawTextLeft((LCD_LINES-1)*FH+1, STR_CHECKTRIMS);
   putsFlightMode(OFS_CHECKTRIMS, (LCD_LINES-1)*FH+1, mixerCurrentFlightMode+1);
   if (sub==MAX_FLIGHT_MODES && !trimsCheckTimer) {
     lcd_status_line();

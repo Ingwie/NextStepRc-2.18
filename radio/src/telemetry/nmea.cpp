@@ -440,37 +440,37 @@ void menuTelemetryNMEA1(uint8_t event)
 
 
     title ('1');
-    lcd_puts        (   2*FW,   1*FH, PSTR("UTC-Time      Sat"));
+    lcdDrawText        (   2*FW,   1*FH, PSTR("UTC-Time      Sat"));
 
     if (rbuf[0][0]) {								// show always if data have been received
-	  lcd_putcAtt   (  19*FW,   1*FH, sbuf[2], 0);				// satellites in view
-        lcd_putsnAtt  (   2*FW,   2*FH, &rbuf[0][0], 2, APSIZE);		// hours
-        lcd_putcAtt   (   6*FW,   2*FH, ':', DBLSIZE);			// ":"
-        lcd_putsnAtt  (   8*FW,   2*FH, &rbuf[0][2], 2, APSIZE);		// minutes
-        lcd_putcAtt   (  12*FW,   2*FH, ':', DBLSIZE);			// ":"
-        lcd_putsnAtt  (  14*FW,   2*FH, &rbuf[0][4], 2, APSIZE);		// seconds
+	  lcdDrawCharAtt   (  19*FW,   1*FH, sbuf[2], 0);				// satellites in view
+        lcdDrawSizedTextAtt  (   2*FW,   2*FH, &rbuf[0][0], 2, APSIZE);		// hours
+        lcdDrawCharAtt   (   6*FW,   2*FH, ':', DBLSIZE);			// ":"
+        lcdDrawSizedTextAtt  (   8*FW,   2*FH, &rbuf[0][2], 2, APSIZE);		// minutes
+        lcdDrawCharAtt   (  12*FW,   2*FH, ':', DBLSIZE);			// ":"
+        lcdDrawSizedTextAtt  (  14*FW,   2*FH, &rbuf[0][4], 2, APSIZE);		// seconds
     }
     else
-        lcd_putsAtt   (   2*FW,   2*FH, val_unknown, APSIZE);		// "?"
+        lcdDrawTextAtt   (   2*FW,   2*FH, val_unknown, APSIZE);		// "?"
 
     if ((show_timer == 1) && rbuf[0][0])  {					// show the Timer when data have been received
 
-        lcd_puts    (   2*FW,   4*FH, PSTR("Timer"));			// display "Timer"
+        lcdDrawText    (   2*FW,   4*FH, PSTR("Timer"));			// display "Timer"
         putsTimer   (   5*FW,   5*FH, (gpstime-gpstimer), DBLSIZE, DBLSIZE);	// display difference as mm:ss
     }
     else
     {
-        lcd_puts      ( 2*FW,   4*FH, PSTR("Date"));			// show the UTC Date	
+        lcdDrawText      ( 2*FW,   4*FH, PSTR("Date"));			// show the UTC Date	
 
         if (rbuf[1][0])	{
-            lcd_putsnAtt( 2*FW,   5*FH, &rbuf[1][0], 2, APSIZE);		// year
-            lcd_putcAtt ( 6*FW,   5*FH, '/', DBLSIZE);			// "/" 
-            lcd_putsnAtt( 8*FW,   5*FH, &rbuf[1][2], 2, APSIZE);		// month
-            lcd_putcAtt (12*FW,   5*FH, '/', DBLSIZE);			// "/"
-            lcd_putsnAtt(14*FW,   5*FH, &rbuf[1][4], 2, APSIZE);		// day
+            lcdDrawSizedTextAtt( 2*FW,   5*FH, &rbuf[1][0], 2, APSIZE);		// year
+            lcdDrawCharAtt ( 6*FW,   5*FH, '/', DBLSIZE);			// "/" 
+            lcdDrawSizedTextAtt( 8*FW,   5*FH, &rbuf[1][2], 2, APSIZE);		// month
+            lcdDrawCharAtt (12*FW,   5*FH, '/', DBLSIZE);			// "/"
+            lcdDrawSizedTextAtt(14*FW,   5*FH, &rbuf[1][4], 2, APSIZE);		// day
         }
         else
-            lcd_putsAtt   (   2*FW,   5*FH, val_unknown, APSIZE);		// "?"
+            lcdDrawTextAtt   (   2*FW,   5*FH, val_unknown, APSIZE);		// "?"
     }
 }
 
@@ -559,21 +559,21 @@ void menuTelemetryNMEA2(uint8_t event)
     }
     title ('2');
     
-    lcd_puts         (   1*FW,   1*FH, PSTR("Altitude Sat   Max"));
+    lcdDrawText         (   1*FW,   1*FH, PSTR("Altitude Sat   Max"));
 
 
-    lcd_puts         (   16*FW,   3*FH, PSTR("Home"));
-    lcd_puts         (   2*FW,   4*FH, PSTR("Lift") );
+    lcdDrawText         (   16*FW,   3*FH, PSTR("Home"));
+    lcdDrawText         (   2*FW,   4*FH, PSTR("Lift") );
 
-    lcd_puts         (   16*FW,   5*FH, PSTR("Beep") );
+    lcdDrawText         (   16*FW,   5*FH, PSTR("Beep") );
     if (beep_on==1)
-        lcd_puts         (   18*FW,   6*FH, PSTR("ON") );
+        lcdDrawText         (   18*FW,   6*FH, PSTR("ON") );
     
     else	
-        lcd_puts         (   17*FW,   6*FH, PSTR("OFF") );
+        lcdDrawText         (   17*FW,   6*FH, PSTR("OFF") );
 
 
-    lcd_outdezNAtt(  20*FW,   4*FH, home_alt, PREC1, 6);		// display home_alt, small characters 
+    lcdDrawNumberNAtt(  20*FW,   4*FH, home_alt, PREC1, 6);		// display home_alt, small characters 
 
     if (xpack[0] != PACK_GGA)
         ggareceived = 0;
@@ -610,29 +610,29 @@ void menuTelemetryNMEA2(uint8_t event)
     }
 
     if (rbuf[0][0])	 {						
-	  lcd_putcAtt   (  13*FW,   1*FH, sbuf[2], 0);				// satellites in view
+	  lcdDrawCharAtt   (  13*FW,   1*FH, sbuf[2], 0);				// satellites in view
 
 	  if (sbuf[1]>0x30)	 {							// & GGA has FIX > 0
 
 
-	        lcd_outdezNAtt(  10*FW,   2*FH, rel_alt, DBLSIZE|PREC1, 7);	// altitude
+	        lcdDrawNumberNAtt(  10*FW,   2*FH, rel_alt, DBLSIZE|PREC1, 7);	// altitude
 	
 		  if (home_alt >= 0) 
-			  lcd_outdezNAtt(  20*FW,   2*FH, (max_alt-home_alt), PREC1, 6);	// display small characters
+			  lcdDrawNumberNAtt(  20*FW,   2*FH, (max_alt-home_alt), PREC1, 6);	// display small characters
 		  else
-			  lcd_outdezNAtt(  20*FW,   2*FH, max_alt, PREC1, 6);			// display small characters
+			  lcdDrawNumberNAtt(  20*FW,   2*FH, max_alt, PREC1, 6);			// display small characters
 	
 
-	        lcd_putcAtt   (  11*FW,   3*FH, sbuf[0], 0);				// dimension [m]
+	        lcdDrawCharAtt   (  11*FW,   3*FH, sbuf[0], 0);				// dimension [m]
 
-      	  lcd_outdezNAtt(  10*FW,   5*FH, lift_alt, DBLSIZE|PREC1, 6);	// lift
-	        lcd_putcAtt   (  11*FW,   6*FH, sbuf[0], 0);				// dimension [m/S]
-      	  lcd_puts    (  12*FW,   6*FH, PSTR("/S") );
+      	  lcdDrawNumberNAtt(  10*FW,   5*FH, lift_alt, DBLSIZE|PREC1, 6);	// lift
+	        lcdDrawCharAtt   (  11*FW,   6*FH, sbuf[0], 0);				// dimension [m/S]
+      	  lcdDrawText    (  12*FW,   6*FH, PSTR("/S") );
 		}
     }
     else {
-        lcd_putsAtt    (   2*FW,   2*FH, val_unknown, APSIZE);
-        lcd_putsAtt    (   2*FW,   5*FH, val_unknown, APSIZE);
+        lcdDrawTextAtt    (   2*FW,   2*FH, val_unknown, APSIZE);
+        lcdDrawTextAtt    (   2*FW,   5*FH, val_unknown, APSIZE);
     }
 }
 
@@ -661,7 +661,7 @@ void menuTelemetryNMEA3(uint8_t event)
     initval (LONG_BUF(1), PACK_RMC, COG);
     initval (SHORT_BUF(2), PACK_GGA, SAT);			// -> sbuf[2]
     title ('3');
-    lcd_puts        (   0*FW,   1*FH, PSTR("GrndSpeed[knt]  Sat"));
+    lcdDrawText        (   0*FW,   1*FH, PSTR("GrndSpeed[knt]  Sat"));
     if (rbuf[0][0])				// if first position is 00, buffer is empty, taken as false 
     {							// any other value is true
         uint8_t i = 0;
@@ -674,15 +674,15 @@ void menuTelemetryNMEA3(uint8_t event)
             }
             i++;
         }
-        lcd_putsAtt   (   2*FW,   2*FH, VALSTR(0), APSIZE);		// speed over ground
+        lcdDrawTextAtt   (   2*FW,   2*FH, VALSTR(0), APSIZE);		// speed over ground
     }
     else
-        lcd_putsAtt   (   2*FW,   2*FH, val_unknown, APSIZE);
+        lcdDrawTextAtt   (   2*FW,   2*FH, val_unknown, APSIZE);
 
-    lcd_putcAtt   (  19*FW,   1*FH, sbuf[2], 0);			// satellites in view
+    lcdDrawCharAtt   (  19*FW,   1*FH, sbuf[2], 0);			// satellites in view
 
-    lcd_puts        (   1*FW,   4*FH, PSTR("Course over ground") );
-    lcd_putsAtt       (   2*FW,   5*FH, VALSTR(1), APSIZE);		// course over ground
+    lcdDrawText        (   1*FW,   4*FH, PSTR("Course over ground") );
+    lcdDrawTextAtt       (   2*FW,   5*FH, VALSTR(1), APSIZE);		// course over ground
 }
 
 
@@ -715,36 +715,36 @@ void menuTelemetryNMEA4(uint8_t event)
     initval (SHORT_BUF(2), PACK_GGA, SAT);			// -> sbuf[2]
     // title of the screen
     title ('4');
-    lcd_puts        (   3*FW,   1*FH, PSTR("Latitude     Sat"));    // line 1 column 3
+    lcdDrawText        (   3*FW,   1*FH, PSTR("Latitude     Sat"));    // line 1 column 3
     // first buffer into line 2 column 2
     if (rbuf[0][0])
     {
-        lcd_putcAtt   (  13*FW,   1*FH, sbuf[0], 0);          // N or S
-	  lcd_putcAtt   (  19*FW,   1*FH, sbuf[2], 0);				// satellites in view
-        lcd_putsnAtt  (   1*FW,   2*FH, rbuf[0], 2, APSIZE);
-        lcd_putcAtt   (   5*FW,   2*FH, '@',0);
-        lcd_putsAtt   (   6*FW,   2*FH, &rbuf[0][2], APSIZE);	// minutes with small decimal point
+        lcdDrawCharAtt   (  13*FW,   1*FH, sbuf[0], 0);          // N or S
+	  lcdDrawCharAtt   (  19*FW,   1*FH, sbuf[2], 0);				// satellites in view
+        lcdDrawSizedTextAtt  (   1*FW,   2*FH, rbuf[0], 2, APSIZE);
+        lcdDrawCharAtt   (   5*FW,   2*FH, '@',0);
+        lcdDrawTextAtt   (   6*FW,   2*FH, &rbuf[0][2], APSIZE);	// minutes with small decimal point
     }
     else
-        lcd_putsAtt   (   2*FW,   2*FH, val_unknown, APSIZE);
-    lcd_puts        (   3*FW,   4*FH, PSTR("Longitude"));   // line 4 column 5
+        lcdDrawTextAtt   (   2*FW,   2*FH, val_unknown, APSIZE);
+    lcdDrawText        (   3*FW,   4*FH, PSTR("Longitude"));   // line 4 column 5
     // second buffer into line 5 column 2
     if (rbuf[0][0])
     {
-        lcd_putcAtt   (  13*FW,   4*FH, sbuf[1], 0);          // E or W
-        lcd_putsnAtt  (   0*FW,   5*FH, rbuf[1], 3, APSIZE);
-        lcd_putcAtt   (   6*FW,   5*FH, '@',0);
-        lcd_putsAtt   (   7*FW,   5*FH, &rbuf[1][3], APSIZE);	// minutes with small decimal point
+        lcdDrawCharAtt   (  13*FW,   4*FH, sbuf[1], 0);          // E or W
+        lcdDrawSizedTextAtt  (   0*FW,   5*FH, rbuf[1], 3, APSIZE);
+        lcdDrawCharAtt   (   6*FW,   5*FH, '@',0);
+        lcdDrawTextAtt   (   7*FW,   5*FH, &rbuf[1][3], APSIZE);	// minutes with small decimal point
 
     }
     else
-        lcd_putsAtt   (   2*FW,   5*FH, val_unknown, APSIZE);
+        lcdDrawTextAtt   (   2*FW,   5*FH, val_unknown, APSIZE);
 }
 
 void title(char x)
 {
-    lcd_putsAtt (0*FW, 0*FH, PSTR("  GPS NMEA data ?/4  "), INVERS);
-    lcd_putcAtt(16*FW, 0*FH, x, INVERS);
+    lcdDrawTextAtt (0*FW, 0*FH, PSTR("  GPS NMEA data ?/4  "), INVERS);
+    lcdDrawCharAtt(16*FW, 0*FH, x, INVERS);
 }
 
 void initval(uint8_t num, uint8_t pack, uint8_t val)

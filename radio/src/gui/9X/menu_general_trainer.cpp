@@ -26,13 +26,13 @@ void menuGeneralTrainer(uint8_t event)
   MENU(STR_MENUTRAINER, menuTabGeneral, e_Trainer, (slave ? 1 : 7), {0, 2, 2, 2, 2, 0/*, 0*/});
 
   if (slave) {
-    lcd_puts(7*FW, 4*FH, STR_SLAVE);
+    lcdDrawText(7*FW, 4*FH, STR_SLAVE);
   }
   else {
     uint8_t attr;
     uint8_t blink = ((s_editMode>0) ? BLINK|INVERS : INVERS);
 
-    lcd_puts(3*FW, MENU_HEADER_HEIGHT+1, STR_MODESRC);
+    lcdDrawText(3*FW, MENU_HEADER_HEIGHT+1, STR_MODESRC);
 
     y = MENU_HEADER_HEIGHT + 1 + FH;
 
@@ -48,17 +48,17 @@ void menuGeneralTrainer(uint8_t event)
 
         switch(j) {
           case 0:
-            lcd_putsiAtt(4*FW, y, STR_TRNMODE, td->mode, attr);
+            lcdDrawTextAtIndex(4*FW, y, STR_TRNMODE, td->mode, attr);
             if (attr&BLINK) CHECK_INCDEC_GENVAR(event, td->mode, 0, 2);
             break;
 
           case 1:
-            lcd_outdezAtt(11*FW, y, td->studWeight, attr);
+            lcdDrawNumberAttUnit(11*FW, y, td->studWeight, attr);
             if (attr&BLINK) CHECK_INCDEC_GENVAR(event, td->studWeight, -125, 125);
             break;
 
           case 2:
-            lcd_putsiAtt(12*FW, y, STR_TRNCHN, td->srcChn, attr);
+            lcdDrawTextAtIndex(12*FW, y, STR_TRNCHN, td->srcChn, attr);
             if (attr&BLINK) CHECK_INCDEC_GENVAR(event, td->srcChn, 0, 3);
             break;
         }
@@ -67,19 +67,19 @@ void menuGeneralTrainer(uint8_t event)
     }
 
     attr = (menuVerticalPosition==5) ? blink : 0;
-    lcd_putsLeft(MENU_HEADER_HEIGHT+1+5*FH, STR_MULTIPLIER);
-    lcd_outdezAtt(LEN_MULTIPLIER*FW+3*FW, MENU_HEADER_HEIGHT+1+5*FH, g_eeGeneral.PPM_Multiplier+10, attr|PREC1);
+    lcdDrawTextLeft(MENU_HEADER_HEIGHT+1+5*FH, STR_MULTIPLIER);
+    lcdDrawNumberAttUnit(LEN_MULTIPLIER*FW+3*FW, MENU_HEADER_HEIGHT+1+5*FH, g_eeGeneral.PPM_Multiplier+10, attr|PREC1);
     if (attr) CHECK_INCDEC_GENVAR(event, g_eeGeneral.PPM_Multiplier, -10, 40);
 
     attr = (menuVerticalPosition==6) ? INVERS : 0;
     if (attr) s_editMode = 0;
-    lcd_putsAtt(0*FW, MENU_HEADER_HEIGHT+1+6*FH, STR_CAL, attr);
+    lcdDrawTextAtt(0*FW, MENU_HEADER_HEIGHT+1+6*FH, STR_CAL, attr);
     for (uint8_t i=0; i<4; i++) {
       uint8_t x = (i*TRAINER_CALIB_POS+16)*FW/2;
 #if defined (PPM_UNIT_PERCENT_PREC1)
-      lcd_outdezAtt(x, MENU_HEADER_HEIGHT+1+6*FH, (ppmInput[i]-g_eeGeneral.trainer.calib[i])*2, PREC1);
+      lcdDrawNumberAttUnit(x, MENU_HEADER_HEIGHT+1+6*FH, (ppmInput[i]-g_eeGeneral.trainer.calib[i])*2, PREC1);
 #else
-      lcd_outdezAtt(x, MENU_HEADER_HEIGHT+1+6*FH, (ppmInput[i]-g_eeGeneral.trainer.calib[i])/5, 0);
+      lcdDrawNumberAttUnit(x, MENU_HEADER_HEIGHT+1+6*FH, (ppmInput[i]-g_eeGeneral.trainer.calib[i])/5, 0);
 #endif
     }
 

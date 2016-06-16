@@ -19,14 +19,14 @@
 void displayKeyState(uint8_t x, uint8_t y, EnumKeys key)
 {
   uint8_t t = switchState(key);
-  lcd_putcAtt(x, y, t+'0', t ? INVERS : 0);
+  lcdDrawCharAtt(x, y, t+'0', t ? INVERS : 0);
 }
 
 void menuGeneralDiagKeys(uint8_t event)
 {
   SIMPLE_MENU(STR_MENUDIAG, menuTabGeneral, e_Keys, 1);
 
-  lcd_puts(14*FW, MENU_HEADER_HEIGHT+2*FH, STR_VTRIM);
+  lcdDrawText(14*FW, MENU_HEADER_HEIGHT+2*FH, STR_VTRIM);
 
   for(uint8_t i=0; i<9; i++) {
     coord_t y;
@@ -39,13 +39,13 @@ void menuGeneralDiagKeys(uint8_t event)
 
     if (i<6) {
       y = i*FH+MENU_HEADER_HEIGHT+FH;
-      lcd_putsiAtt(0, y, STR_VKEYS, (5-i), 0);
+      lcdDrawTextAtIndex(0, y, STR_VKEYS, (5-i), 0);
       displayKeyState(5*FW+2, y, (EnumKeys)(KEY_MENU+(5-i)));
     }
 
     if (i != SW_ID0-SW_BASE) {
       y = MENU_HEADER_HEIGHT+i*FH-2*FH;
-      putsSwitches(8*FW, y, i+1, 0); //ohne off,on
+      lcdPutsSwitches(8*FW, y, i+1, 0); //ohne off,on
       displayKeyState(11*FW+2, y, (EnumKeys)(SW_BASE+i));
     }
   }
@@ -53,10 +53,10 @@ void menuGeneralDiagKeys(uint8_t event)
 #if defined(ROTARY_ENCODERS) || defined(ROTARY_ENCODER_NAVIGATION)
   for(uint8_t i=0; i<DIM(g_rotenc); i++) {
     coord_t y = MENU_HEADER_HEIGHT /* ??? + 1 ??? */ + i*FH;
-    lcd_putsiAtt(14*FW, y, STR_VRENCODERS, i, 0);
+    lcdDrawTextAtIndex(14*FW, y, STR_VRENCODERS, i, 0);
     int16_t rex = getRotaryEncoder(i);
     rex /= 8; 
-    lcd_outdezNAtt(18*FW, y, rex, LEFT|(switchState((EnumKeys)(BTN_REa+i)) ? INVERS : 0));
+    lcdDrawNumberNAtt(18*FW, y, rex, LEFT|(switchState((EnumKeys)(BTN_REa+i)) ? INVERS : 0));
   }
 #endif
 

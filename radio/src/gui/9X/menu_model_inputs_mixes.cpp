@@ -23,12 +23,12 @@
 void displayFlightModes(coord_t x, coord_t y, FlightModesType value);
 FlightModesType editFlightModes(coord_t x, coord_t y, uint8_t event, FlightModesType value, uint8_t attr)
 {
-  lcd_putsColumnLeft(x, y, STR_FLMODE);
+  lcdDrawTextColumnLeft(x, y, STR_FLMODE);
 
   uint8_t posHorz = menuHorizontalPosition;
 
   for (uint8_t p=0; p<MAX_FLIGHT_MODES; p++) {
-    lcd_putcAtt(x, y, '0'+p, ((posHorz==p) && attr) ? BLINK|INVERS : ((value & (1<<p)) ? 0 : INVERS));
+    lcdDrawCharAtt(x, y, '0'+p, ((posHorz==p) && attr) ? BLINK|INVERS : ((value & (1<<p)) ? 0 : INVERS));
     x += FW;
   }
 
@@ -57,8 +57,8 @@ int16_t expoFn(int16_t x)
 
 void DrawFunction(FnFuncP fn, uint8_t offset)
 {
-  lcd_vlineStip(X0-offset, 0, LCD_H, 0xee);
-  lcd_hlineStip(X0-WCHART-offset, Y0, WCHART*2, 0xee);
+  lcdDrawSolidVerticalLineStip(X0-offset, 0, LCD_H, 0xee);
+  lcdDrawSolidHorizontalLineStip(X0-WCHART-offset, Y0, WCHART*2, 0xee);
 
   coord_t prev_yv = (coord_t)-1;
 
@@ -66,11 +66,11 @@ void DrawFunction(FnFuncP fn, uint8_t offset)
     coord_t yv = (LCD_H-1) - (((uint16_t)RESX + fn(xv * (RESX/WCHART))) / 2 * (LCD_H-1) / RESX);
     if (prev_yv != (coord_t)-1) {
       if (abs((int8_t)yv-prev_yv) <= 1) {
-        lcd_plot(X0+xv-offset-1, prev_yv, FORCE);
+        lcdDrawPoint(X0+xv-offset-1, prev_yv, FORCE);
       }
       else {
         uint8_t tmp = (prev_yv < yv ? 0 : 1);
-        lcd_vline(X0+xv-offset-1, yv+tmp, prev_yv-yv);
+        lcdDrawSolidVerticalLine(X0+xv-offset-1, yv+tmp, prev_yv-yv);
       }
     }
     prev_yv = yv;
@@ -283,26 +283,26 @@ void menuModelExpoOne(uint8_t event)
     {
 
       case EXPO_FIELD_WEIGHT:
-        lcd_putsLeft(y, STR_WEIGHT);
+        lcdDrawTextLeft(y, STR_WEIGHT);
         ed->weight = GVAR_MENU_ITEM(EXPO_ONE_2ND_COLUMN, y, ed->weight, MIN_EXPO_WEIGHT, 100, attr, 0, event);
         break;
 
       case EXPO_FIELD_EXPO:
-        lcd_putsLeft(y, STR_EXPO);
+        lcdDrawTextLeft(y, STR_EXPO);
         if (ed->curveMode==MODE_EXPO || ed->curveParam==0) {
           ed->curveMode = MODE_EXPO;
           ed->curveParam = GVAR_MENU_ITEM(EXPO_ONE_2ND_COLUMN, y, ed->curveParam, -100, 100, attr, 0, event);
         }
         else {
-          lcd_putsAtt(EXPO_ONE_2ND_COLUMN-3*FW, y, STR_NA, attr);
+          lcdDrawTextAtt(EXPO_ONE_2ND_COLUMN-3*FW, y, STR_NA, attr);
         }
         break;
 
 #if defined(CURVES)
       case EXPO_FIELD_CURVE:
-        lcd_putsLeft(y, STR_CURVE);
+        lcdDrawTextLeft(y, STR_CURVE);
         if (ed->curveMode!=MODE_EXPO || ed->curveParam==0) {
-          putsCurve(EXPO_ONE_2ND_COLUMN-3*FW, y, ed->curveParam, attr);
+          lcdDrawCurveName(EXPO_ONE_2ND_COLUMN-3*FW, y, ed->curveParam, attr);
           if (attr) {
             CHECK_INCDEC_MODELVAR_ZERO(event, ed->curveParam, CURVE_BASE+MAX_CURVES-1);
             if (ed->curveParam) ed->curveMode = MODE_CURVE;
@@ -313,7 +313,7 @@ void menuModelExpoOne(uint8_t event)
           }
         }
         else {
-          lcd_putsAtt(EXPO_ONE_2ND_COLUMN-3*FW, y, STR_NA, attr);
+          lcdDrawTextAtt(EXPO_ONE_2ND_COLUMN-3*FW, y, STR_NA, attr);
         }
         break;
 #endif
@@ -338,15 +338,15 @@ void menuModelExpoOne(uint8_t event)
   DrawFunction(expoFn);
 
   int16_t x512 = calibratedStick[ed->chn];
-  lcd_outdezAtt(LCD_W-8, 6*FH, calcRESXto100(x512), 0);
+  lcdDrawNumberAttUnit(LCD_W-8, 6*FH, calcRESXto100(x512), 0);
   int16_t y512 = expoFn(x512);
-  lcd_outdezAtt(LCD_W-8-6*FW, 1*FH, calcRESXto100(y512), 0);
+  lcdDrawNumberAttUnit(LCD_W-8-6*FW, 1*FH, calcRESXto100(y512), 0);
 
   x512 = X0+x512/(RESXu/WCHART);
   y512 = (LCD_H-1) - (uint16_t)((y512+RESX)/2) * (LCD_H-1) / RESX;
 
-  lcd_vline(x512, y512-3, 3*2+1);
-  lcd_hline(x512-3, y512, 3*2+1);
+  lcdDrawSolidVerticalLine(x512, y512-3, 3*2+1);
+  lcdDrawSolidHorizontalLine(x512-3, y512, 3*2+1);
 }
 
 enum MixFields {
@@ -394,33 +394,33 @@ void drawOffsetBar(uint8_t x, uint8_t y, MixData * md)
     barMax = offset + weight;
   }
   if (y > 15) {
-    lcd_outdezAtt(x-((barMin >= 0) ? 2 : 3), y-8, barMin, LEFT);
-    lcd_outdezAtt(x+GAUGE_WIDTH+1, y-8, barMax);
+    lcdDrawNumberAttUnit(x-((barMin >= 0) ? 2 : 3), y-8, barMin, LEFT);
+    lcdDrawNumberAttUnit(x+GAUGE_WIDTH+1, y-8, barMax);
   }
   if (barMin < -101)
     barMin = -101;
   if (barMax > 101)
     barMax = 101;
-  lcd_hlineStip(x-2, y, GAUGE_WIDTH+2, DOTTED);
-  lcd_hlineStip(x-2, y+GAUGE_HEIGHT, GAUGE_WIDTH+2, DOTTED);
-  lcd_vline(x-2, y+1, GAUGE_HEIGHT-1);
-  lcd_vline(x+GAUGE_WIDTH-1, y+1, GAUGE_HEIGHT-1);
+  lcdDrawSolidHorizontalLineStip(x-2, y, GAUGE_WIDTH+2, DOTTED);
+  lcdDrawSolidHorizontalLineStip(x-2, y+GAUGE_HEIGHT, GAUGE_WIDTH+2, DOTTED);
+  lcdDrawSolidVerticalLine(x-2, y+1, GAUGE_HEIGHT-1);
+  lcdDrawSolidVerticalLine(x+GAUGE_WIDTH-1, y+1, GAUGE_HEIGHT-1);
   if (barMin <= barMax) {
     int8_t right = (barMax * GAUGE_WIDTH) / 200;
     int8_t left = ((barMin * GAUGE_WIDTH) / 200)-1;
-    drawFilledRect(x+GAUGE_WIDTH/2+left, y+2, right-left, GAUGE_HEIGHT-3);
+    lcdDrawFilledRect(x+GAUGE_WIDTH/2+left, y+2, right-left, GAUGE_HEIGHT-3);
   }
-  lcd_vline(x+GAUGE_WIDTH/2-1, y, GAUGE_HEIGHT+1);
+  lcdDrawSolidVerticalLine(x+GAUGE_WIDTH/2-1, y, GAUGE_HEIGHT+1);
   if (barMin == -101) {
     for (uint8_t i=0; i<3; ++i) {
-      lcd_plot(x+i, y+4-i);
-      lcd_plot(x+3+i, y+4-i);
+      lcdDrawPoint(x+i, y+4-i);
+      lcdDrawPoint(x+3+i, y+4-i);
     }
   }
   if (barMax == 101) {
     for (uint8_t i=0; i<3; ++i) {
-      lcd_plot(x+GAUGE_WIDTH-8+i, y+4-i);
-      lcd_plot(x+GAUGE_WIDTH-5+i, y+4-i);
+      lcdDrawPoint(x+GAUGE_WIDTH-8+i, y+4-i);
+      lcdDrawPoint(x+GAUGE_WIDTH-5+i, y+4-i);
     }
   }
 }
@@ -448,7 +448,7 @@ void menuModelMixOne(uint8_t event)
 #endif
 
 #if MENU_COLUMNS > 1
-  lcd_vline(MENU_COLUMN2_X-4, FH+1, LCD_H-FH-1);
+  lcdDrawSolidVerticalLine(MENU_COLUMN2_X-4, FH+1, LCD_H-FH-1);
 #endif
 
   int8_t sub = menuVerticalPosition;
@@ -479,17 +479,17 @@ void menuModelMixOne(uint8_t event)
         editSingleName(COLUMN_X+MIXES_2ND_COLUMN, y, STR_MIXNAME, md2->name, sizeof(md2->name), event, attr);
         break;    */
       case MIX_FIELD_SOURCE:
-        lcd_putsColumnLeft(COLUMN_X, y, NO_INDENT(STR_SOURCE));
+        lcdDrawTextColumnLeft(COLUMN_X, y, NO_INDENT(STR_SOURCE));
         putsMixerSource(COLUMN_X+MIXES_2ND_COLUMN, y, md2->srcRaw, STREXPANDED|attr);
         if (attr) CHECK_INCDEC_MODELSOURCE(event, md2->srcRaw, 1, MIXSRC_LAST);
         break;
       case MIX_FIELD_WEIGHT:
-        lcd_putsColumnLeft(COLUMN_X, y, STR_WEIGHT);
+        lcdDrawTextColumnLeft(COLUMN_X, y, STR_WEIGHT);
         gvarWeightItem(COLUMN_X+MIXES_2ND_COLUMN, y, md2, attr|LEFT, event);
         break;
       case MIX_FIELD_OFFSET:
       {
-        lcd_putsColumnLeft(COLUMN_X, y, NO_INDENT(STR_OFFSET));
+        lcdDrawTextColumnLeft(COLUMN_X, y, NO_INDENT(STR_OFFSET));
         u_int8int16_t offset;
         MD_OFFSET_TO_UNION(md2, offset);
         offset.word = GVAR_MENU_ITEM(COLUMN_X+MIXES_2ND_COLUMN, y, offset.word, GV_RANGELARGE_OFFSET_NEG, GV_RANGELARGE_OFFSET, attr|LEFT, 0, event);
@@ -504,11 +504,11 @@ void menuModelMixOne(uint8_t event)
       {
         uint8_t not_stick = (md2->srcRaw > NUM_STICKS);
         int8_t carryTrim = -md2->carryTrim;
-        lcd_putsColumnLeft(COLUMN_X, y, STR_TRIM);
-        lcd_putsiAtt((not_stick ? COLUMN_X+MIXES_2ND_COLUMN : COLUMN_X+6*FW-3), y, STR_VMIXTRIMS, (not_stick && carryTrim == 0) ? 0 : carryTrim+1, menuHorizontalPosition==0 ? attr : 0);
+        lcdDrawTextColumnLeft(COLUMN_X, y, STR_TRIM);
+        lcdDrawTextAtIndex((not_stick ? COLUMN_X+MIXES_2ND_COLUMN : COLUMN_X+6*FW-3), y, STR_VMIXTRIMS, (not_stick && carryTrim == 0) ? 0 : carryTrim+1, menuHorizontalPosition==0 ? attr : 0);
         if (attr && menuHorizontalPosition==0 && (not_stick || editMode>0)) md2->carryTrim = -checkIncDecModel(event, carryTrim, not_stick ? TRIM_ON : -TRIM_OFF, -TRIM_AIL);
         if (!not_stick) {
-          lcd_puts(COLUMN_X+MIXES_2ND_COLUMN, y, STR_DREX);
+          lcdDrawText(COLUMN_X+MIXES_2ND_COLUMN, y, STR_DREX);
           menu_lcd_onoff(COLUMN_X+MIXES_2ND_COLUMN+DREX_CHBOX_OFFSET, y, !md2->noExpo, menuHorizontalPosition==1 ? attr : 0);
           if (attr && menuHorizontalPosition==1 && editMode>0) md2->noExpo = !checkIncDecModel(event, !md2->noExpo, 0, 1);
         }
@@ -521,10 +521,10 @@ void menuModelMixOne(uint8_t event)
 #if defined(CURVES)
       case MIX_FIELD_CURVE:
       {
-        lcd_putsColumnLeft(COLUMN_X, y, STR_CURVE);
+        lcdDrawTextColumnLeft(COLUMN_X, y, STR_CURVE);
         int8_t curveParam = md2->curveParam;
         if (md2->curveMode == MODE_CURVE) {
-          putsCurve(COLUMN_X+MIXES_2ND_COLUMN, y, curveParam, attr);
+          lcdDrawCurveName(COLUMN_X+MIXES_2ND_COLUMN, y, curveParam, attr);
           if (attr) {
             if (event==EVT_KEY_LONG(KEY_ENTER) && (curveParam<0 || curveParam>=CURVE_BASE)){
               s_curveChan = (curveParam<0 ? -curveParam-1 : curveParam-CURVE_BASE);
@@ -538,7 +538,7 @@ void menuModelMixOne(uint8_t event)
           }
         }
         else {
-          lcd_putsAtt(COLUMN_X+MIXES_2ND_COLUMN, y, PSTR("Diff"), menuHorizontalPosition==0 ? attr : 0);
+          lcdDrawTextAtt(COLUMN_X+MIXES_2ND_COLUMN, y, PSTR("Diff"), menuHorizontalPosition==0 ? attr : 0);
           md2->curveParam = GVAR_MENU_ITEM(COLUMN_X+MIXES_2ND_COLUMN+5*FW, y, curveParam, -100, 100, LEFT|(menuHorizontalPosition==1 ? attr : 0), 0, editMode>0 ? event : 0);
           if (attr && editMode>0 && menuHorizontalPosition==0) {
             int8_t tmp = 0;
@@ -561,11 +561,11 @@ void menuModelMixOne(uint8_t event)
         md2->swtch = switchMenuItem(COLUMN_X+MIXES_2ND_COLUMN, y, md2->swtch, attr, event);
         break;
       case MIX_FIELD_WARNING:
-        lcd_putsColumnLeft(COLUMN_X+MIXES_2ND_COLUMN, y, STR_MIXWARNING);
+        lcdDrawTextColumnLeft(COLUMN_X+MIXES_2ND_COLUMN, y, STR_MIXWARNING);
         if (md2->mixWarn)
-          lcd_outdezAtt(COLUMN_X+MIXES_2ND_COLUMN, y, md2->mixWarn, attr|LEFT);
+          lcdDrawNumberAttUnit(COLUMN_X+MIXES_2ND_COLUMN, y, md2->mixWarn, attr|LEFT);
         else
-          lcd_putsAtt(COLUMN_X+MIXES_2ND_COLUMN, y, STR_OFF, attr);
+          lcdDrawTextAtt(COLUMN_X+MIXES_2ND_COLUMN, y, STR_OFF, attr);
         if (attr) CHECK_INCDEC_MODELVAR_ZERO(event, md2->mixWarn, 3);
         break;
       case MIX_FIELD_MLTPX:
@@ -643,13 +643,13 @@ void displayMixInfos(coord_t y, MixData *md)
 {
   if (md->curveParam) {
     if (md->curveMode == MODE_CURVE)
-      putsCurve(MIX_LINE_CURVE_POS, y, md->curveParam);
+      lcdDrawCurveName(MIX_LINE_CURVE_POS, y, md->curveParam);
     else
       displayGVar(MIX_LINE_CURVE_POS+3*FW, y, md->curveParam, -100, 100);
   }
 
   if (md->swtch) {
-    putsSwitches(MIX_LINE_SWITCH_POS, y, md->swtch);
+    lcdPutsSwitches(MIX_LINE_SWITCH_POS, y, md->swtch);
   }
 }
 
@@ -658,11 +658,11 @@ void displayMixInfos(coord_t y, MixData *md)
 void displayExpoInfos(coord_t y, ExpoData *ed)
 {
   if (ed->curveMode == MODE_CURVE)
-    putsCurve(EXPO_LINE_EXPO_POS-3*FW, y, ed->curveParam);
+    lcdDrawCurveName(EXPO_LINE_EXPO_POS-3*FW, y, ed->curveParam);
   else
     displayGVar(EXPO_LINE_EXPO_POS, y, ed->curveParam, -100, 100);
 
-  putsSwitches(EXPO_LINE_SWITCH_POS, y, ed->swtch, 0);
+  lcdPutsSwitches(EXPO_LINE_SWITCH_POS, y, ed->swtch, 0);
 }
 
 #define displayExpoLine(y, ed) \
@@ -824,8 +824,8 @@ void menuModelExpoMix(uint8_t expo, uint8_t event)
       break;
   }
 
-  lcd_outdezAtt(FW*max(sizeof(TR_MENUINPUTS), sizeof(TR_MIXER))+FW+FW/2, 0, getExpoMixCount(expo));
-  lcd_puts(FW*max(sizeof(TR_MENUINPUTS), sizeof(TR_MIXER))+FW+FW/2, 0, expo ? STR_MAX(MAX_EXPOS) : STR_MAX(MAX_MIXERS));
+  lcdDrawNumberAttUnit(FW*max(sizeof(TR_MENUINPUTS), sizeof(TR_MIXER))+FW+FW/2, 0, getExpoMixCount(expo));
+  lcdDrawText(FW*max(sizeof(TR_MENUINPUTS), sizeof(TR_MIXER))+FW+FW/2, 0, expo ? STR_MAX(MAX_EXPOS) : STR_MAX(MAX_MIXERS));
 
   SIMPLE_MENU(expo ? STR_MENUINPUTS : STR_MIXER, menuTabModel, expo ? e_InputsAll : e_MixAll, s_maxLines);
 
@@ -850,7 +850,7 @@ void menuModelExpoMix(uint8_t expo, uint8_t event)
       do {
         if (s_copyMode) {
           if (s_copyMode == MOVE_MODE && menuVerticalOffset < cur && cur-menuVerticalOffset < 8 && s_copySrcCh == ch && s_copyTgtOfs != 0 && i == (s_copySrcIdx + (s_copyTgtOfs<0))) {
-            lcd_rect(expo ? 18 : 22, y-1, expo ? LCD_W-18 : LCD_W-22, 9, DOTTED);
+            lcdDrawRect(expo ? 18 : 22, y-1, expo ? LCD_W-18 : LCD_W-22, 9, DOTTED);
             cur++; y+=FH;
           }
           if (s_currIdx == i) {
@@ -867,11 +867,11 @@ void menuModelExpoMix(uint8_t expo, uint8_t event)
             ed->weight = GVAR_MENU_ITEM(EXPO_LINE_WEIGHT_POS, y, ed->weight, MIN_EXPO_WEIGHT, 100, attr | (isExpoActive(i) ? BOLD : 0), 0, event);
             displayExpoLine(y, ed);
             if (ed->mode!=3) {
-              lcd_putc(EXPO_LINE_SIDE_POS, y, ed->mode == 2 ? 126 : 127);
+              lcdDrawChar(EXPO_LINE_SIDE_POS, y, ed->mode == 2 ? 126 : 127);
             }
           }
           else {
-            if (mixCnt > 0) lcd_putsiAtt(FW, y, STR_VMLTPX2, md->mltpx, 0);
+            if (mixCnt > 0) lcdDrawTextAtIndex(FW, y, STR_VMLTPX2, md->mltpx, 0);
 
             putsMixerSource(MIX_LINE_SRC_POS, y, md->srcRaw, 0);
 
@@ -884,23 +884,23 @@ void menuModelExpoMix(uint8_t expo, uint8_t event)
               cs = 'S';
             if (md->delayUp || md->delayDown)
               cs = (cs =='S' ? '*' : 'D');
-            lcd_putc(MIX_LINE_DELAY_POS, y, cs);
+            lcdDrawChar(MIX_LINE_DELAY_POS, y, cs);
           }
           if (s_copyMode) {
             if ((s_copyMode==COPY_MODE || s_copyTgtOfs == 0) && s_copySrcCh == ch && i == (s_copySrcIdx + (s_copyTgtOfs<0))) {
               /* draw a border around the raw on selection mode (copy/move) */
-              lcd_rect(expo ? EXPO_LINE_SELECT_POS : 22, y-1, expo ? (LCD_W-EXPO_LINE_SELECT_POS) : (LCD_W-22), 9, s_copyMode == COPY_MODE ? SOLID : DOTTED);
+              lcdDrawRect(expo ? EXPO_LINE_SELECT_POS : 22, y-1, expo ? (LCD_W-EXPO_LINE_SELECT_POS) : (LCD_W-22), 9, s_copyMode == COPY_MODE ? SOLID : DOTTED);
             }
             if (cur == sub) {
               /* invert the raw when it's the current one */
-              drawFilledRect(expo ? EXPO_LINE_SELECT_POS+1 : 23, y, expo ? (LCD_W-EXPO_LINE_SELECT_POS-2) : (LCD_W-24), 7);
+              lcdDrawFilledRect(expo ? EXPO_LINE_SELECT_POS+1 : 23, y, expo ? (LCD_W-EXPO_LINE_SELECT_POS-2) : (LCD_W-24), 7);
             }
           }
         }
         cur++; y+=FH; mixCnt++; i++; if (expo) ed++; else md++;
       } while (expo ? (i<MAX_EXPOS && ed->chn+1 == ch && EXPO_VALID(ed)) : (i<MAX_MIXERS && md->srcRaw && md->destCh+1 == ch));
       if (s_copyMode == MOVE_MODE && menuVerticalOffset < cur && cur-menuVerticalOffset < LCD_LINES && s_copySrcCh == ch && i == (s_copySrcIdx + (s_copyTgtOfs<0))) {
-        lcd_rect(expo ? EXPO_LINE_SELECT_POS : 22, y-1, expo ? LCD_W-EXPO_LINE_SELECT_POS : LCD_W-22, 9, DOTTED);
+        lcdDrawRect(expo ? EXPO_LINE_SELECT_POS : 22, y-1, expo ? LCD_W-EXPO_LINE_SELECT_POS : LCD_W-22, 9, DOTTED);
         cur++; y+=FH;
       }
     }
@@ -921,7 +921,7 @@ void menuModelExpoMix(uint8_t expo, uint8_t event)
           putsChn(0, y, ch, attr); // show CHx
         }
         if (s_copyMode == MOVE_MODE && s_copySrcCh == ch) {
-          lcd_rect(expo ? EXPO_LINE_SELECT_POS : 22, y-1, expo ? (LCD_W-EXPO_LINE_SELECT_POS) : (LCD_W-22), 9, DOTTED);
+          lcdDrawRect(expo ? EXPO_LINE_SELECT_POS : 22, y-1, expo ? (LCD_W-EXPO_LINE_SELECT_POS) : (LCD_W-22), 9, DOTTED);
         }
       }
       cur++; y+=FH;

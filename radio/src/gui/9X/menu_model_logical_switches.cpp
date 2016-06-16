@@ -64,10 +64,10 @@ void menuModelLogicalSwitches(uint8_t event)
 
     // CSW name
     uint8_t sw = SWSRC_SW1+k;
-    putsSwitches(0, y, sw, (getSwitch(sw) ? BOLD : 0) | ((sub==k && CURSOR_ON_LINE()) ? INVERS : 0));
+    lcdPutsSwitches(0, y, sw, (getSwitch(sw) ? BOLD : 0) | ((sub==k && CURSOR_ON_LINE()) ? INVERS : 0));
 
     // CSW func
-    lcd_putsiAtt(CSW_1ST_COLUMN, y, STR_VCSWFUNC, cs->func, horz==0 ? attr : 0);
+    lcdDrawTextAtIndex(CSW_1ST_COLUMN, y, STR_VCSWFUNC, cs->func, horz==0 ? attr : 0);
 
     // CSW params
     uint8_t cstate = lswFamily(cs->func);
@@ -75,8 +75,8 @@ void menuModelLogicalSwitches(uint8_t event)
     #define v1_val cs->v1
 
     if (cstate == LS_FAMILY_BOOL || cstate == LS_FAMILY_STICKY) {
-      putsSwitches(CSW_2ND_COLUMN, y, cs->v1, attr1);
-      putsSwitches(CSW_3RD_COLUMN, y, cs->v2, attr2);
+      lcdPutsSwitches(CSW_2ND_COLUMN, y, cs->v1, attr1);
+      lcdPutsSwitches(CSW_3RD_COLUMN, y, cs->v2, attr2);
       v1_min = SWSRC_FIRST_IN_LOGICAL_SWITCHES; v1_max = SWSRC_LAST_IN_LOGICAL_SWITCHES;
       v2_min = SWSRC_FIRST_IN_LOGICAL_SWITCHES; v2_max = SWSRC_LAST_IN_LOGICAL_SWITCHES;
       INCDEC_SET_FLAG(EE_MODEL | INCDEC_SWITCH);
@@ -89,8 +89,8 @@ void menuModelLogicalSwitches(uint8_t event)
       INCDEC_ENABLE_CHECK(isSourceAvailable);
     }
     else if (cstate == LS_FAMILY_TIMER) {
-      lcd_outdezAtt(CSW_2ND_COLUMN, y, lswTimerValue(cs->v1), LEFT|PREC1|attr1);
-      lcd_outdezAtt(CSW_3RD_COLUMN, y, lswTimerValue(cs->v2), LEFT|PREC1|attr2);
+      lcdDrawNumberAttUnit(CSW_2ND_COLUMN, y, lswTimerValue(cs->v1), LEFT|PREC1|attr1);
+      lcdDrawNumberAttUnit(CSW_3RD_COLUMN, y, lswTimerValue(cs->v2), LEFT|PREC1|attr2);
       v1_min = v2_min = -128;
       v1_max = v2_max = 122;
       INCDEC_SET_FLAG(EE_MODEL);
@@ -108,7 +108,7 @@ void menuModelLogicalSwitches(uint8_t event)
       }
 #if   defined(FRSKY)
       if (v1_val >= MIXSRC_FIRST_TELEM) {
-        putsTelemetryChannelValue(CSW_3RD_COLUMN, y, v1_val - MIXSRC_FIRST_TELEM, convertLswTelemValue(cs), LEFT|attr2);
+        lcdPutsTelemetryChannelValue(CSW_3RD_COLUMN, y, v1_val - MIXSRC_FIRST_TELEM, convertLswTelemValue(cs), LEFT|attr2);
         v2_max = maxTelemValue(v1_val - MIXSRC_FIRST_TELEM + 1);
         if (cstate == LS_FAMILY_OFS) {
           v2_min = -128;
@@ -124,18 +124,18 @@ void menuModelLogicalSwitches(uint8_t event)
         }
       }
       else {
-        lcd_outdezAtt(CSW_3RD_COLUMN, y, cs->v2, LEFT|attr2);
+        lcdDrawNumberAttUnit(CSW_3RD_COLUMN, y, cs->v2, LEFT|attr2);
         {
           v2_min = -LIMIT_EXT_PERCENT; v2_max = +LIMIT_EXT_PERCENT;
         }
       }
 #else
       if (v1_val >= MIXSRC_FIRST_TELEM) {
-        putsTelemetryChannelValue(CSW_3RD_COLUMN, y, v1_val - MIXSRC_FIRST_TELEM, convertLswTelemValue(cs), LEFT|attr2);
+        lcdPutsTelemetryChannelValue(CSW_3RD_COLUMN, y, v1_val - MIXSRC_FIRST_TELEM, convertLswTelemValue(cs), LEFT|attr2);
         v2_min = -128; v2_max = 127;
       }
       else {
-        lcd_outdezAtt(CSW_3RD_COLUMN, y, cs->v2, LEFT|attr2);
+        lcdDrawNumberAttUnit(CSW_3RD_COLUMN, y, cs->v2, LEFT|attr2);
         v2_min = -LIMIT_EXT_PERCENT; v2_max = +LIMIT_EXT_PERCENT;
       }
 #endif
@@ -146,7 +146,7 @@ void menuModelLogicalSwitches(uint8_t event)
     if (andsw > SWSRC_LAST_SWITCH) {
       andsw += SWSRC_SW1-SWSRC_LAST_SWITCH-1;
     }
-    putsSwitches(CSW_4TH_COLUMN, y, andsw, horz==LS_FIELD_ANDSW ? attr : 0);
+    lcdPutsSwitches(CSW_4TH_COLUMN, y, andsw, horz==LS_FIELD_ANDSW ? attr : 0);
 
 
     if ((s_editMode>0 || p1valdiff) && attr) {

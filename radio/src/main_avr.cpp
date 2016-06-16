@@ -113,7 +113,7 @@ void perMain()
   bool popupMenuActive = (popupMenuNoItems > 0);
 
   if(IS_LCD_REFRESH_ALLOWED()){//No need to redraw until lcdRefresh_ST7920(0) below completely refreshes the display.
-      lcd_clear();
+      lcdClear();
       if (menuEvent) {
         menuVerticalPosition = menuEvent == EVT_ENTRY_UP ? menuVerticalPositions[menuLevel] : 0;
         menuHorizontalPosition = 0;

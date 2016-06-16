@@ -20,26 +20,26 @@ void menuGeneralSdManagerInfo(uint8_t event)
 {
   SIMPLE_SUBMENU(STR_SD_INFO_TITLE, 1);
 
-  lcd_putsLeft(2*FH, STR_SD_TYPE);
-  lcd_puts(10*FW, 2*FH, SD_IS_HC() ? STR_SDHC_CARD : STR_SD_CARD);
+  lcdDrawTextLeft(2*FH, STR_SD_TYPE);
+  lcdDrawText(10*FW, 2*FH, SD_IS_HC() ? STR_SDHC_CARD : STR_SD_CARD);
 
-  lcd_putsLeft(3*FH, STR_SD_SIZE);
-  lcd_outdezAtt(10*FW, 3*FH, sdGetSize(), LEFT);
-  lcd_putc(lcdLastPos, 3*FH, 'M');
+  lcdDrawTextLeft(3*FH, STR_SD_SIZE);
+  lcdDrawNumberAttUnit(10*FW, 3*FH, sdGetSize(), LEFT);
+  lcdDrawChar(lcdLastPos, 3*FH, 'M');
 
-  lcd_putsLeft(4*FH, STR_SD_SECTORS);
+  lcdDrawTextLeft(4*FH, STR_SD_SECTORS);
 #if defined(SD_GET_FREE_BLOCKNR)
-  lcd_outdezAtt(10*FW, 4*FH,  SD_GET_FREE_BLOCKNR()/1000, LEFT);
-  lcd_putc(lcdLastPos, 4*FH, '/');
-  lcd_outdezAtt(lcdLastPos+FW, 4*FH, sdGetNoSectors()/1000, LEFT);
+  lcdDrawNumberAttUnit(10*FW, 4*FH,  SD_GET_FREE_BLOCKNR()/1000, LEFT);
+  lcdDrawChar(lcdLastPos, 4*FH, '/');
+  lcdDrawNumberAttUnit(lcdLastPos+FW, 4*FH, sdGetNoSectors()/1000, LEFT);
 #else
-  lcd_outdezAtt(10*FW, 4*FH, sdGetNoSectors()/1000, LEFT);
+  lcdDrawNumberAttUnit(10*FW, 4*FH, sdGetNoSectors()/1000, LEFT);
 #endif
-  lcd_putc(lcdLastPos, 4*FH, 'k');
+  lcdDrawChar(lcdLastPos, 4*FH, 'k');
 
-  lcd_putsLeft(5*FH, STR_SD_SPEED);
-  lcd_outdezAtt(10*FW, 5*FH, SD_GET_SPEED()/1000, LEFT);
-  lcd_puts(lcdLastPos, 5*FH, "kb/s");
+  lcdDrawTextLeft(5*FH, STR_SD_SPEED);
+  lcdDrawNumberAttUnit(10*FW, 5*FH, SD_GET_SPEED()/1000, LEFT);
+  lcdDrawText(lcdLastPos, 5*FH, "kb/s");
 }
 
 inline bool isFilenameGreater(bool isfile, const char * fn, const char * line)
@@ -237,9 +237,9 @@ void menuGeneralSdManager(uint8_t _event)
     lcdNextPos = 0;
     uint8_t attr = (menuVerticalPosition-1-menuVerticalOffset == i ? BSS|INVERS : BSS);
     if (reusableBuffer.sdmanager.lines[i][0]) {
-      if (!reusableBuffer.sdmanager.lines[i][SD_SCREEN_FILE_LENGTH+1]) { lcd_putcAtt(0, y, '[', attr); }
-      lcd_putsAtt(lcdNextPos, y, reusableBuffer.sdmanager.lines[i], attr);
-      if (!reusableBuffer.sdmanager.lines[i][SD_SCREEN_FILE_LENGTH+1]) { lcd_putcAtt(lcdNextPos, y, ']', attr); }
+      if (!reusableBuffer.sdmanager.lines[i][SD_SCREEN_FILE_LENGTH+1]) { lcdDrawCharAtt(0, y, '[', attr); }
+      lcdDrawTextAtt(lcdNextPos, y, reusableBuffer.sdmanager.lines[i], attr);
+      if (!reusableBuffer.sdmanager.lines[i][SD_SCREEN_FILE_LENGTH+1]) { lcdDrawCharAtt(lcdNextPos, y, ']', attr); }
     }
   }
 }

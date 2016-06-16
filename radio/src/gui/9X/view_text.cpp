@@ -118,7 +118,7 @@ void menuTextView(uint8_t event)
   }
 
   for (int i=0; i<LCD_LINES-1; i++) {
-    lcd_putsAtt(0, i*FH+FH+1, s_text_screen[i], FIXEDWIDTH);
+    lcdDrawTextAtt(0, i*FH+FH+1, s_text_screen[i], FIXEDWIDTH);
   }
 
   char *title = s_text_file;
@@ -127,8 +127,8 @@ void menuTextView(uint8_t event)
 #else
   // TODO?
 #endif
-  lcd_puts(LCD_W/2-strlen(title)*FW/2, 0, title);
-  lcd_invert_line(0);
+  lcdDrawText(LCD_W/2-strlen(title)*FW/2, 0, title);
+  lcdInvertLine(0);
 
   if (lines_count > LCD_LINES-1) {
     displayScrollbar(LCD_W-1, FH, LCD_H-FH, menuVerticalOffset, lines_count, LCD_LINES-1);

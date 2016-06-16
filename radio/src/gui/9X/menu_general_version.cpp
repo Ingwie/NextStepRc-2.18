@@ -20,15 +20,15 @@ void menuGeneralVersion(uint8_t event)
 {
   SIMPLE_MENU(STR_MENUVERSION, menuTabGeneral, e_Vers, 1);
 
-  lcd_putsLeft(MENU_HEADER_HEIGHT+FH, vers_stamp);
+  lcdDrawTextLeft(MENU_HEADER_HEIGHT+FH, vers_stamp);
 
 #if defined(COPROCESSOR)
   if (Coproc_valid == 1) {
-     lcd_putsLeft(6*FH, PSTR("CoPr:"));
+     lcdDrawTextLeft(6*FH, PSTR("CoPr:"));
      lcd_outdez8(10*FW, 6*FH, Coproc_read);
   }
   else {
-     lcd_putsLeft(6*FH, PSTR("CoPr: ---"));
+     lcdDrawTextLeft(6*FH, PSTR("CoPr: ---"));
   }
 #endif
 }

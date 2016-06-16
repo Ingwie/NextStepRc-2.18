@@ -53,7 +53,7 @@ void DrawCurve(uint8_t offset=0)
     point_t point = getPoint(i);
     i++;
     if (point.x == 0) break;
-    drawFilledRect(point.x-offset, point.y-1, 3, 3, SOLID, FORCE); // do markup square
+    lcdDrawFilledRect(point.x-offset, point.y-1, 3, 3, SOLID, FORCE); // do markup square
   } while(1);
 }
 
@@ -86,7 +86,7 @@ bool moveCurve(uint8_t index, int8_t shift, int8_t custom=0)
 void menuModelCurveOne(uint8_t event)
 {
   TITLE(STR_MENUCURVE);
-  lcd_outdezAtt(PSIZE(TR_MENUCURVE)*FW+1, 0, s_curveChan+1, INVERS|LEFT);
+  lcdDrawNumberAttUnit(PSIZE(TR_MENUCURVE)*FW+1, 0, s_curveChan+1, INVERS|LEFT);
   DISPLAY_PROGRESS_BAR(20*FW+1);
 
   CurveInfo crv = curveInfo(s_curveChan);
@@ -167,10 +167,10 @@ void menuModelCurveOne(uint8_t event)
       break;
   }
 
-  lcd_putsLeft(7*FH, STR_TYPE);
+  lcdDrawTextLeft(7*FH, STR_TYPE);
   uint8_t attr = (s_editMode <= 0 ? INVERS : 0);
-  lcd_outdezAtt(5*FW-2, 7*FH, crv.points, LEFT|attr);
-  lcd_putsAtt(lcdLastPos, 7*FH, crv.custom ? PSTR("pt'") : PSTR("pt"), attr);
+  lcdDrawNumberAttUnit(5*FW-2, 7*FH, crv.points, LEFT|attr);
+  lcdDrawTextAtt(lcdLastPos, 7*FH, crv.custom ? PSTR("pt'") : PSTR("pt"), attr);
 
   DrawCurve();
 
@@ -180,15 +180,15 @@ void menuModelCurveOne(uint8_t event)
 
     if (s_editMode==1 || !BLINK_ON_PHASE) {
       // do selection square
-      drawFilledRect(point.x-1, point.y-2, 5, 5, SOLID, FORCE);
-      drawFilledRect(point.x, point.y-1, 3, 3, SOLID);
+      lcdDrawFilledRect(point.x-1, point.y-2, 5, 5, SOLID, FORCE);
+      lcdDrawFilledRect(point.x, point.y-1, 3, 3, SOLID);
     }
 
     int8_t x = -100 + 200*i/(crv.points-1);
     if (crv.custom && i>0 && i<crv.points-1) x = crv.crv[crv.points+i-1];
-    lcd_puts(7, 2*FH, PSTR("x=")); lcd_outdezAtt(7+2*FW, 2*FH, x, LEFT);
-    lcd_puts(7, 3*FH, PSTR("y=")); lcd_outdezAtt(7+2*FW, 3*FH, crv.crv[i], LEFT);
-    lcd_rect(3, 1*FH+4, 7*FW-2, 3*FH-2);
+    lcdDrawText(7, 2*FH, PSTR("x=")); lcdDrawNumberAttUnit(7+2*FW, 2*FH, x, LEFT);
+    lcdDrawText(7, 3*FH, PSTR("y=")); lcdDrawNumberAttUnit(7+2*FW, 3*FH, crv.crv[i], LEFT);
+    lcdDrawRect(3, 1*FH+4, 7*FW-2, 3*FH-2);
 
     if (p1valdiff || event==EVT_KEY_FIRST(KEY_DOWN) || event==EVT_KEY_FIRST(KEY_UP) || event==EVT_KEY_REPT(KEY_DOWN) || event==EVT_KEY_REPT(KEY_UP))
       CHECK_INCDEC_MODELVAR(event, crv.crv[i], -100, 100);  // edit Y on up/down
@@ -234,17 +234,17 @@ void menuModelCurvesAll(uint8_t event)
     uint8_t attr = (sub == k ? INVERS : 0);
 #if defined(GVARS) && defined(PCBSTD)
     if (k >= MAX_CURVES) {
-      putsStrIdx(0, y, STR_GV, k-MAX_CURVES+1);
+      lcdDrawStringWithIndex(0, y, STR_GV, k-MAX_CURVES+1);
       if (GVAR_SELECTED()) {
         if (attr && s_editMode>0) attr |= BLINK;
-        lcd_outdezAtt(10*FW, y, GVAR_VALUE(k-MAX_CURVES, -1), attr);
+        lcdDrawNumberAttUnit(10*FW, y, GVAR_VALUE(k-MAX_CURVES, -1), attr);
         if (attr) g_model.gvars[k-MAX_CURVES] = checkIncDec(event, g_model.gvars[k-MAX_CURVES], -1000, 1000, EE_MODEL);
       }
     }
     else
 #endif
     {
-      putsStrIdx(0, y, STR_CV, k+1, attr);
+      lcdDrawStringWithIndex(0, y, STR_CV, k+1, attr);
     }
   }
 
