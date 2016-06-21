@@ -1,26 +1,26 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 // driver adapted from somo14d driver for gruvin9x board for driving WTV20SDMini module
 
 #include "../../opentx.h"
 
 // Start and stop bits need to be 2ms in duration. Start bit is low, stop bit is high
-#define WTV20SD_STOP_TIME    68 // This is the needed 2ms (4) + 30ms (60) to allow for the
-                                // point at which the busy flag is checkable + 2ms for saftey (4)
+#define WTV20SD_STOP_TIME    84 // This is the needed 2ms (4) + 40ms (80) to allow for the
+// point at which the busy flag is checkable + 2ms for saftey (4)
 #define WTV20SD_START_TIME   5  // The 2ms of a stop/start bit
 
 enum WTV20SD_State
@@ -36,7 +36,7 @@ enum WTV20SD_State
 #define QUEUE_LENGTH 10
 uint16_t WTV20SD_playlist[QUEUE_LENGTH] = {0};
 volatile uint8_t WTV20SD_InputIndex = 0;
-uint8_t WTV20SD_PlayIndex = 4; // Also used for reset, resetpause (save 2 static uint8_t) 
+uint8_t WTV20SD_PlayIndex = 4; // Also used for reset, resetpause (save 2 static uint8_t)
 uint8_t Startstop = WTV20SD_START_TIME;
 uint16_t WTV20SD_current = 0;
 uint8_t state = RESET;
@@ -78,7 +78,7 @@ void WTV20SD_sendstop()
   WTV20SD_Data_off; // Data low
   WTV20SD_Clock_on; // Stop Bit, CLK high for 2ms
   --Startstop;
-	
+
   if (!Startstop && !WTV20SD_BUSY) state = PAUSE;
 }
 
@@ -86,7 +86,7 @@ void pushPrompt(uint16_t prompt)
 {
   // if mute active => no voice
   if (g_eeGeneral.beepMode == e_mode_quiet) return;
-  
+
   /* Load playlist and activate interrupt */
   WTV20SD_playlist[WTV20SD_InputIndex] = prompt;
   ++WTV20SD_InputIndex;
@@ -110,7 +110,7 @@ uint8_t isPlaying()
 #if !defined(SIMU)
 ISR(TIMER5_COMPA_vect) // every 0.5ms normally, every 2ms during startup reset
 {
-
+  sei();
   if (state == PAUSE) {
     if (WTV20SD_PlayIndex == WTV20SD_InputIndex) {
       TIMSK5 &= ~(1<<OCIE5A); // stop reentrance
@@ -120,7 +120,7 @@ ISR(TIMER5_COMPA_vect) // every 0.5ms normally, every 2ms during startup reset
     else {
       WTV20SD_current = WTV20SD_playlist[WTV20SD_PlayIndex];
       ++WTV20SD_PlayIndex;
-	  if (WTV20SD_PlayIndex == QUEUE_LENGTH) WTV20SD_PlayIndex = 0;
+      if (WTV20SD_PlayIndex == QUEUE_LENGTH) WTV20SD_PlayIndex = 0;
       Startstop = WTV20SD_START_TIME;
       state = SENDSTART;
     }
@@ -138,34 +138,35 @@ ISR(TIMER5_COMPA_vect) // every 0.5ms normally, every 2ms during startup reset
 
   if (state == SENDSTOP) {
     WTV20SD_sendstop();
-   return;
+    return;
   }
 
   if (state == RESET) {
-	if (WTV20SD_PlayIndex) { // WTV20SD_PlayIndex used as reset counter
-		// OCR5A=0x1f4; setted in board_mega2560.cpp
-		WTV20SD_Reset_off;
-		WTV20SD_Data_off;
-		WTV20SD_Clock_on;
-		--WTV20SD_PlayIndex;
-	} // RESET low
-	else {
-		state = RESETPAUSE;
-		WTV20SD_PlayIndex = 150;
-		return;
-	}
+    if (WTV20SD_PlayIndex) { // WTV20SD_PlayIndex used as reset counter
+      // OCR5A=0x1f4; setted in board_mega2560.cpp
+      WTV20SD_Reset_off;
+      WTV20SD_Data_off;
+      WTV20SD_Clock_on;
+      --WTV20SD_PlayIndex;
+    } // RESET low
+    else {
+      state = RESETPAUSE;
+      WTV20SD_PlayIndex = 150;
+      return;
+    }
   }
 
   if (state == RESETPAUSE) {
     if (WTV20SD_PlayIndex) {
-		WTV20SD_Reset_on;
-		--WTV20SD_PlayIndex;
-	} // RESET high
-	else {
-		state = PAUSE;
-		OCR5A = 0x7d; // 0.5 ms after init
-		return;
-	}
+      WTV20SD_Reset_on;
+      --WTV20SD_PlayIndex;
+    } // RESET high
+    else {
+      state = PAUSE;
+      OCR5A = 0x7d; // 0.5 ms after init
+      return;
+    }
   }
+  cli();
 }
 #endif
