@@ -104,9 +104,7 @@
 
 #define LEN_RETA123            "\001"
 
-#if   defined(REVX)
-  #define TR_RETA123           "KWGL123LR"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
     #define TR_RETA123         "KWGL123ab"
 #else
   #define TR_RETA123           "KWGL123"
@@ -443,11 +441,7 @@
 #define TR_PHASENAME           "Nazwa Fazy"
 #define TR_MIXNAME             "Nazwa Mix"
 #define TR_INPUTNAME           "Wpisz Nazw"
-#if defined(VIRTUALINPUTS)
-  #define TR_EXPONAME          "LiniaNazw"
-#else
-  #define TR_EXPONAME          "Nazwa Exp"
-#endif
+#define TR_EXPONAME            "Nazwa Exp"
 #define TR_BITMAP              "Obrazek    "
 #define TR_TIMER               TR("Timer", "Timer ")
 #define TR_ELIMITS             TR("Limi+25%", "Kanał +/- 125% ")
@@ -600,13 +594,8 @@
 #define TR_MENUFLIGHTPHASES    "FAZY LOTU"
 #define TR_MENUHELISETUP       "USTAW HELI"
 
-#if defined(VIRTUALINPUTS)
-  #define TR_MENUINPUTS        "WEJŚCIA"
-  #define TR_MENULIMITS        "WYJŚCIA"
-#else
-  #define TR_MENUINPUTS        "DRĄŻKI"
-  #define TR_MENULIMITS        "SERWA "
-#endif
+#define TR_MENUINPUTS        "DRĄŻKI"
+#define TR_MENULIMITS        "SERWA "
 
 #define TR_MENUCURVES          "KRZYWE"
 #define TR_MENUCURVE           "KRZYWA"

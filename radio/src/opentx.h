@@ -770,11 +770,7 @@ extern int16_t            ex_chans[NUM_CHNOUT]; // Outputs (before LIMITS) of th
 extern int16_t            channelOutputs[NUM_CHNOUT];
 extern uint16_t           BandGap;
 
-#if defined(VIRTUALINPUTS)
-  #define NUM_INPUTS      (MAX_INPUTS)
-#else
   #define NUM_INPUTS      (NUM_STICKS)
-#endif
 
 int intpol(int x, uint8_t idx);
 int expo(int x, int k);
@@ -802,10 +798,6 @@ int expo(int x, int k);
   #define APPLY_EXPOS_EXTRA_PARAMS
 #endif
 
-#if defined(VIRTUALINPUTS)
-void clearInputs();
-void defaultInputs();
-#endif
 
 void applyExpos(int16_t *anas, uint8_t mode APPLY_EXPOS_EXTRA_PARAMS_INC);
 int16_t applyLimits(uint8_t channel, int32_t value);
@@ -830,11 +822,7 @@ LogicalSwitchData *lswAddress(uint8_t idx);
 
 // static variables used in evalFlightModeMixes - moved here so they don't interfere with the stack
 // It's also easier to initialize them here.
-#if defined(VIRTUALINPUTS)
-  extern int8_t  virtualInputsTrims[NUM_INPUTS];
-#else
   extern int16_t rawAnas[NUM_INPUTS];
-#endif
 
 extern int16_t  anas [NUM_INPUTS];
 extern int16_t  trims[NUM_STICKS];
@@ -1034,10 +1022,6 @@ enum AUDIO_SOUNDS {
 #include "rtc.h"
 #endif
 
-#if defined(REVX)
-void setMFP();
-void clearMFP();
-#endif
 
 
 

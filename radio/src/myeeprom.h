@@ -848,18 +848,6 @@ enum SwashType {
   SWASH_TYPE_MAX = SWASH_TYPE_90
 };
 
-#if defined(VIRTUALINPUTS)
-PACK(typedef struct {
-  uint8_t   type;
-  uint8_t   value;
-  uint8_t   collectiveSource;
-  uint8_t   aileronSource;
-  uint8_t   elevatorSource;
-  int8_t    collectiveWeight;
-  int8_t    aileronWeight;
-  int8_t    elevatorWeight;
-}) SwashRingData;
-#else
 PACK(typedef struct {
   uint8_t   invertELE:1;
   uint8_t   invertAIL:1;
@@ -868,7 +856,6 @@ PACK(typedef struct {
   uint8_t   collectiveSource;
   uint8_t   value;
 }) SwashRingData;
-#endif
 
 #define TRIM_EXTENDED_MAX 500
 #define TRIM_EXTENDED_MIN (-TRIM_EXTENDED_MAX)
@@ -877,17 +864,13 @@ PACK(typedef struct {
 
 #define ROTARY_ENCODER_MAX  1024
 
-#if defined(REVX)
-#define NUM_ROTARY_ENCODERS 0
-#define ROTARY_ENCODER_ARRAY int16_t rotaryEncoders[1];
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
 #define NUM_ROTARY_ENCODERS 2
 #define ROTARY_ENCODER_ARRAY int16_t rotaryEncoders[2];
 #else
 #define NUM_ROTARY_ENCODERS 0
 #define ROTARY_ENCODER_ARRAY
 #endif
-
 #if defined(PCBSTD)
 #define TRIMS_ARRAY       int8_t trim[4]; int8_t trim_ext:8
 #define TRIMS_ARRAY_SIZE  5
@@ -982,15 +965,6 @@ enum SwitchSources {
 
 enum MixSources {
   MIXSRC_NONE,
-
-#if defined(VIRTUALINPUTS)
-  MIXSRC_FIRST_INPUT,
-  MIXSRC_LAST_INPUT = MIXSRC_FIRST_INPUT+MAX_INPUTS-1,
-
-  MIXSRC_FIRST_LUA,
-  MIXSRC_LAST_LUA = MIXSRC_FIRST_LUA+(MAX_SCRIPTS*MAX_SCRIPT_OUTPUTS)-1,
-#endif
-
   MIXSRC_FIRST_STICK,
   MIXSRC_Rud = MIXSRC_FIRST_STICK,
   MIXSRC_Ele,

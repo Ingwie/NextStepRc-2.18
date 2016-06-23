@@ -100,9 +100,7 @@
 
 #define LEN_RETA123            "\001"
 
-#if   defined(REVX)
-  #define TR_RETA123           "RETA123LR"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
   #define TR_RETA123           "RETA123ab"
 #else
   #define TR_RETA123           "RETA123"
@@ -439,11 +437,7 @@
 #define TR_PHASENAME           "Mode Name"
 #define TR_MIXNAME             "Mix Name"
 #define TR_INPUTNAME           "Input Name"
-#if defined(VIRTUALINPUTS)
-  #define TR_EXPONAME          "Line Name"
-#else
-  #define TR_EXPONAME          "Expo Name"
-#endif
+#define TR_EXPONAME          "Expo Name"
 #define TR_BITMAP              "Model Image"
 #define TR_TIMER               TR("Timer", "Timer ")
 #define TR_ELIMITS             TR("E.Limits", "Extended Limits")
@@ -596,13 +590,8 @@
 #define TR_MENUFLIGHTPHASE     "FLIGHT MODE"
 #define TR_MENUHELISETUP       "HELI SETUP"
 
-#if defined(VIRTUALINPUTS)
-  #define TR_MENUINPUTS        "INPUTS"
-  #define TR_MENULIMITS        "OUTPUTS"
-#else
-  #define TR_MENUINPUTS        "STICKS"
-  #define TR_MENULIMITS        "SERVOS"
-#endif
+#define TR_MENUINPUTS        "STICKS"
+#define TR_MENULIMITS        "SERVOS"
 
 #define TR_MENUCURVES          "CURVES"
 #define TR_MENUCURVE           "CURVE"

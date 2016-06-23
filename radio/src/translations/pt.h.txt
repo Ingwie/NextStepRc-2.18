@@ -110,9 +110,7 @@
 
 #define LEN_RETA123      "\001"
 
-#if defined(REVX)
-  #define TR_RETA123         "LPMA123LR"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
   #define TR_RETA123         "LPMA123ab"
 #else
   #define TR_RETA123         "LPMA123"

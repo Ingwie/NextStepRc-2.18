@@ -49,10 +49,8 @@ int16_t ex_chans[NUM_CHNOUT] = {0}; // Outputs (before LIMITS) of the last perMa
 
 void applyExpos(int16_t *anas, uint8_t mode APPLY_EXPOS_EXTRA_PARAMS)
 {
-#if !defined(VIRTUALINPUTS)
   int16_t anas2[NUM_INPUTS]; // values before expo, to ensure same expo base when multiple expo lines are used
   memcpy(anas2, anas, sizeof(anas2));
-#endif
 
   int8_t cur_chn = -1;
 
@@ -67,21 +65,7 @@ void applyExpos(int16_t *anas, uint8_t mode APPLY_EXPOS_EXTRA_PARAMS)
     if (ed->flightModes & (1<<mixerCurrentFlightMode))
       continue;
     if (getSwitch(ed->swtch)) {
-#if defined(VIRTUALINPUTS)
-      int v;
-      if (ed->srcRaw == ovwrIdx) {
-        v = ovwrValue;
-      }
-      else {
-        v = getValue(ed->srcRaw);
-        if (ed->srcRaw >= MIXSRC_FIRST_TELEM && ed->scale > 0) {
-          v = (v * 1024) / convertTelemValue(ed->srcRaw-MIXSRC_FIRST_TELEM+1, ed->scale);
-        }
-        v = limit(-1024, v, 1024);
-      }
-#else
       int16_t v = anas2[ed->chn];
-#endif
       if (EXPO_MODE_ENABLE(ed, v)) {
 #if defined(BOLD_FONT)
         if (mode==e_perout_mode_normal) swOn[i].activeExpo = true;
@@ -108,19 +92,6 @@ void applyExpos(int16_t *anas, uint8_t mode APPLY_EXPOS_EXTRA_PARAMS)
         weight = calc100to256(weight);
         v = ((int32_t)v * weight) >> 8;
 
-#if defined(VIRTUALINPUTS)
-        //========== OFFSET ===============
-        int16_t offset = GET_GVAR(ed->offset, -100, 100, mixerCurrentFlightMode);
-        if (offset) v += calc100toRESX(offset);
-
-        //========== TRIMS ================
-        if (ed->carryTrim < TRIM_ON)
-          virtualInputsTrims[cur_chn] = -ed->carryTrim - 1;
-        else if (ed->carryTrim == TRIM_ON && ed->srcRaw >= MIXSRC_Rud && ed->srcRaw <= MIXSRC_Ail)
-          virtualInputsTrims[cur_chn] = ed->srcRaw - MIXSRC_Rud;
-        else
-          virtualInputsTrims[cur_chn] = -1;
-#endif
 
         anas[cur_chn] = v;
       }
@@ -215,11 +186,6 @@ getvalue_t getValue(mixsrc_t i)
 {
   if (i==MIXSRC_NONE) return 0;
 
-#if defined(VIRTUALINPUTS)
-  else if (i <= MIXSRC_LAST_INPUT) {
-    return anas[i-MIXSRC_FIRST_INPUT];
-  }
-#endif
 
 #if defined(LUAINPUTS)       //FA: should we keep this as we don't use LUA in 9x - NexStepRC ??
   else if (i<MIXSRC_LAST_LUA) {
@@ -309,7 +275,7 @@ void evalInputs(uint8_t mode)
 {
   BeepANACenter anaCenter = 0;
 
-#if defined(HELI) && !defined(VIRTUALINPUTS)
+#if defined(HELI) 
   uint16_t d = 0;
   if (g_model.swashR.value) {
     uint32_t v = (int32_t(calibratedStick[ELE_STICK])*calibratedStick[ELE_STICK] + int32_t(calibratedStick[AIL_STICK])*calibratedStick[AIL_STICK]);
@@ -368,11 +334,6 @@ void evalInputs(uint8_t mode)
     }
 
     if (ch < NUM_STICKS) { //only do this for sticks
-#if defined(VIRTUALINPUTS)
-      if (mode & e_perout_mode_nosticks) {
-        v = 0;
-      }
-#endif
 
       if (mode <= e_perout_mode_inactive_flight_mode && isFunctionActive(FUNCTION_TRAINER+ch) && IS_TRAINER_INPUT_VALID()) {
         // trainer mode
@@ -395,9 +356,6 @@ void evalInputs(uint8_t mode)
         }
       }
 
-#if defined(VIRTUALINPUTS)
-      calibratedStick[ch] = v;
-#else
   #if defined(HELI)
       if (d && (ch==ELE_STICK || ch==AIL_STICK)) {
         v = (int32_t(v) * calc100toRESX(g_model.swashR.value)) / int32_t(d);
@@ -405,7 +363,6 @@ void evalInputs(uint8_t mode)
   #endif
       rawAnas[ch] = v;
       anas[ch] = v; // set values for mixer
-#endif
     }
   }
 
@@ -422,35 +379,6 @@ void evalInputs(uint8_t mode)
   }
 }
 
-#if defined(VIRTUALINPUTS)
-int getStickTrimValue(int stick, int stickValue)
-{
-  if (stick < 0)
-    return 0;
-
-  int trim = trims[stick];
-  if (stick == THR_STICK) {
-    if (g_model.thrTrim) {
-      int trimMin = g_model.extendedTrims ? 2*TRIM_EXTENDED_MIN : 2*TRIM_MIN;
-      trim = ((g_model.throttleReversed ? (trim+trimMin) : (trim-trimMin)) * (RESX-stickValue)) >> (RESX_SHIFT+1);
-    }
-    if (g_model.throttleReversed) {
-      trim = -trim;
-    }
-  }
-  return trim;
-}
-
-int getSourceTrimValue(int source, int stickValue=0)
-{
-  if (source >= MIXSRC_Rud && source <= MIXSRC_Ail)
-    return getStickTrimValue(source - MIXSRC_Rud, stickValue);
-  else if (source >= MIXSRC_FIRST_INPUT && source <= MIXSRC_LAST_INPUT)
-    return getStickTrimValue(virtualInputsTrims[source - MIXSRC_FIRST_INPUT], stickValue);
-  else
-    return 0;
-}
-#endif
 
 uint8_t mixerCurrentFlightMode;
 void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
@@ -464,13 +392,8 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 #endif
 
 #if defined(HELI)
-#if defined(VIRTUALINPUTS)
-  int heliEleValue = getValue(g_model.swashR.elevatorSource);
-  int heliAilValue = getValue(g_model.swashR.aileronSource);
-#else
   int16_t heliEleValue = anas[ELE_STICK];
   int16_t heliAilValue = anas[AIL_STICK];
-#endif
   if (g_model.swashR.value) {
     uint32_t v = ((int32_t)heliEleValue*heliEleValue + (int32_t)heliAilValue*heliAilValue);
     uint32_t q = calc100toRESX(g_model.swashR.value);
@@ -487,26 +410,15 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 #define REZ_SWASH_Y(x)  ((x))   //  1024 => 1024
 
   if (g_model.swashR.type) {
-#if defined(VIRTUALINPUTS)
-    getvalue_t vp = heliEleValue + getSourceTrimValue(g_model.swashR.elevatorSource);
-    getvalue_t vr = heliAilValue + getSourceTrimValue(g_model.swashR.aileronSource);
-#else
     getvalue_t vp = heliEleValue + trims[ELE_STICK];
     getvalue_t vr = heliAilValue + trims[AIL_STICK];
-#endif
     getvalue_t vc = 0;
     if (g_model.swashR.collectiveSource)
       vc = getValue(g_model.swashR.collectiveSource);
 
-#if defined(VIRTUALINPUTS)
-    vp = (vp * g_model.swashR.elevatorWeight) / 100;
-    vr = (vr * g_model.swashR.aileronWeight) / 100;
-    vc = (vc * g_model.swashR.collectiveWeight) / 100;
-#else
     if (g_model.swashR.invertELE) vp = -vp;
     if (g_model.swashR.invertAIL) vr = -vr;
     if (g_model.swashR.invertCOL) vc = -vc;
-#endif
 
     switch (g_model.swashR.type) {
       case SWASH_TYPE_120:
@@ -598,29 +510,18 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       //========== VALUE ====================
       getvalue_t v = 0;
       if (mode > e_perout_mode_inactive_flight_mode) {
-#if defined(VIRTUALINPUTS)
-        if (!mixEnabled) {
-          continue;
-        }
-        else {
-          v = getValue(md->srcRaw);
-        }
-#else
         if (!mixEnabled || stickIndex >= NUM_STICKS || (stickIndex == THR_STICK && g_model.thrTrim)) {
           continue;
         }
         else {
           if (!(mode & e_perout_mode_nosticks)) v = anas[stickIndex];
         }
-#endif
       }
       else {
-#if !defined(VIRTUALINPUTS)
         if (stickIndex < NUM_STICKS) {
           v = md->noExpo ? rawAnas[stickIndex] : anas[stickIndex];
         }
         else
-#endif
         {
           mixsrc_t srcRaw = MIXSRC_Rud + stickIndex;
           v = getValue(srcRaw);
@@ -690,12 +591,6 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       int16_t trim = 0;
       if (apply_offset_and_curve) {
         if (!(mode & e_perout_mode_notrims)) {
-#if defined(VIRTUALINPUTS)
-          if (md->carryTrim == 0) {
-            trim = getSourceTrimValue(md->srcRaw, v);
-            v += trim;
-          }
-#else
           int8_t mix_trim = md->carryTrim;
           if (mix_trim < TRIM_ON)
             mix_trim = -mix_trim - 1;
@@ -710,7 +605,6 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
             else
               v += trim;
           }
-#endif
         }
       }
 
@@ -777,17 +671,11 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       //Revert trim
         if (apply_offset_and_curve) {
           if (!(mode & e_perout_mode_notrims)) {
-#if defined(VIRTUALINPUTS)
-            if (md->carryTrim == 0) {
-              dv -= dtrim;
-            }
-#else
             int8_t mix_trim = md->carryTrim;
             if (mix_trim == THR_STICK && g_model.throttleReversed)
               dv += dtrim;
             else
               dv -= dtrim;
-#endif
           }
         }
         //Value and trim are computed separatly

@@ -101,9 +101,7 @@
 
 #define LEN_RETA123            "\001"
 
-#if   defined(REVX)
-  #define TR_RETA123           "SVPK123LR"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
   #define TR_RETA123           "SVPK123ab"
 #else
   #define TR_RETA123           "SVPK123"
@@ -441,11 +439,7 @@
 #define TR_PHASENAME           "Název"
 #define TR_MIXNAME             "Název"
 #define TR_INPUTNAME           "Název"
-#if defined(VIRTUALINPUTS)
-  #define TR_EXPONAME          "Popis"
-#else
-  #define TR_EXPONAME          "Název"
-#endif
+#define TR_EXPONAME            "Název"
 #define TR_BITMAP              "Obrázek"
 #define TR_TIMER               "Stopky"
 #define TR_ELIMITS             TR("Limit +25%", "Kanál +/- 125%")
@@ -600,11 +594,8 @@
 
 #define TR_MENULIMITS          "SERVA"
 
-#if defined(VIRTUALINPUTS)
-  #define TR_MENUINPUTS        "VSTUPY"
-#else
-  #define TR_MENUINPUTS        "DR/EXPO"
-#endif
+#define TR_MENUINPUTS        "DR/EXPO"
+
 
 #define TR_MENUCURVES          "KŘIVKY"
 #define TR_MENUCURVE           "\002K"

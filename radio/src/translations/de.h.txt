@@ -113,9 +113,7 @@
 
 #define LEN_RETA123            "\001"
 
-#if   defined(REVX)
-  #define TR_RETA123           "SHGQ123LR"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
   #define TR_RETA123           "SHGQ123ab"
 #else
   #define TR_RETA123           "SHGQ123"
@@ -452,11 +450,7 @@
 #define TR_PHASENAME           "Phase-Name"
 #define TR_MIXNAME             "Mix-Name"
 #define TR_INPUTNAME           "Input-Name"
-#if defined(VIRTUALINPUTS)
-  #define TR_EXPONAME          "Info-Name"
-#else
-  #define TR_EXPONAME          "Info-Name" // Expo Name
-#endif
+#define TR_EXPONAME          "Info-Name" // Expo Name
 #define TR_BITMAP              "Modellfoto"
 #define TR_TIMER               TR("Timer", "Timer ")  // für Timer1 Timer2 Timer3
 #define TR_ELIMITS             TR("Erw. Limit", "Erw. Wege auf 150%")

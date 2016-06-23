@@ -102,9 +102,7 @@
 
 #define LEN_RETA123            "\001"
 
-#if   defined(REVX)
-  #define TR_RETA123           "RETA123LR"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
   #define TR_RETA123           "RETA123ab"
 #else
   #define TR_RETA123           "RETA123"
@@ -451,11 +449,7 @@
 #define TR_PHASENAME           "Modus"
 #define TR_MIXNAME             "Mix Naam"
 #define TR_INPUTNAME           "Input Naam"
-#if defined(VIRTUALINPUTS)
-  #define TR_EXPONAME          "Lijn Naam"
-#else
-  #define TR_EXPONAME          "Expo Naam"
-#endif
+#define TR_EXPONAME          "Expo Naam"
 #define TR_BITMAP              "Modelafbeelding"
 #define TR_TIMER               TR("Timer", "Timer ")
 #define TR_ELIMITS             TR("E.Limits", "Extended Limits")
@@ -615,13 +609,8 @@
 #define TR_MENUFLIGHTPHASE     "VLIEGFASE"
 #define TR_MENUHELISETUP       "HELI TS-Mixer"
 
-#if defined(VIRTUALINPUTS)
-  #define TR_MENUINPUTS        "INPUTS"
-  #define TR_MENULIMITS        "OUTPUTS"
-#else
-  #define TR_MENUINPUTS        "STICKS"
-  #define TR_MENULIMITS        "SERVOS"
-#endif
+#define TR_MENUINPUTS        "STICKS"
+#define TR_MENULIMITS        "SERVOS"
 
 #define TR_MENUCURVES          "CURVEN"
 #define TR_MENUCURVE           "CURVE"

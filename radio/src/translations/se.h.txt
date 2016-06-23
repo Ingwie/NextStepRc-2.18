@@ -100,9 +100,7 @@
 
 #define LEN_RETA123            "\001"
 
-#if   defined(REVX)
-  #define TR_RETA123           "RHGS123HV"
-#elif defined(CPUM2560)
+#if defined(CPUM2560)
   #define TR_RETA123           "RHGS123ab"
 #else
   #define TR_RETA123           "RHGS123"
@@ -439,11 +437,7 @@
 #define TR_PHASENAME           "Lägesnamn "
 #define TR_MIXNAME             "Mixnamn "
 #define TR_INPUTNAME           "Inputnamn"
-#if defined(VIRTUALINPUTS)
-  #define TR_EXPONAME          "Radnamn"
-#else
-  #define TR_EXPONAME          "Exponamn"
-#endif
+#define TR_EXPONAME          "Exponamn"
 #define TR_BITMAP              "Modellikon"
 #define TR_TIMER               TR("Timer","Timer ")
 #define TR_ELIMITS             TR("Gränser++","Utökade Gränser")
@@ -595,15 +589,8 @@
 #define TR_MENUFLIGHTPHASE     "FLYGLÄGE"
 #define TR_MENUFLIGHTPHASES    "FLYGLÄGEN"
 #define TR_MENUHELISETUP       "HELIKOPTER"
-
-#if defined(VIRTUALINPUTS)
-  #define TR_MENUINPUTS        "INPUT"
-  #define TR_MENULIMITS        "SERVON"
-#else
-  #define TR_MENUINPUTS        "SPAKAR"
-  #define TR_MENULIMITS        "SERVON"
-#endif
-
+#define TR_MENUINPUTS        "SPAKAR"
+#define TR_MENULIMITS        "SERVON"
 #define TR_MENUCURVES          "KURVOR"
 #define TR_MENUCURVE           "KURVA"
 #define TR_MENULOGICALSWITCH   "LOGISK BRYTARE"

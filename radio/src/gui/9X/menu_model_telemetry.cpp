@@ -17,9 +17,6 @@
 #include "../../opentx.h"
 
 enum menuModelTelemetryItems {
-#if defined(REVX)
-  ITEM_TELEMETRY_INVERTED_SERIAL,
-#endif
   ITEM_TELEMETRY_A1_LABEL,
   ITEM_TELEMETRY_A1_RANGE,
   ITEM_TELEMETRY_A1_OFFSET,
@@ -104,11 +101,7 @@ enum menuModelTelemetryItems {
   #define VARIO_RANGE_ROWS             3
 #endif
 
-#if defined(REVX)
-  #define TELEMETRY_TYPE_ROWS          0, 0,
-#else
   #define TELEMETRY_TYPE_ROWS
-#endif
 
   #define TELEMETRY_SCREEN_ROWS(x)     SCREEN_TYPE_ROWS, 2, 2, 2, 2
   #define TELEMETRY_CURRENT_CHANNEL(k) (k >= ITEM_TELEMETRY_A2_LABEL ? TELEM_ANA_A2 : TELEM_ANA_A1)
