@@ -119,7 +119,6 @@ void deleteExpoMix(uint8_t expo, uint8_t idx)
   eeDirty(EE_MODEL);
 }
 
-// TODO avoid this global s_currCh on ARM boards ...
 int8_t s_currCh;
 void insertExpoMix(uint8_t expo, uint8_t idx)
 {

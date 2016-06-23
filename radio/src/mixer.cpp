@@ -17,14 +17,14 @@
 #include "opentx.h"
 #include "timers.h"
 
-bool OffsetOnInput = true;       //temporary, this bool could be link to a checkbox in mixer screen or to a option in makefile 
 
-#if defined(VIRTUALINPUTS)
-  int8_t  virtualInputsTrims[NUM_INPUTS];
+#if defined(FADMIXER)
+bool OffsetOnInput = false;       //temporary (done !.. temporary), this bool could be link to a checkbox in mixer screen or to a option in makefile 
 #else
-  int16_t rawAnas[NUM_INPUTS] = {0};
+bool OffsetOnInput = true;
 #endif
 
+int16_t  rawAnas[NUM_INPUTS] = {0};
 int16_t  anas [NUM_INPUTS] = {0};
 int16_t  trims[NUM_STICKS] = {0};
 int32_t  chans[NUM_CHNOUT] = {0};
