@@ -204,7 +204,7 @@ getvalue_t getValue(mixsrc_t i)
   else if (i>=MIXSRC_FIRST_STICK && i<=MIXSRC_LAST_POT) return calibratedStick[i-MIXSRC_Rud];
 #endif
 
-#if defined(CPU2560) || defined(ROTARY_ENCODERS)
+#if defined(CPUM2560) || defined(ROTARY_ENCODERS)
   else if (i<=MIXSRC_LAST_ROTARY_ENCODER) return getRotaryEncoder(i-MIXSRC_REa);
 #endif
 
