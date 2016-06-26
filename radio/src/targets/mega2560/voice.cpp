@@ -148,23 +148,19 @@ ISR(TIMER5_COMPA_vect) // every 0.5ms normally, every 2ms during startup reset
       WTV20SD_Data_off;
       WTV20SD_Clock_on;
       --WTV20SD_PlayIndex;
+      return;
     } // RESET low
     else {
       state = RESETPAUSE;
-      WTV20SD_PlayIndex = 150;
       return;
     }
   }
 
   if (state == RESETPAUSE) {
-    if (WTV20SD_PlayIndex) {
-      WTV20SD_Reset_on;
-      --WTV20SD_PlayIndex;
-    } // RESET high
-    else {
+    WTV20SD_Reset_on; // RESET high
+    if (!WTV20SD_BUSY) {
       state = PAUSE;
       OCR5A = 0x7d; // 0.5 ms after init
-      return;
     }
   }
   cli();
