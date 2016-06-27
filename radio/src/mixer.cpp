@@ -649,25 +649,30 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         }
       }
 
+       //========== CURVES ==================
+#if defined(XCURVES)
+      if (apply_offset_and_curve && md->curve.type != CURVE_REF_DIFF && md->curve.value) {
+        v = applyCurve(v, md->curve);
+      }
+#else
+      if (apply_offset_and_curve && md->curveParam && md->curveMode == MODE_CURVE) {
+        v = applyCurve(v, md->curveParam);
+      }
+#endif
+
       //========== WEIGHT ===================
       int16_t weight = GET_GVAR(MD_WEIGHT(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
       weight = calc100to256_16Bits(weight);
       int32_t dv = (int32_t) v * weight;
       int32_t dtrim = (int32_t) trim * weight;
-     
-      //========== CURVE & DIFFERENTIAL =====
+
+      //========== DIFFERENTIAL =============
 #if defined(XCURVES)
-      if (apply_offset_and_curve && md->curve.type != CURVE_REF_DIFF && md->curve.value) {
+      if (md->curve.type == CURVE_REF_DIFF && md->curve.value) {
         dv = applyCurve(dv, md->curve);
-      }
-      else if (md->curve.type == CURVE_REF_DIFF && md->curve.value) {
-        dv = applyCurve(dv, md->curve);
-      }
+      }  
 #else
-      if (apply_offset_and_curve && md->curveParam && md->curveMode == MODE_CURVE) {
-        dv = applyCurve(dv, md->curveParam);
-      }
-      else if (md->curveMode == MODE_DIFFERENTIAL) {
+      if (md->curveMode == MODE_DIFFERENTIAL) {
       //Revert trim
         if (apply_offset_and_curve) {
           if (!(mode & e_perout_mode_notrims)) {
@@ -704,11 +709,11 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       }
       
       //Output with offset before 
-      //    Curve((stick + offset + trim) * weight)
+      //    Curve(stick + offset + trim) * weight
       //    Diff((stick + offset) * weight) + Diff(trim * weight)
 
       //Output with offset after 
-      //    Curve((stick + trim) * weight) + offset
+      //    Curve(stick + trim) * weight + offset
       //    Diff(stick * weight) + Diff(trim * weight) + offset
 
       int32_t *ptr = &chans[md->destCh]; // Save calculating address several times
