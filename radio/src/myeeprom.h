@@ -862,7 +862,7 @@ PACK(typedef struct {
 #define TRIM_MAX 125
 #define TRIM_MIN (-TRIM_MAX)
 
-#define ROTARY_ENCODER_MAX  1024
+#define ROTARY_ENCODER_MAX  1000 // =125 was 1024
 
 #if defined(CPUM2560)
 #define NUM_ROTARY_ENCODERS 2
