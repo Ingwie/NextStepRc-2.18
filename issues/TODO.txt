@@ -1,0 +1,18 @@
+In French ;-)
+
+> - correction bug T_on
+
+> - correction bug encodeur rotatif qui saute de +125 à -125 - FAIT
+
+> - limiter la valeur d'une GVAR (pilotée par un encodeur rotatif) de +125 à -125
+
+> - communalisation pin buzzer avec pin speaker
+
+> - interrupteur 3 positions avec potar :
+
+> - ajout companiontx + fix compilation
+
+> - ajout nouveaux modules d'émission
+
+> - remplacement carte WT par « mieux »
+
