@@ -2,9 +2,11 @@ In French ;-)
 
 *****************  TODO TODO TODO TODO  *****************
 
+> - Changer le splash (NEXTSTEPRC)
+
 > - correction bug T_on
 
-> - limiter la valeur d'une GVAR (pilotee par un encodeur rotatif) de +125 à -125
+> - changer le type des GVAR de 16bits vers 8bits (nouveau format d'eeprom) ou doubler le nombre de GVAR ...
 
 > - communalisation pin buzzer avec pin speaker
 
@@ -14,9 +16,10 @@ In French ;-)
 
 > - ajout nouveaux modules d'emission
 
-> - remplacement carte WT par « mieux »
+> - remplacement carte WT par " mieux "
 
 
 *****************  DONE DONE DONE DONE  *****************
 
 > - correction bug encodeur rotatif qui saute de +125 a -125 - FAIT
+> - limiter la valeur d'une GVAR de +125 à -125 - FAIT

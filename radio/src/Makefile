@@ -1119,8 +1119,17 @@ ifeq ($(IRPROTOS), YES)
   CPPDEFS += -DIRPROTOS
 endif
 
-ifeq ($(LUA_COMPILER), YES)
-  CPPDEFS += -DLUA_COMPILER
+ifeq ($(3POS), POT1)
+  CPPDEFS += -DEXTRA_3POS=1
+  # EEPROM_VARIANT += ${3POS_VARIANT}
+endif
+ifeq ($(3POS), POT2)
+  CPPDEFS += -DEXTRA_3POS=2
+  # EEPROM_VARIANT += ${3POS_VARIANT}
+endif
+ifeq ($(3POS), POT3)
+  CPPDEFS += -DEXTRA_3POS=3
+  # EEPROM_VARIANT += ${3POS_VARIANT}
 endif
 
 #---------------- Compiler Options C++ ----------------

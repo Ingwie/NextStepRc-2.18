@@ -36,7 +36,7 @@ enum WTV20SD_State
 #define QUEUE_LENGTH 10
 uint16_t WTV20SD_playlist[QUEUE_LENGTH] = {0};
 volatile uint8_t WTV20SD_InputIndex = 0;
-uint8_t WTV20SD_PlayIndex = 4; // Also used for reset, resetpause (save 2 static uint8_t)
+uint8_t WTV20SD_PlayIndex = 4; // Also used for reset,(save 2 static uint8_t)
 uint8_t Startstop = WTV20SD_START_TIME;
 uint16_t WTV20SD_current = 0;
 uint8_t state = RESET;

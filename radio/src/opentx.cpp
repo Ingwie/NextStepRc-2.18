@@ -456,6 +456,7 @@ int16_t getGVarValue(int16_t x, int16_t min, int16_t max, int8_t phase)
 
 void setGVarValue(uint8_t idx, int16_t value, int8_t phase)
 {
+  value = limit(-125,value,125); //Limit Gvar value
   phase = getGVarFlightPhase(phase, idx);
   if (GVAR_VALUE(idx, phase) != value) {
     SET_GVAR_VALUE(idx, phase, value);
