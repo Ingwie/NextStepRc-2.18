@@ -8,7 +8,9 @@ In French ;-)
 
 > - changer le type des GVAR de 16bits vers 8bits (nouveau format d'eeprom) ou doubler le nombre de GVAR ...
 
-> - communalisation pin buzzer avec pin speaker
+> - communalisation pin buzzer avec pin speaker : ** Firmware FAIT reste Schema a mettre a jour **
+
+> - Schema : corriger cablage KS108 + Le gain des amplis (R6/2)
 
 > - interrupteur 3 positions avec potar
 

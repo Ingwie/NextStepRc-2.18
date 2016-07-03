@@ -99,7 +99,7 @@ void sdPoll10ms(void);
 #define INP_B_WTV_BUSY            7    //WTV20SD, not used (reserved)
 #define OUT_B_PPM                 6    
 #define OUT_B_SIM_CTL             5    
-#define OUT_B_BUZZER              4
+#define I_O_B_UNUSED              4    //unused was Buzzer
 #define INP_D_I2C_SCL             1
 #define INP_D_I2C_SDA             0
 #define OUT_E_WTV_DATA            3    //WTV20SD
@@ -109,7 +109,7 @@ void sdPoll10ms(void);
 #define INP_H_RF_Activated        6    
 #define INP_H_DSC_Activated       5    //not used, reserved for pwrCheck()                                                                         
 #define INP_H_Hold_Power          4    //not used, reserved for pwrCheck() 
-#define OUT_H_Speaker             3
+#define OUT_H_SpeakerBuzzer       3
 #define OUT_H_WTV_RESET           1    //WTV20SD
 #define OUT_H_HAPTIC              0
   
@@ -128,7 +128,7 @@ void sdPoll10ms(void);
 #define PORTA_LCD_DAT            PORTA    
 #define PORTC_LCD_CTRL           PORTC 
 #if defined(LCD_KS108)              // (For KS108 LCD only) MEGA R/W pin always at 0 state in Opentx then
-#define OUT_C_LCD_CS2            6	// use this pin to control second KS108 (CS2)
+#define OUT_C_LCD_CS2            6  // use this pin to control second KS108 (CS2)
 #else                               // and connect KS108 R/W pin to ground via a 1k resistor
 #define OUT_C_LCD_RnW            6        
 #endif
@@ -158,13 +158,13 @@ void pwrOff();
 #define hapticOff()               PORTH &= ~(1 << OUT_H_HAPTIC)
 
 // Buzzer driver
-#define buzzerOn()                PORTB |=  (1 << OUT_B_BUZZER)
-#define buzzerOff()               PORTB &= ~(1 << OUT_B_BUZZER)
+#define buzzerOn()                PORTH |=  (1 << OUT_H_SpeakerBuzzer)
+#define buzzerOff()               PORTH &= ~(1 << OUT_H_SpeakerBuzzer)
 
 // Speaker driver
 #if defined(AUDIO)
-#define speakerOn()               TCCR4A |=  (1 << COM4A0)
 #define speakerOff()              TCCR4A &= ~(1 << COM4A0)
+#define speakerOn()               TCCR4A |=  (1 << COM4A0)
 #endif
 
 // Voice driver
