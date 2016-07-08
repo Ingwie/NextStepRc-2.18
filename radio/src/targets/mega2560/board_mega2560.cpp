@@ -28,7 +28,7 @@ inline void boardInit()
   DDRF = 0b00000000;  PORTF = 0b11111111; // 7-0:Trim switch inputs
   DDRG = 0b00100000;  PORTG = 0b11011111; // 7:N/A, 6:N/A, 5:WTV20SDClock, 4:N/A, 3:N/A, 2:TCut_SW, 1:Gear_SW, 0: RudDr_SW
 #if defined(DEBUG)  
-  DDRH = 0b01011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
+  DDRH = 0b01011011;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
 #else
   DDRH = 0b00011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
 #endif  
