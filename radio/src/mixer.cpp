@@ -17,9 +17,8 @@
 #include "opentx.h"
 #include "timers.h"
 
-
 #if defined(FADMIXER)
-bool OffsetOnInput = false;       //temporary (done !.. temporary), this bool could be link to a checkbox in mixer screen or to a option in makefile 
+bool OffsetOnInput = false;   //temporary, option in makefile 
 #else
 bool OffsetOnInput = true;
 #endif
@@ -31,7 +30,7 @@ int32_t  chans[NUM_CHNOUT] = {0};
 BeepANACenter bpanaCenter = 0;
 
 int24_t act   [MAX_MIXERS] = {0};
-SwOn    swOn  [MAX_MIXERS]; // TODO better name later...
+SwOn    swOn  [MAX_MIXERS];   // TODO better name later...
 
 uint8_t mixWarning;
 
@@ -91,7 +90,6 @@ void applyExpos(int16_t *anas, uint8_t mode APPLY_EXPOS_EXTRA_PARAMS)
         int16_t weight = GET_GVAR(ed->weight, MIN_EXPO_WEIGHT, 100, mixerCurrentFlightMode);
         weight = calc100to256(weight);
         v = ((int32_t)v * weight) >> 8;
-
 
         anas[cur_chn] = v;
       }
@@ -180,29 +178,10 @@ int16_t applyLimits(uint8_t channel, int32_t value)
   return ofs;
 }
 
-// TODO same naming convention than the putsMixerSource
-
 getvalue_t getValue(mixsrc_t i)
 {
   if (i==MIXSRC_NONE) return 0;
-
-
-#if defined(LUAINPUTS)       //FA: should we keep this as we don't use LUA in 9x - NexStepRC ??
-  else if (i<MIXSRC_LAST_LUA) {
-#if defined(LUA_MODEL_SCRIPTS)
-    div_t qr = div(i-MIXSRC_FIRST_LUA, MAX_SCRIPT_OUTPUTS);
-    return scriptInputsOutputs[qr.quot].outputs[qr.rem].value;
-#else
-    return 0;
-#endif
-  }
-#endif
-
-#if defined(LUAINPUTS)       //FA: should we keep this as we don't use LUA in 9x - NexStepRC ??
-  else if (i<=MIXSRC_LAST_POT) return calibratedStick[i-MIXSRC_Rud];
-#else
   else if (i>=MIXSRC_FIRST_STICK && i<=MIXSRC_LAST_POT) return calibratedStick[i-MIXSRC_Rud];
-#endif
 
 #if defined(CPUM2560) || defined(ROTARY_ENCODERS)
   else if (i<=MIXSRC_LAST_ROTARY_ENCODER) return getRotaryEncoder(i-MIXSRC_REa);
@@ -459,7 +438,6 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 
   //========== MIXER LOOP ===================
   uint8_t lv_mixWarning = 0;
-
   uint8_t pass = 0;
 
   bitfield_channels_t dirtyChannels = (bitfield_channels_t)-1; // all dirty when mixer starts
@@ -471,7 +449,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
     for (uint8_t i=0; i<MAX_MIXERS; i++) {
 
 #if defined(BOLD_FONT)
-      if (mode==e_perout_mode_normal && pass==0) swOn[i].activeMix = 0;
+      if (mode==e_perout_mode_normal && pass==0) swOn[i].activeMix = false;
 #endif
 
       MixData *md = mixAddress(i);
@@ -489,23 +467,11 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 
       //========== PHASE && SWITCH ==========
       bool mixCondition = (md->flightModes != 0 || md->swtch);
-      delayval_t mixEnabled = (!(md->flightModes & (1 << mixerCurrentFlightMode)) && getSwitch(md->swtch)) ? DELAY_POS_MARGIN+1 : 0;
-
-#define MIXER_LINE_DISABLE()   (mixCondition = true, mixEnabled = 0)
-
+      delayval_t mixEnabled = (!(md->flightModes & (1 << mixerCurrentFlightMode)) && getSwitch(md->swtch)) ? 1 : 0;
+#define MIXER_LINE_DISABLE()  (mixCondition = true, mixEnabled = 0)
       if (mixEnabled && md->srcRaw >= MIXSRC_FIRST_TRAINER && md->srcRaw <= MIXSRC_LAST_TRAINER && !IS_TRAINER_INPUT_VALID()) {
         MIXER_LINE_DISABLE();
       }
-
-#if defined(LUA_MODEL_SCRIPTS)
-      // disable mixer if Lua script is used as source and script was killed
-      if (mixEnabled && md->srcRaw >= MIXSRC_FIRST_LUA && md->srcRaw <= MIXSRC_LAST_LUA) {
-        div_t qr = div(md->srcRaw-MIXSRC_FIRST_LUA, MAX_SCRIPT_OUTPUTS);
-        if (scriptInternalData[qr.quot].state != SCRIPT_OK) {
-          MIXER_LINE_DISABLE();
-        }
-      }
-#endif
 
       //========== VALUE ====================
       getvalue_t v = 0;
@@ -521,8 +487,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         if (stickIndex < NUM_STICKS) {
           v = md->noExpo ? rawAnas[stickIndex] : anas[stickIndex];
         }
-        else
-        {
+        else {
           mixsrc_t srcRaw = MIXSRC_Rud + stickIndex;
           v = getValue(srcRaw);
           srcRaw -= MIXSRC_CH1;
@@ -530,50 +495,76 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
             if (dirtyChannels & ((bitfield_channels_t)1 << srcRaw) & (passDirtyChannels|~(((bitfield_channels_t) 1 << md->destCh)-1)))
               passDirtyChannels |= (bitfield_channels_t) 1 << md->destCh;
             if (srcRaw < md->destCh || pass > 0)
-              v = chans[srcRaw] >> 8;
+              v = chans[srcRaw]>>8;
           }
         }
         if (!mixCondition) {
-          mixEnabled = v >> DELAY_POS_SHIFT;
+          mixEnabled = v>>10;
         }
       }
-
-      bool apply_offset_and_curve = true;
 
       //========== DELAYS ===================
-      delayval_t _swOn = swOn[i].now;
-      delayval_t _swPrev = swOn[i].prev;
-      bool swTog = (mixEnabled > _swOn+DELAY_POS_MARGIN || mixEnabled < _swOn-DELAY_POS_MARGIN);
-      if (mode==e_perout_mode_normal && swTog) {
-        if (!swOn[i].delay) _swPrev = _swOn;
-        swOn[i].delay = (mixEnabled > _swOn ? md->delayUp : md->delayDown) * (100/DELAY_STEP);
-        swOn[i].now = mixEnabled;
-        swOn[i].prev = _swPrev;
-      }
-      if (mode==e_perout_mode_normal && swOn[i].delay > 0) {
-        swOn[i].delay = max<int16_t>(0, (int16_t)swOn[i].delay - tick10ms);
-        if (!mixCondition)
-          v = _swPrev << DELAY_POS_SHIFT;
-        else if (mixEnabled)
-          continue;
-      }
-      else {
-        if (mode==e_perout_mode_normal) {
-          swOn[i].now = swOn[i].prev = mixEnabled;
+      if (mode <= e_perout_mode_inactive_flight_mode && (md->delayDown || md->delayUp)) { // there are delay values      
+        if (!s_mixer_first_run_done || !swOn[i].delay) {
+          swOn[i].hold = v;     // store actual value of v as reference for next run
+          swOn[i].delay = (v > swOn[i].hold ? md->delayUp : md->delayDown) * (100/DELAY_STEP); // init delay
         }
-        if (!mixEnabled) {
-          if ((md->speedDown || md->speedUp) && md->mltpx!=MLTPX_REP) {
-            if (mixCondition) {
-              v = (md->mltpx == MLTPX_ADD ? 0 : RESX);
-              apply_offset_and_curve = false;
+        else if ((swOn[i].delay > 0) && ((v > swOn[i].hold +10) || (v < swOn[i].hold -10))) {  // compare v to value stored at previous run
+          swOn[i].delay = max<int16_t>(0, (int16_t)swOn[i].delay - tick10ms);   // decrement delay
+          v = swOn[i].hold;     // keep v to stored value until end of delay
+        }   
+      }
+
+      //========== SLOW DOWN ================
+      // lower weight causes slower movement
+      if (mode <= e_perout_mode_inactive_flight_mode && (md->speedUp || md->speedDown)) { // there are slow-down values    
+        int32_t tact = act[i];
+        int16_t diff = v - (tact>>8);  // we recale to a mult 256 higher value for calculation
+        if (diff) {
+          // open.20.fsguruh: speed is defined in % movement per second; In menu we specify the full movement (-100% to 100%) = 200% in total
+          // the unit of the stored value is the value from md->speedUp or md->speedDown divide SLOW_STEP seconds; e.g. value 4 means 4/SLOW_STEP = 2 seconds for CPU64
+          // because we get a tick each 10msec, we need 100 ticks for one second
+          // the value in md->speedXXX gives the time it should take to do a full movement from -100 to 100 therefore 200%. This equals 2048 in recalculated internal range
+          if (tick10ms || !s_mixer_first_run_done) {
+            // only if already time is passed add or substract a value according the speed configured
+            int32_t rate = (int32_t)tick10ms<<(8+11);  // = 256*2048*tick10ms
+            // rate equals a full range for one second; if less time is passed rate is accordingly smaller
+            // if one second passed, rate would be 2048(full motion)*256(recalculated weight)*100(100 ticks needed for one second)
+            int32_t currentValue = (int32_t)v<<8;
+            if (diff > 0) {
+              if (s_mixer_first_run_done && md->speedUp > 0) {
+                // if a speed upwards is defined recalculate the new value according configured speed; the higher the speed the smaller the add value is
+                int32_t newValue = tact+rate/((int16_t)(100/SLOW_STEP)*md->speedUp);
+                if (newValue<currentValue) currentValue = newValue; // Endposition; prevent toggling around the destination
+              }
             }
-          }
-          else if (mixCondition) {
-            continue;
-          }
+            else {  // if is <0 because ==0 is not possible
+              if (s_mixer_first_run_done && md->speedDown > 0) {
+                // see explanation in speedUp
+                int32_t newValue = tact-rate/((int16_t)(100/SLOW_STEP)*md->speedDown);
+                if (newValue>currentValue) currentValue = newValue; // Endposition; prevent toggling around the destination
+              }
+            }
+            act[i] = tact = currentValue;
+            // open.20.fsguruh: this implementation would save about 50 bytes code
+          } // endif tick10ms ; in case no time passed assign the old value, not the current value from source
+          v = tact>>8;
         }
       }
 
+      //========== Active Mix ===============
+      bool apply_offset_and_curve = true;
+      if (!mixEnabled) {
+        if ((md->delayDown || md->delayUp) && md->mltpx!=MLTPX_REP) {
+          if (mixCondition) {
+            v = (md->mltpx == MLTPX_ADD ? 0 : RESX);
+            apply_offset_and_curve = false;
+          }
+        }
+        else if (mixCondition) {
+          continue;
+        }
+      }
       if (mode==e_perout_mode_normal && (!mixCondition || mixEnabled || swOn[i].delay)) {
         if (md->mixWarn) lv_mixWarning |= 1 << (md->mixWarn - 1);
 #if defined(BOLD_FONT)
@@ -600,56 +591,17 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
             mix_trim = -1;
           if (mix_trim >= 0) {
             trim = trims[mix_trim];
-            if (mix_trim == THR_STICK && g_model.throttleReversed)
-              v -= trim;
-            else
-              v += trim;
+            if (md->curveMode != MODE_DIFFERENTIAL) {
+              if (mix_trim == THR_STICK && g_model.throttleReversed)
+                v -= trim;
+              else
+                v += trim;
+            }
           }
         }
       }
 
-      //========== SPEED ====================
-      // now its on input side, but without weight compensation. More like other remote controls
-      // lower weight causes slower movement
-
-      if (mode <= e_perout_mode_inactive_flight_mode && (md->speedUp || md->speedDown)) { // there are delay values
-#define DEL_MULT_SHIFT 8
-        // we recale to a mult 256 higher value for calculation
-        int32_t tact = act[i];
-        int16_t diff = v - (tact>>DEL_MULT_SHIFT);
-        if (diff) {
-          // open.20.fsguruh: speed is defined in % movement per second; In menu we specify the full movement (-100% to 100%) = 200% in total
-          // the unit of the stored value is the value from md->speedUp or md->speedDown divide SLOW_STEP seconds; e.g. value 4 means 4/SLOW_STEP = 2 seconds for CPU64
-          // because we get a tick each 10msec, we need 100 ticks for one second
-          // the value in md->speedXXX gives the time it should take to do a full movement from -100 to 100 therefore 200%. This equals 2048 in recalculated internal range
-          if (tick10ms || !s_mixer_first_run_done) {
-            // only if already time is passed add or substract a value according the speed configured
-            int32_t rate = (int32_t) tick10ms << (DEL_MULT_SHIFT+11);  // = DEL_MULT*2048*tick10ms
-            // rate equals a full range for one second; if less time is passed rate is accordingly smaller
-            // if one second passed, rate would be 2048 (full motion)*256(recalculated weight)*100(100 ticks needed for one second)
-            int32_t currentValue = ((int32_t) v<<DEL_MULT_SHIFT);
-            if (diff > 0) {
-              if (s_mixer_first_run_done && md->speedUp > 0) {
-                // if a speed upwards is defined recalculate the new value according configured speed; the higher the speed the smaller the add value is
-                int32_t newValue = tact+rate/((int16_t)(100/SLOW_STEP)*md->speedUp);
-                if (newValue<currentValue) currentValue = newValue; // Endposition; prevent toggling around the destination
-              }
-            }
-            else {  // if is <0 because ==0 is not possible
-              if (s_mixer_first_run_done && md->speedDown > 0) {
-                // see explanation in speedUp
-                int32_t newValue = tact-rate/((int16_t)(100/SLOW_STEP)*md->speedDown);
-                if (newValue>currentValue) currentValue = newValue; // Endposition; prevent toggling around the destination
-              }
-            }
-            act[i] = tact = currentValue;
-            // open.20.fsguruh: this implementation would save about 50 bytes code
-          } // endif tick10ms ; in case no time passed assign the old value, not the current value from source
-          v = (tact >> DEL_MULT_SHIFT);
-        }
-      }
-
-       //========== CURVES ==================
+      //========== CURVES ==================
 #if defined(XCURVES)
       if (apply_offset_and_curve && md->curve.type != CURVE_REF_DIFF && md->curve.value) {
         v = applyCurve(v, md->curve);
@@ -670,20 +622,12 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 #if defined(XCURVES)
       if (md->curve.type == CURVE_REF_DIFF && md->curve.value) {
         dv = applyCurve(dv, md->curve);
+        dtrim = applyCurve(dtrim, md->curve);
+        dv += dtrim;
       }  
 #else
       if (md->curveMode == MODE_DIFFERENTIAL) {
-      //Revert trim
-        if (apply_offset_and_curve) {
-          if (!(mode & e_perout_mode_notrims)) {
-            int8_t mix_trim = md->carryTrim;
-            if (mix_trim == THR_STICK && g_model.throttleReversed)
-              dv += dtrim;
-            else
-              dv -= dtrim;
-          }
-        }
-        //Value and trim are computed separatly
+        // stick and trim are computed separatly
         // @@@2 also recalculate curveParam to a 256 basis which ease the calculation later a lot
         int16_t curveParam = calc100to256(GET_GVAR(md->curveParam, -100, 100, mixerCurrentFlightMode));
         if (curveParam > 0 && dv < 0) {
@@ -708,13 +652,16 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
         if (offset) dv += int32_t(calc100toRESX_16Bits(offset)) << 8; 
       }
       
-      //Output with offset before 
-      //    Curve(stick + offset + trim) * weight
-      //    Diff((stick + offset) * weight) + Diff(trim * weight)
+      //Stick value to mixer
+      //    stick => delay => slow_down => mixer source      
+      
+      //Mixer output with offset before 
+      //    Curve(source + offset + trim) * weight
+      //    Diff((source + offset) * weight) + Diff(trim * weight)
 
-      //Output with offset after 
-      //    Curve(stick + trim) * weight + offset
-      //    Diff(stick * weight) + Diff(trim * weight) + offset
+      //Mixer output with offset after 
+      //    Curve(source + trim) * weight + offset
+      //    Diff(source * weight) + Diff(trim * weight) + offset
 
       int32_t *ptr = &chans[md->destCh]; // Save calculating address several times
 
@@ -739,6 +686,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
           *ptr += dv; //Mixer output add up to the line (dv + (dv>0 ? 100/2 : -100/2))/(100);
           break;
       } //endswitch md->mltpx
+
 #ifdef PREVENT_ARITHMETIC_OVERFLOW
 /*
       // a lot of assumptions must be true, for this kind of check; not really worth for only 4 bytes flash savings
@@ -791,13 +739,12 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
 
 int32_t sum_chans512[NUM_CHNOUT] = {0};
 
-
 #define MAX_ACT 0xffff
 uint8_t lastFlightMode = 255; // TODO reinit everything here when the model changes, no???
 
 void evalMixes(uint8_t tick10ms)
 {
-#if defined(PCBMEGA2560) && defined(DEBUG) && !defined(VOICE)   //FA: why not CPU2560 to include Gruvin9x ? why voice ?
+#if defined(CPUM2560) && defined(DEBUG) && !defined(VOICE)
   PORTH |= 0x40; // PORTH:6 LOW->HIGH signals start of mixer interrupt
 #endif
 
