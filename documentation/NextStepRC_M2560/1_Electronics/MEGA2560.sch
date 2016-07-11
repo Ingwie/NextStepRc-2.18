@@ -35,7 +35,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "OpenTX board based on Arduino MEGA2560"
-Date "15 jun 2016"
+Date "10 jul 2016"
 Rev "0"
 Comp "Copyright F. Aguerre"
 Comment1 ""
@@ -245,7 +245,7 @@ L SPEAKER .
 U 1 1 54994432
 P 10600 6200
 F 0 "." H 10500 6450 70  0000 C CNN
-F 1 "BUZZER" H 10500 5950 40  0000 C CNN
+F 1 "BUZZER or SPEAKER" H 10700 5800 40  0000 C CNN
 F 2 "" H 10600 6200 60  0001 C CNN
 F 3 "" H 10600 6200 60  0001 C CNN
 	1    10600 6200
@@ -1247,7 +1247,7 @@ port H 4 (1)
 Text GLabel 2750 4600 1    42   Output ~ 0
 port H 3 (0)
 Text Label 2750 3700 3    42   ~ 0
-Speaker
+Buzzer
 Text Label 3150 3700 3    42   ~ 0
 Rot_1_A
 Text GLabel 3150 4600 1    42   Input ~ 0
@@ -1271,7 +1271,7 @@ port B 5 (1)
 Text GLabel 2300 4600 1    42   Output ~ 0
 port B 4 (0)
 Text Label 2300 3700 3    42   ~ 0
-Buzzer
+-----
 Text Label 2100 3700 3    42   ~ 0
 PPM_OUT
 Text GLabel 2100 4600 1    42   Output ~ 0
@@ -41016,7 +41016,7 @@ port pin (init. state)
 Text Notes 1250 3200 0    60   ~ 0
 Pinout caption :
 Text Label 5750 2400 2    42   ~ 0
-Gain = 1 + R2/R6
+Gain = 1 + R2/(R6/2)
 $Bitmap
 Pos 4600 4650
 Scale 1.000000
@@ -41109,7 +41109,7 @@ CA 3B B1 B4 D6 FB 76 3A 4D 11 32 4D 1E A1 3D 78 1C 8B 1E 14 74 10 57 46 8C 97 FB
 33 B3 93 2C A5 90 EC 7D 2B A5 BC 7A F5 EA E1 E1 5E 44 C8 BD 2E 90 84 08 60 87 C2 BB D7 FD 40 85 
 4A 52 6F 3D D0 6D 9E 6E 41 36 CA 77 04 97 99 83 92 6E D1 7C 20 6D 2C 33 D2 7F 5B 16 F2 83 51 39 
 A0 3F CF F3 A7 9F 7E FA CB 5F FE F5 EB D7 AF 45 64 59 96 6D DB F6 23 3E B3 52 CA B3 1B C5 00 F7 
-08 C0 CC FE 1F 15 4F 30 6D 3D C2 80 DE 00 00 00 00 49 45 4E 44 AE 42 60 82 0C $EndBitmap
+08 C0 CC FE 1F 15 4F 30 6D 3D C2 80 DE 00 00 00 00 49 45 4E 44 AE 42 60 82 03 $EndBitmap
 EndData
 $EndBitmap
 $Comp

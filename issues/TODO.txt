@@ -4,13 +4,7 @@ In French ;-)
 
 > - Changer le splash (NEXTSTEPRC)
 
-> - correction bug T_on
-
 > - changer le type des GVAR de 16bits vers 8bits (nouveau format d'eeprom) ou doubler le nombre de GVAR ...
-
-> - communalisation pin buzzer avec pin speaker : ** Firmware FAIT reste Schema a mettre a jour **
-
-> - Schema : corriger cablage KS108 + Le gain des amplis (R6/2)
 
 > - interrupteur 3 positions avec potar
 
@@ -25,3 +19,6 @@ In French ;-)
 
 > - correction bug encodeur rotatif qui saute de +125 a -125 - FAIT
 > - limiter la valeur d'une GVAR de +125 à -125 - FAIT
+> - correction bug T_on - FAIT
+> - communalisation pin buzzer avec pin speaker - FAIT
+> - Schema : corriger cablage KS108 + Le gain des amplis (R6/2) + pin buzzer - FAIT
