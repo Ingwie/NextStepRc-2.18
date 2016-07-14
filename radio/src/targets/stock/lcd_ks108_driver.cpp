@@ -17,7 +17,7 @@
 #define DISPLAY_SET_COLUMN       0x40
 #define DISPLAY_SET_PAGE         0xB8
 #define DISPLAY_SET_START        0XC0 
-#define DISPLAY_ON_CMD           0x3F
+#define DISPLAY_ON_CMD           0x3F //or 3E
 #define CS1_on                   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_CS1)
 #define CS1_off                  PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_CS1)
 #define CS2_on                   PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_CS2)
@@ -30,7 +30,7 @@
 void lcdPulseEnable(void)
 {
   E_on;
-  _delay_us(4);
+  _delay_us(8); //Was 4 on the first tested 
   E_off;
 }
 
@@ -40,9 +40,10 @@ void lcdSendCtl(uint8_t val)
   A0_off;
   lcdPulseEnable();
   A0_on;
+
 }
 
-void LcdInitCommand()
+static void LcdInitCommand()
 {
   lcdSendCtl(DISPLAY_ON_CMD);
   lcdSendCtl(DISPLAY_SET_START);
