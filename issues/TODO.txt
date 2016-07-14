@@ -2,8 +2,6 @@ In French ;-)
 
 *****************  TODO TODO TODO TODO  *****************
 
-> - Changer le splash (NEXTSTEPRC)
-
 > - changer le type des GVAR de 16bits vers 8bits (nouveau format d'eeprom) ou doubler le nombre de GVAR ...
 
 > - interrupteur 3 positions avec potar
@@ -22,3 +20,5 @@ In French ;-)
 > - correction bug T_on - FAIT
 > - communalisation pin buzzer avec pin speaker - FAIT
 > - Schema : corriger cablage KS108 + Le gain des amplis (R6/2) + pin buzzer - FAIT
+> - Corriger bug de flash "error mismatch"
+> - Changer le splash (NEXTSTEPRC) - FAIT
