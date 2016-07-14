@@ -847,14 +847,14 @@ void moveTrimsToOffsets();
 #define delayval_t         int8_t
 
 PACK(typedef struct {
-  uint16_t delay:10;
-  int16_t  hold:16;
-  int16_t  activeMix:1;
-  int16_t  activeExpo:1;
+  int16_t hold;
+  uint8_t delay;
+  bool activeMix;
+  bool activeExpo;
 }) SwOn;
 
-extern SwOn   swOn  [MAX_MIXERS];
-extern int24_t act   [MAX_MIXERS];
+extern SwOn     swOn  [MAX_MIXERS];
+extern int24_t  act   [MAX_MIXERS];
 
 #ifdef BOLD_FONT
   inline bool isExpoActive(uint8_t expo)

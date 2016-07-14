@@ -510,7 +510,7 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
           swOn[i].delay = (v > swOn[i].hold ? md->delayUp : md->delayDown) * (100/DELAY_STEP); // init delay
         }
         else if ((swOn[i].delay > 0) && ((v > swOn[i].hold +10) || (v < swOn[i].hold -10))) {  // compare v to value stored at previous run
-          swOn[i].delay = max<int16_t>(0, (int16_t)swOn[i].delay - tick10ms);   // decrement delay
+          swOn[i].delay = max(0, swOn[i].delay - tick10ms);   // decrement delay
           v = swOn[i].hold;     // keep v to stored value until end of delay
         }   
       }
