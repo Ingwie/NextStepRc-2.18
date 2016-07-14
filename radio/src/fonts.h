@@ -20,10 +20,9 @@
 extern const pm_uchar font_5x7[];
 extern const pm_uchar font_10x14[];
 
-#if defined(BOLD_FONT) && (!defined(CPUM64) || defined(EXTSTD)) && !defined(BOOT)
+#if defined(BOLD_FONT) && defined(EXTSTD) && !defined(BOOT)
  #define BOLD_SPECIFIC_FONT
  extern const pm_uchar font_5x7_B[];
 #endif
-
 
 #endif
