@@ -848,9 +848,9 @@ void moveTrimsToOffsets();
 
 PACK(typedef struct {
   int16_t hold;
-  uint8_t delay;
-  bool activeMix;
-  bool activeExpo;
+  uint16_t delay:10;
+  bool activeMix:1;
+  bool activeExpo:1;
 }) SwOn;
 
 extern SwOn     swOn  [MAX_MIXERS];
