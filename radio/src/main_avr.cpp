@@ -96,9 +96,6 @@ void perMain()
   uint8_t evt = getEvent();
   evt = checkTrim(evt);
 
-  if (evt && (g_eeGeneral.backlightMode & e_backlight_mode_keys)) backlightOn(); // on keypress turn the light on
-  checkBacklight();
-
 #if defined(FRSKY) || defined(MAVLINK)
   telemetryWakeup();
 #endif
@@ -107,6 +104,9 @@ void perMain()
   uint8_t sticks_evt = getSticksNavigationEvent();
   if (sticks_evt) evt = sticks_evt;
 #endif
+
+  if (evt && (g_eeGeneral.backlightMode & e_backlight_mode_keys)) backlightOn(); // on keypress turn the light on
+  checkBacklight();
 
 #if defined(GUI)
   const char *warn = warningText;

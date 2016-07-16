@@ -297,6 +297,7 @@
   typedef int8_t swsrc_t;
 
 #if defined(NAVIGATION_STICKS)
+  extern uint8_t getSticksNavigationEvent();
   extern uint8_t StickScrollAllowed;
   extern uint8_t StickScrollTimer;
   #define STICK_SCROLL_TIMEOUT          9

@@ -1294,12 +1294,12 @@ uint8_t calcStickScroll( uint8_t index )
   value = calibratedStick[index] / 128;
   direction = value > 0 ? 0x80 : 0;
   if (value < 0)
-  value = -value;                        // (abs)
+  value = -value;                             // (abs)
   if (value > 7)
   value = 7;
   value = pgm_read_byte(rate+(uint8_t)value);
   if (value)
-  StickScrollTimer = STICK_SCROLL_TIMEOUT;               // Seconds
+  StickScrollTimer = STICK_SCROLL_TIMEOUT;    // Seconds
   return value | direction;
 }
 #endif
@@ -1382,7 +1382,7 @@ uint8_t getSticksNavigationEvent()
       {
         repeater += 1;
       }
-      value = calcStickScroll( 2 );
+      value = calcStickScroll(1);
       direction = value & 0x80;
       value &= 0x7F;
       if ( value )
@@ -1405,7 +1405,7 @@ uint8_t getSticksNavigationEvent()
       }
       else
       {
-        value = calcStickScroll( 3 );
+        value = calcStickScroll(0);
         direction = value & 0x80;
         value &= 0x7F;
         if ( value )

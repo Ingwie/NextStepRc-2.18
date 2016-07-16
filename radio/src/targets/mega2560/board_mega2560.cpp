@@ -200,6 +200,13 @@ void readKeysAndTrims()
     keys[enuk].input(in & pgm_read_byte(crossTrim+i));
     ++enuk;
   }
+
+#if defined(NAVIGATION_STICKS)
+  if (~PINL & 0x10) {        //Check menu key
+    StickScrollTimer = STICK_SCROLL_TIMEOUT ;
+  }
+#endif
+
 }
 
 // Rotary encoders increment/decrement (0 = rotary 1, 1 = rotary 2)

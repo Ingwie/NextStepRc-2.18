@@ -10,7 +10,9 @@ In French ;-)
 
 > - ajout nouveaux modules d'emission
 
-> - remplacement carte WT par " mieux "
+> - remplacement carte WT par "mieux" -> JQ6500 testé bientôt
+
+> - finir navigation avec les manches (placer les routines dans key.xxx) 
 
 
 *****************  DONE DONE DONE DONE  *****************
