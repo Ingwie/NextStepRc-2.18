@@ -818,8 +818,7 @@ bool eeConvert()
 
   // Models conversion
   for (uint8_t id=0; id<MAX_MODELS; id++) {
-#if defined(COLORLCD)
-#elif LCD_W >= 212
+#if defined(LCD212)
     lcdDrawSolidHorizontalLine(61, 6*FH+5, 10+id*2, FORCE);
 #else
     lcdDrawSolidHorizontalLine(11, 6*FH+5, 10+(id*3)/2, FORCE);

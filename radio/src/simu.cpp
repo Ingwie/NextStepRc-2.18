@@ -26,11 +26,7 @@
   #include <SDL.h>
 #endif
 
-#if LCD_W > 212
-  #define LCD_ZOOM 1
-#else
   #define LCD_ZOOM 2
-#endif
 
 #define W2 LCD_W*LCD_ZOOM
 #define H2 LCD_H*LCD_ZOOM
@@ -293,9 +289,6 @@ void Open9xSim::refreshDisplay()
   if (lcd_refresh) {
     lcd_refresh = false;
     FXColor offColor = isBacklightEnable() ? BL_COLOR : FXRGB(200, 200, 200);
-#if LCD_W == 128
-    FXColor onColor = FXRGB(0, 0, 0);
-#endif
     for (int x=0; x<LCD_W; x++) {
       for (int y=0; y<LCD_H; y++) {
         if (lcd_buf[x+(y/8)*LCD_W] & (1<<(y%8))) {

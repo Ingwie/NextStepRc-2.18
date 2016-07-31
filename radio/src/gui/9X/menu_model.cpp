@@ -61,11 +61,7 @@ extern uint8_t s_curveChan;
 
   #define FlightModesType uint8_t
 
-#if LCD_W >= 212
-  #define MIXES_2ND_COLUMN  (18*FW)
-#else
   #define MIXES_2ND_COLUMN  (12*FW)
-#endif
 
 uint8_t editDelay(const coord_t y, const uint8_t event, const uint8_t attr, const pm_char *str, uint8_t delay)
 {

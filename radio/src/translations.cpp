@@ -451,19 +451,7 @@ const pm_char STR_CONFIRMRESET[] PROGMEM = TR_CONFIRMRESET;
 const pm_char STR_TOO_MANY_LUA_SCRIPTS[] PROGMEM = TR_TO_MANY_LUA_SCRIPTS;
 const pm_char STR_BLCOLOR[]  PROGMEM = TR_BLCOLOR;
 
-#if LCD_W >= 212
-  const pm_char STR_MODELNAME[] PROGMEM = TR_MODELNAME;
-  const pm_char STR_PHASENAME[] PROGMEM = TR_PHASENAME;
-  const pm_char STR_MIXNAME[] PROGMEM = TR_MIXNAME;
-  const pm_char STR_INPUTNAME[] PROGMEM = TR_INPUTNAME;
-  const pm_char STR_EXPONAME[] PROGMEM = TR_EXPONAME;
-#endif
 
-#if LCD_W >= 212
-  const char * const STR_PHASES_HEADERS[] = TR_PHASES_HEADERS;
-  const char * const STR_LIMITS_HEADERS[] = TR_LIMITS_HEADERS;
-  const char * const STR_CSW_HEADERS[] =    TR_CSW_HEADERS;
-#endif
 
 
 

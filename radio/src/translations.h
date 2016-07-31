@@ -55,11 +55,7 @@
 #define PSIZE(x) ( sizeof(x) - 1 )
 #define EOFS(x)  ( OFS_##x + sizeof(TR_##x) )
 
-#if LCD_W >= 212
-  #define TR(x, y) y
-#else
   #define TR(x, y) x
-#endif
 
 // The non-0-terminated-strings
 
@@ -599,24 +595,11 @@ extern const pm_char STR_BLCOLOR[];
   #define LANGUAGE_PACK_DECLARE_DEFAULT(lng, name)
 #endif
 
-#if LCD_W >= 212
-  extern const pm_char STR_MODELNAME[];
-  extern const pm_char STR_PHASENAME[];
-  extern const pm_char STR_MIXNAME[];
-  extern const pm_char STR_INPUTNAME[];
-  extern const pm_char STR_EXPONAME[];
-#else
   #define STR_MODELNAME STR_NAME
   #define STR_PHASENAME STR_NAME
   #define STR_MIXNAME   STR_NAME
   #define STR_EXPONAME  STR_NAME
-#endif
 
-#if LCD_W >= 212
-  extern const char * const STR_PHASES_HEADERS[];
-  extern const char * const STR_LIMITS_HEADERS[];
-  extern const char * const STR_CSW_HEADERS[];
-#endif
 
 
 
