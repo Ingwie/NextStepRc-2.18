@@ -818,11 +818,7 @@ bool eeConvert()
 
   // Models conversion
   for (uint8_t id=0; id<MAX_MODELS; id++) {
-#if defined(LCD212)
-    lcdDrawSolidHorizontalLine(61, 6*FH+5, 10+id*2, FORCE);
-#else
     lcdDrawSolidHorizontalLine(11, 6*FH+5, 10+(id*3)/2, FORCE);
-#endif
     lcdRefresh();
     if (eeModelExists(id)) {
       ConvertModel(id, conversionVersionStart);
