@@ -43,6 +43,27 @@
 # define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s);&__c[0];}))
 #endif
 
+#if !defined GET_FAR_ADDRESS  // Use with progmem "far"
+#define GET_FAR_ADDRESS(var)                          \
+({                                                    \
+    uint_farptr_t tmp;                                \
+                                                      \
+    __asm__ __volatile__(                             \
+                                                      \
+            "ldi    %A0, lo8(%1)"           "\n\t"    \
+            "ldi    %B0, hi8(%1)"           "\n\t"    \
+            "ldi    %C0, hh8(%1)"           "\n\t"    \
+            "clr    %D0"                    "\n\t"    \
+        :                                             \
+            "=d" (tmp)                                \
+        :                                             \
+            "p"  (&(var))                             \
+    );                                                \
+    tmp;                                              \
+})
+#endif
+
+
 typedef void      pm_void;
 typedef char      pm_char;
 typedef unsigned char pm_uchar;
