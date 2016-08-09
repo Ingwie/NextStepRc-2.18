@@ -1099,6 +1099,16 @@ ifeq ($(TEMPLATES), YES)
     GUIMODELSRC += gui/$(GUIDIRECTORY)/menu_model_templates.cpp
 endif
 
+# Enable navigation with Pots / Sticks / Rotary encoders
+# Values = NO
+#          POT1 (only POT1 available for fields modification),
+#          POT2 (menus scroll),
+#          POT3 (cursor down/up),
+#          POTS (POT1, POT2, POT3),
+#          STICKS
+#          ROTENC (Rotary encoder)
+NAVIGATION = NO
+
 ifeq ($(PXX), YES)
   CPPDEFS += -DPXX
 endif
@@ -1467,9 +1477,6 @@ clean_list :
 	@echo
 	@echo $(MSG_CLEANING)
 	$(REMOVE) simu
-	$(REMOVE) gtests
-	$(REMOVE) gtest.a
-	$(REMOVE) gtest_main.a
 	$(REMOVE) $(TARGET).bin
 	$(REMOVE) $(TARGET).hex
 	$(REMOVE) $(TARGET).eep
@@ -1492,7 +1499,6 @@ clean_list :
 	$(REMOVE) fonts/*.lbm
 	$(REMOVE) fonts/*/*.lbm
 	$(REMOVE) translations/*.h
-	$(REMOVE) lua_exports*.txt lua/lua_exports*.inc lua_fields*.txt
 
 #### Install
 
@@ -1526,42 +1532,3 @@ ifdef	SECOND_WRITE_COMMAND
 	$(SLEEP) $(DELAY)
 	$(SECOND_WRITE_COMMAND)
 endif
-
-#### GOOGLE TESTS
-
-GTEST_INCDIR = /usr/include/gtest
-GTEST_SRCDIR = /usr/src/gtest/
-
-# Where to find user code.
-USER_DIR = ./
-
-# All Google Test headers.  Usually you shouldn't change this
-# definition.
-GTEST_HEADERS = $(GTEST_INCDIR)/*.h \
-                $(GTEST_INCDIR)/internal/*.h
-
-# House-keeping build targets.
-
-# Builds gtest.a and gtest_main.a.
-
-# Usually you shouldn't tweak such internal variables, indicated by a
-# trailing _.
-GTEST_SRCS = $(GTEST_SRCDIR)/src/*.cc $(GTEST_HEADERS)
-
-# For simplicity and to avoid depending on Google Test's
-# implementation details, the dependencies specified below are
-# conservative and not optimized.  This is fine as Google Test
-# compiles fast and for ordinary users its source rarely changes.
-gtest-all.o : $(GTEST_SRCS)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_SRCDIR) -I$(GTEST_INCDIR) -c $(GTEST_SRCDIR)/src/gtest-all.cc
-
-# Builds a sample test.  A test should link with either gtest.a or
-# gtest_main.a, depending on whether it defines its own main()
-# function.
-
-#use all .cpp files from tests/ dir
-GTEST_TESTS_SRCS = $(shell find tests/ -type f -name '*.cpp')
-
-gtests: allsimusrc.cpp $(GTEST_TESTS_SRCS) targets/simu/simpgmspace.cpp *.h tests/gtests.h gtest-all.o
-	g++ -std=gnu++0x $(CPPFLAGS) $(SIMUCPPFLAGS) allsimusrc.cpp $(LUASRC) $(GTEST_TESTS_SRCS) targets/simu/simpgmspace.cpp ${INCFLAGS} -I$(GTEST_INCDIR) -I/usr/include/qt4 -o gtests -lpthread -MD -DSIMU -lQtCore -lQtGui gtest-all.o -fexceptions
-

@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #ifndef keys_h
 #define keys_h
@@ -77,35 +77,35 @@ enum EnumKeys {
 #define EVT_ENTRY_UP         0xbe
 #define EVT_MENU_UP          0xbd
 
-  #define EVT_ROTARY_BREAK   0xcf
-  #define EVT_ROTARY_LONG    0xce
-  #define EVT_ROTARY_LEFT    0xdf
-  #define EVT_ROTARY_RIGHT   0xde
+#define EVT_ROTARY_BREAK   0xcf
+#define EVT_ROTARY_LONG    0xce
+#define EVT_ROTARY_LEFT    0xdf
+#define EVT_ROTARY_RIGHT   0xde
 
 #if defined(ROTARY_ENCODER_NAVIGATION)
-  #define IS_ROTARY_LEFT(evt)   (evt == EVT_ROTARY_LEFT)
-  #define IS_ROTARY_RIGHT(evt)  (evt == EVT_ROTARY_RIGHT)
-  #define IS_ROTARY_UP(evt)     IS_ROTARY_LEFT(evt)
-  #define IS_ROTARY_DOWN(evt)   IS_ROTARY_RIGHT(evt)
-  #define IS_ROTARY_BREAK(evt)  (evt == EVT_ROTARY_BREAK)
-  #define IS_ROTARY_LONG(evt)   (evt == EVT_ROTARY_LONG)
-  #define IS_ROTARY_EVENT(evt)  (EVT_KEY_MASK(evt) >= 0x0e)
-  #define CASE_EVT_ROTARY_BREAK case EVT_ROTARY_BREAK:
-  #define CASE_EVT_ROTARY_LONG  case EVT_ROTARY_LONG:
-  #define CASE_EVT_ROTARY_LEFT  case EVT_ROTARY_LEFT:
-  #define CASE_EVT_ROTARY_RIGHT case EVT_ROTARY_RIGHT:
+#define IS_ROTARY_LEFT(evt)   (evt == EVT_ROTARY_LEFT)
+#define IS_ROTARY_RIGHT(evt)  (evt == EVT_ROTARY_RIGHT)
+#define IS_ROTARY_UP(evt)     IS_ROTARY_LEFT(evt)
+#define IS_ROTARY_DOWN(evt)   IS_ROTARY_RIGHT(evt)
+#define IS_ROTARY_BREAK(evt)  (evt == EVT_ROTARY_BREAK)
+#define IS_ROTARY_LONG(evt)   (evt == EVT_ROTARY_LONG)
+#define IS_ROTARY_EVENT(evt)  (EVT_KEY_MASK(evt) >= 0x0e)
+#define CASE_EVT_ROTARY_BREAK case EVT_ROTARY_BREAK:
+#define CASE_EVT_ROTARY_LONG  case EVT_ROTARY_LONG:
+#define CASE_EVT_ROTARY_LEFT  case EVT_ROTARY_LEFT:
+#define CASE_EVT_ROTARY_RIGHT case EVT_ROTARY_RIGHT:
 #else
-  #define IS_ROTARY_LEFT(evt)   (0)
-  #define IS_ROTARY_RIGHT(evt)  (0)
-  #define IS_ROTARY_UP(evt)     (0)
-  #define IS_ROTARY_DOWN(evt)   (0)
-  #define IS_ROTARY_BREAK(evt)  (0)
-  #define IS_ROTARY_LONG(evt)   (0)
-  #define IS_ROTARY_EVENT(evt)  (0)
-  #define CASE_EVT_ROTARY_BREAK
-  #define CASE_EVT_ROTARY_LONG
-  #define CASE_EVT_ROTARY_LEFT
-  #define CASE_EVT_ROTARY_RIGHT
+#define IS_ROTARY_LEFT(evt)   (0)
+#define IS_ROTARY_RIGHT(evt)  (0)
+#define IS_ROTARY_UP(evt)     (0)
+#define IS_ROTARY_DOWN(evt)   (0)
+#define IS_ROTARY_BREAK(evt)  (0)
+#define IS_ROTARY_LONG(evt)   (0)
+#define IS_ROTARY_EVENT(evt)  (0)
+#define CASE_EVT_ROTARY_BREAK
+#define CASE_EVT_ROTARY_LONG
+#define CASE_EVT_ROTARY_LEFT
+#define CASE_EVT_ROTARY_RIGHT
 #endif
 
 class Key
@@ -124,16 +124,16 @@ class Key
 #define KSTATE_PAUSE    98
 #define KSTATE_KILLED   99
 
-  private:
-    uint8_t m_vals;   // key debounce?  4 = 40ms
-    uint8_t m_cnt;
-    uint8_t m_state;
-  public:
-    void input(bool val);
-    bool state()       { return m_vals > 0; }
-    void pauseEvents() { m_state = KSTATE_PAUSE; m_cnt = 0; }
-    void killEvents()  { m_state = KSTATE_KILLED; }
-    EnumKeys key() const;
+private:
+  uint8_t m_vals;   // key debounce?  4 = 40ms
+  uint8_t m_cnt;
+  uint8_t m_state;
+public:
+  void input(bool val);
+  bool state()       { return m_vals > 0; }
+  void pauseEvents() { m_state = KSTATE_PAUSE; m_cnt = 0; }
+  void killEvents()  { m_state = KSTATE_KILLED; }
+  EnumKeys key() const;
 };
 
 extern Key keys[NUM_KEYS];
@@ -144,8 +144,8 @@ extern uint8_t s_evt;
 
 void pauseEvents(uint8_t enuk);
 void killEvents(uint8_t enuk);
-  void clearKeyEvents();
-  uint8_t getEvent();
+void clearKeyEvents();
+uint8_t getEvent();
 
 uint8_t keyDown();
 

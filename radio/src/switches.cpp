@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #include "opentx.h"
 
@@ -26,7 +26,7 @@ volatile GETSWITCH_RECURSIVE_TYPE s_last_switch_used = 0;
 volatile GETSWITCH_RECURSIVE_TYPE s_last_switch_value = 0;
 
 
-  #define getValueForLogicalSwitch(i) getValue(i)
+#define getValueForLogicalSwitch(i) getValue(i)
 
 PACK(typedef struct {
   uint8_t state;
@@ -59,16 +59,16 @@ bool getLogicalSwitch(uint8_t idx)
     bool res1 = getSwitch(ls->v1);
     bool res2 = getSwitch(ls->v2);
     switch (ls->func) {
-      case LS_FUNC_AND:
-        result = (res1 && res2);
-        break;
-      case LS_FUNC_OR:
-        result = (res1 || res2);
-        break;
+    case LS_FUNC_AND:
+      result = (res1 && res2);
+      break;
+    case LS_FUNC_OR:
+      result = (res1 || res2);
+      break;
       // case LS_FUNC_XOR:
-      default:
-        result = (res1 ^ res2);
-        break;
+    default:
+      result = (res1 ^ res2);
+      break;
     }
   }
   else if (s == LS_FAMILY_TIMER) {
@@ -84,15 +84,15 @@ bool getLogicalSwitch(uint8_t idx)
       y = getValueForLogicalSwitch(ls->v2);
 
       switch (ls->func) {
-        case LS_FUNC_EQUAL:
-          result = (x==y);
-          break;
-        case LS_FUNC_GREATER:
-          result = (x>y);
-          break;
-        default:
-          result = (x<y);
-          break;
+      case LS_FUNC_EQUAL:
+        result = (x==y);
+        break;
+      case LS_FUNC_GREATER:
+        result = (x>y);
+        break;
+      default:
+        result = (x<y);
+        break;
       }
     }
     else {
@@ -137,27 +137,27 @@ bool getLogicalSwitch(uint8_t idx)
 #endif
 
       switch (ls->func) {
-        case LS_FUNC_VALMOSTEQUAL:
+      case LS_FUNC_VALMOSTEQUAL:
 #if defined(GVARS)
-          if (v1 >= MIXSRC_GVAR1 && v1 <= MIXSRC_LAST_GVAR)
-            result = (x==y);
-          else
+        if (v1 >= MIXSRC_GVAR1 && v1 <= MIXSRC_LAST_GVAR)
+        result = (x==y);
+        else
 #endif
-          result = (abs(x-y) < (1024 / STICK_TOLERANCE));
-          break;
-        case LS_FUNC_VPOS:
-          result = (x>y);
-          break;
-        case LS_FUNC_VNEG:
-          result = (x<y);
-          break;
-        case LS_FUNC_APOS:
-          result = (abs(x)>y);
-          break;
-        case LS_FUNC_ANEG:
-          result = (abs(x)<y);
-          break;
-        default:
+        result = (abs(x-y) < (1024 / STICK_TOLERANCE));
+        break;
+      case LS_FUNC_VPOS:
+        result = (x>y);
+        break;
+      case LS_FUNC_VNEG:
+        result = (x<y);
+        break;
+      case LS_FUNC_APOS:
+        result = (abs(x)>y);
+        break;
+      case LS_FUNC_ANEG:
+        result = (abs(x)<y);
+        break;
+      default:
         {
           if (LS_LAST_VALUE(mixerCurrentFlightMode, idx) == CS_LAST_VALUE_INIT) {
             LS_LAST_VALUE(mixerCurrentFlightMode, idx) = x;
@@ -168,12 +168,12 @@ bool getLogicalSwitch(uint8_t idx)
             if (y >= 0) {
               result = (diff >= y);
               if (diff < 0)
-                update = true;
+              update = true;
             }
             else {
               result = (diff <= y);
               if (diff > 0)
-                update = true;
+              update = true;
             }
           }
           else {
@@ -201,7 +201,7 @@ bool getSwitch(swsrc_t swtch)
   bool result;
 
   if (swtch == SWSRC_NONE)
-    return true;
+  return true;
 
   uint8_t cs_idx = abs(swtch);
 
@@ -284,7 +284,7 @@ swsrc_t getMovedSwitch()
     bool next = switchState((EnumKeys)(SW_BASE+i-1));
     if (prev != next) {
       if (((i<NUM_PSWITCH) && (i>3)) || next==true) 
-        result = next ? i : -i;
+      result = next ? i : -i;
       if (i<=3 && result==0) result = 1;
       switches_states ^= mask;
     }
@@ -292,7 +292,7 @@ swsrc_t getMovedSwitch()
   }
 
   if ((tmr10ms_t)(get_tmr10ms() - s_move_last_time) > 10)
-    result = 0;
+  result = 0;
 
   s_move_last_time = get_tmr10ms();
   return result;
@@ -314,7 +314,7 @@ void checkSwitches()
   while (1) {
 
 #if defined(TELEMETRY_MOD_14051) || defined(TELEMETRY_MOD_14051_SWAPPED)
-// FIXME: One getADC() call only reads one 14051 MUX input. To have all switch states updated, we need to call it MUX_MAX+1 times.
+    // FIXME: One getADC() call only reads one 14051 MUX input. To have all switch states updated, we need to call it MUX_MAX+1 times.
 #define GETADC_COUNT (MUX_MAX+1)
 #endif
 #ifdef GETADC_COUNT
@@ -326,15 +326,15 @@ void checkSwitches()
 #endif  // !defined(MODULE_ALWAYS_SEND_PULSES)
 
     getMovedSwitch();
-  
+    
     bool warn = false;
     for (int i=0; i<NUM_SWITCHES-1; i++) {
       if (!(g_model.switchWarningEnable & (1<<i))) {
-      	if (i == 0) {
-      	  if ((states & 0x03) != (switches_states & 0x03)) {
-      	    warn = true;
-      	  }
-      	}
+        if (i == 0) {
+          if ((states & 0x03) != (switches_states & 0x03)) {
+            warn = true;
+          }
+        }
         else if ((states & (1<<(i+1))) != (switches_states & (1<<(i+1)))) {
           warn = true;
         }
@@ -356,11 +356,11 @@ void checkSwitches()
       for (uint8_t i=0; i<NUM_SWITCHES-1; i++) {
         uint8_t attr;
         if (i == 0)
-          attr = ((states & 0x03) != (switches_states & 0x03)) ? INVERS : 0;
+        attr = ((states & 0x03) != (switches_states & 0x03)) ? INVERS : 0;
         else
-          attr = (states & (1 << (i+1))) == (switches_states & (1 << (i+1))) ? 0 : INVERS;
+        attr = (states & (1 << (i+1))) == (switches_states & (1 << (i+1))) ? 0 : INVERS;
         if (!(g_model.switchWarningEnable & (1<<i)))
-          lcdPutsSwitches(x, 5*FH, (i>0?(i+3):(states&0x3)+1), attr);
+        lcdPutsSwitches(x, 5*FH, (i>0?(i+3):(states&0x3)+1), attr);
         x += 3*FW+FW/2;
       }
       lcdRefresh();
@@ -394,44 +394,44 @@ void checkSwitches()
 
 void logicalSwitchesTimerTick()
 {
-    for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++) {
-      LogicalSwitchData * ls = lswAddress(i);
-      if (ls->func == LS_FUNC_TIMER) {
-        int16_t *lastValue = &LS_LAST_VALUE(fm, i);
-        if (*lastValue == 0 || *lastValue == CS_LAST_VALUE_INIT) {
-          *lastValue = -lswTimerValue(ls->v1);
-        }
-        else if (*lastValue < 0) {
-          if (++(*lastValue) == 0)
-            *lastValue = lswTimerValue(ls->v2);
-        }
-        else { // if (*lastValue > 0)
-          *lastValue -= 1;
-        }
+  for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++) {
+    LogicalSwitchData * ls = lswAddress(i);
+    if (ls->func == LS_FUNC_TIMER) {
+      int16_t *lastValue = &LS_LAST_VALUE(fm, i);
+      if (*lastValue == 0 || *lastValue == CS_LAST_VALUE_INIT) {
+        *lastValue = -lswTimerValue(ls->v1);
       }
-      else if (ls->func == LS_FUNC_STICKY) {
-        ls_sticky_struct & lastValue = (ls_sticky_struct &)LS_LAST_VALUE(fm, i);
-        bool before = lastValue.last & 0x01;
-        if (lastValue.state) {
-          bool now = getSwitch(ls->v2);
-          if (now != before) {
-            lastValue.last ^= 1;
-            if (!before) {
-              lastValue.state = 0;
-            }
+      else if (*lastValue < 0) {
+        if (++(*lastValue) == 0)
+        *lastValue = lswTimerValue(ls->v2);
+      }
+      else { // if (*lastValue > 0)
+        *lastValue -= 1;
+      }
+    }
+    else if (ls->func == LS_FUNC_STICKY) {
+      ls_sticky_struct & lastValue = (ls_sticky_struct &)LS_LAST_VALUE(fm, i);
+      bool before = lastValue.last & 0x01;
+      if (lastValue.state) {
+        bool now = getSwitch(ls->v2);
+        if (now != before) {
+          lastValue.last ^= 1;
+          if (!before) {
+            lastValue.state = 0;
           }
         }
-        else {
-          bool now = getSwitch(ls->v1);
-          if (before != now) {
-            lastValue.last ^= 1;
-            if (!before) {
-              lastValue.state = 1;
-            }
+      }
+      else {
+        bool now = getSwitch(ls->v1);
+        if (before != now) {
+          lastValue.last ^= 1;
+          if (!before) {
+            lastValue.state = 1;
           }
         }
       }
     }
+  }
 }
 
 LogicalSwitchData * lswAddress(uint8_t idx)
@@ -442,15 +442,15 @@ LogicalSwitchData * lswAddress(uint8_t idx)
 uint8_t lswFamily(uint8_t func)
 {
   if (func <= LS_FUNC_ANEG)
-    return LS_FAMILY_OFS;
+  return LS_FAMILY_OFS;
   else if (func <= LS_FUNC_XOR)
-    return LS_FAMILY_BOOL;
+  return LS_FAMILY_BOOL;
   else if (func <= LS_FUNC_LESS)
-    return LS_FAMILY_COMP;
+  return LS_FAMILY_COMP;
   else if (func <= LS_FUNC_ADIFFEGREATER)
-    return LS_FAMILY_DIFF;
+  return LS_FAMILY_DIFF;
   else
-    return LS_FAMILY_TIMER+func-LS_FUNC_TIMER;
+  return LS_FAMILY_TIMER+func-LS_FUNC_TIMER;
 }
 
 int16_t lswTimerValue(delayval_t val)
@@ -462,18 +462,18 @@ void logicalSwitchesReset()
 {
   s_last_switch_value = 0;
 
-    for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++) {
-      LS_LAST_VALUE(fm, i) = CS_LAST_VALUE_INIT;
-    }
+  for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++) {
+    LS_LAST_VALUE(fm, i) = CS_LAST_VALUE_INIT;
+  }
 }
 
 getvalue_t convertLswTelemValue(LogicalSwitchData * ls)
 {
   getvalue_t val;
   if (lswFamily(ls->func)==LS_FAMILY_OFS)
-    val = convert8bitsTelemValue(ls->v1 - MIXSRC_FIRST_TELEM + 1, 128+ls->v2);
+  val = convert8bitsTelemValue(ls->v1 - MIXSRC_FIRST_TELEM + 1, 128+ls->v2);
   else
-    val = convert8bitsTelemValue(ls->v1 - MIXSRC_FIRST_TELEM + 1, 128+ls->v2) - convert8bitsTelemValue(ls->v1 - MIXSRC_FIRST_TELEM + 1, 128);
+  val = convert8bitsTelemValue(ls->v1 - MIXSRC_FIRST_TELEM + 1, 128+ls->v2) - convert8bitsTelemValue(ls->v1 - MIXSRC_FIRST_TELEM + 1, 128);
   return val;
 }
 

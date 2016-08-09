@@ -12,8 +12,6 @@ In French ;-)
 
 > - remplacement carte WT par "mieux" -> JQ6500 testé bientôt
 
-> - finir navigation avec les manches (placer les routines dans key.xxx) 
-
 
 *****************  DONE DONE DONE DONE  *****************
 
@@ -24,3 +22,4 @@ In French ;-)
 > - Schema : corriger cablage KS108 + Le gain des amplis (R6/2) + pin buzzer - FAIT
 > - Corriger bug de flash "error mismatch"
 > - Changer le splash (NEXTSTEPRC) - FAIT
+> - finir navigation avec les manches (placer les routines dans key.xxx) Placé dans gui/9X/navigation.cpp

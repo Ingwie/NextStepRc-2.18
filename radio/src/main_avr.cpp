@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #include "opentx.h"
 
@@ -36,7 +36,7 @@ void perMain()
 
     // @@@ open.20.fsguruh
     // SLEEP();   // wouldn't that make sense? should save a lot of battery power!!!
-/*  for future use; currently very very beta...  */
+    /*  for future use; currently very very beta...  */
 #if defined(POWER_SAVE)
     ADCSRA&=0x7F;   // disable ADC for power saving
     ACSR&=0xF7;   // disable ACIE Interrupts
@@ -83,9 +83,9 @@ void perMain()
 
   if (!eeprom_buffer_size) {
     if (theFile.isWriting())
-      theFile.nextWriteStep();
+    theFile.nextWriteStep();
     else if (TIME_TO_WRITE())
-      eeCheck(false);
+    eeCheck(false);
   }
 
 #if defined(SDCARD)
@@ -102,7 +102,7 @@ void perMain()
 
 #if defined(NAVIGATION_STICKS)
   uint8_t sticks_evt = getSticksNavigationEvent();
-  if (sticks_evt) evt = sticks_evt;
+  if (sticks_evt) evt = EVT_KEY_FIRST(sticks_evt);
 #endif
 
   if (evt && (g_eeGeneral.backlightMode & e_backlight_mode_keys)) backlightOn(); // on keypress turn the light on
@@ -113,28 +113,28 @@ void perMain()
   bool popupMenuActive = (popupMenuNoItems > 0);
 
   if(IS_LCD_REFRESH_ALLOWED()){//No need to redraw until lcdRefresh_ST7920(0) below completely refreshes the display.
-      lcdClear();
-      if (menuEvent) {
-        menuVerticalPosition = menuEvent == EVT_ENTRY_UP ? menuVerticalPositions[menuLevel] : 0;
-        menuHorizontalPosition = 0;
-        evt = menuEvent;
-        menuEvent = 0;
-        AUDIO_MENUS();
-      }
-      menuHandlers[menuLevel]((warn || popupMenuActive) ? 0 : evt);
+    lcdClear();
+    if (menuEvent) {
+      menuVerticalPosition = menuEvent == EVT_ENTRY_UP ? menuVerticalPositions[menuLevel] : 0;
+      menuHorizontalPosition = 0;
+      evt = menuEvent;
+      menuEvent = 0;
+      AUDIO_MENUS();
+    }
+    menuHandlers[menuLevel]((warn || popupMenuActive) ? 0 : evt);
 
 
-      if (warn) DISPLAY_WARNING(evt);
+    if (warn) DISPLAY_WARNING(evt);
 #if defined(NAVIGATION_MENUS)
-      if (popupMenuActive) {
-        const char * result = displayPopupMenu(evt);
-        if (result) {
-          popupMenuHandler(result);
-          putEvent(EVT_MENU_UP);
-        }
+    if (popupMenuActive) {
+      const char * result = displayPopupMenu(evt);
+      if (result) {
+        popupMenuHandler(result);
+        putEvent(EVT_MENU_UP);
       }
+    }
 #endif
-      drawStatusLine();
+    drawStatusLine();
   }
 
 #if defined(LCD_KS108)

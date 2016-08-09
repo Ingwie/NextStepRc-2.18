@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #include "../../opentx.h"
 
@@ -95,51 +95,51 @@ bool switchState(EnumKeys enuk)
   uint8_t result = 0 ;
 
   if (enuk < (int)DIM(keys))
-    return keys[enuk].state() ? 1 : 0;
+  return keys[enuk].state() ? 1 : 0;
 
   switch(enuk){
-    case SW_ELE:
-      result = !(PINL & (1<<INP_L_ElevDR));
-      break;
+  case SW_ELE:
+    result = !(PINL & (1<<INP_L_ElevDR));
+    break;
 
-    case SW_AIL:
-      result = !(PIND & (1<<INP_D_AileDR));
-      break;
+  case SW_AIL:
+    result = !(PIND & (1<<INP_D_AileDR));
+    break;
 
-    case SW_RUD:
-      result = !(PING & (1<<INP_G_RuddDR));
-      break;
+  case SW_RUD:
+    result = !(PING & (1<<INP_G_RuddDR));
+    break;
 
     //       INP_C_ID1  INP_C_ID2
     // ID0      0          1
     // ID1      1          1
     // ID2      1          0
-    case SW_ID0:
-      result = !(PINC & (1<<INP_C_ID1));
-      break;
+  case SW_ID0:
+    result = !(PINC & (1<<INP_C_ID1));
+    break;
 
-    case SW_ID1:
-      result = (PINC & (1<<INP_C_ID1))&& (PINC & (1<<INP_C_ID2));
-      break;
+  case SW_ID1:
+    result = (PINC & (1<<INP_C_ID1))&& (PINC & (1<<INP_C_ID2));
+    break;
 
-    case SW_ID2:
-      result = !(PINC & (1<<INP_C_ID2));
-      break;
+  case SW_ID2:
+    result = !(PINC & (1<<INP_C_ID2));
+    break;
 
-    case SW_GEA:
-      result = !(PING & (1<<INP_G_Gear));
-      break;
+  case SW_GEA:
+    result = !(PING & (1<<INP_G_Gear));
+    break;
 
-    case SW_THR:
-      result = !(PING & (1<<INP_G_ThrCt));
-      break;
+  case SW_THR:
+    result = !(PING & (1<<INP_G_ThrCt));
+    break;
 
-    case SW_TRN:
-      result = !(PINL & (1<<INP_L_Trainer));
-      break;
+  case SW_TRN:
+    result = !(PINL & (1<<INP_L_Trainer));
+    break;
 
-    default:
-      break;
+  default:
+    break;
   }
 
   return result;
@@ -169,7 +169,7 @@ static const pm_uchar crossTrim[] PROGMEM = {
   TRIMS_GPIO_PIN_RHR
 };
 #endif
-     
+
 uint8_t trimDown(uint8_t idx)
 {
   uint8_t in = ~PINF;                //was PIND
@@ -202,8 +202,12 @@ void readKeysAndTrims()
   }
 
 #if defined(NAVIGATION_STICKS)
-  if (~PINL & 0x10) {        //Check menu key
+  if (~PINL & 0x10) {   //Check menu key
     StickScrollTimer = STICK_SCROLL_TIMEOUT ;
+    uint8_t sticks_evt = getSticksNavigationEvent();
+    if (sticks_evt) {
+      putEvent(EVT_KEY_LONG(sticks_evt)); // create a stick based event long to choose menu
+    }
   }
 #endif
 
@@ -219,7 +223,7 @@ ISR(INT4_vect)     // Arduino2560 IO02 (portE pin4)
   if (input == 0 || input == 0x30) incRotaryEncoder(0, -1);
 #endif
 }
-                 
+
 ISR(INT5_vect)     // Arduino2560 IO03 (portE pin5)
 {
   uint8_t input = (PINE & 0x30);
@@ -249,4 +253,4 @@ ISR(INT3_vect)     // Arduino2560 IO18 (portD pin3)
   if (input == 0 || input == 0x0C) incRotaryEncoder(1, +1);
 #endif
 }  
-       
+

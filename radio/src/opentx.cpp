@@ -1271,34 +1271,6 @@ void doMixerCalculations()
   s_mixer_first_run_done = true;
 }
 
-
-
-#if defined(NAVIGATION_STICKS)
-uint8_t StickScrollAllowed;
-uint8_t StickScrollTimer;
-static const pm_uint8_t rate[] PROGMEM = { 0, 0, 100, 40, 16, 7, 3, 1 } ;
-
-uint8_t calcStickScroll( uint8_t index )
-{
-  uint8_t direction;
-  int8_t value;
-
-  if ( ( g_eeGeneral.stickMode & 1 ) == 0 )
-  index ^= 3;
-
-  value = calibratedStick[index] / 128;
-  direction = value > 0 ? 0x80 : 0;
-  if (value < 0)
-  value = -value;                             // (abs)
-  if (value > 7)
-  value = 7;
-  value = pgm_read_byte(rate+(uint8_t)value);
-  if (value)
-  StickScrollTimer = STICK_SCROLL_TIMEOUT;    // Seconds
-  return value | direction;
-}
-#endif
-
 void opentxStart()
 {
   doSplash();
@@ -1342,9 +1314,6 @@ void opentxClose()
 
   saveTimers();
 
-
-
-
   if (s_eeDirtyMsk & EE_MODEL) {
     displayPopup(STR_SAVEMODEL);
   }
@@ -1358,77 +1327,6 @@ void opentxClose()
 #if defined(SDCARD)
   sdDone();
 #endif
-}
-#endif
-
-
-
-#if defined(NAVIGATION_STICKS)
-uint8_t getSticksNavigationEvent()
-{
-  uint8_t evt = 0;
-  if (StickScrollAllowed) {
-    if ( StickScrollTimer ) {
-      static uint8_t repeater;
-      uint8_t direction;
-      uint8_t value;
-
-      if ( repeater < 128 )
-      {
-        repeater += 1;
-      }
-      value = calcStickScroll(1);
-      direction = value & 0x80;
-      value &= 0x7F;
-      if ( value )
-      {
-        if ( repeater > value )
-        {
-          repeater = 0;
-          if ( evt == 0 )
-          {
-            if ( direction )
-            {
-              evt = EVT_KEY_FIRST(KEY_UP);
-            }
-            else
-            {
-              evt = EVT_KEY_FIRST(KEY_DOWN);
-            }
-          }
-        }
-      }
-      else
-      {
-        value = calcStickScroll(0);
-        direction = value & 0x80;
-        value &= 0x7F;
-        if ( value )
-        {
-          if ( repeater > value )
-          {
-            repeater = 0;
-            if ( evt == 0 )
-            {
-              if ( direction )
-              {
-                evt = EVT_KEY_FIRST(KEY_RIGHT);
-              }
-              else
-              {
-                evt = EVT_KEY_FIRST(KEY_LEFT);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  else {
-    StickScrollTimer = 0;          // Seconds
-  }
-  StickScrollAllowed = 1 ;
-  return evt;
 }
 #endif
 

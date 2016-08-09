@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #include "opentx.h"
 
@@ -46,54 +46,54 @@ void Key::input(bool val)
     m_state = KSTATE_OFF;
   }
   switch(m_state){
-    case KSTATE_OFF:
-      if (m_vals == FFVAL) { //gerade eben sprung auf ff
-        m_state = KSTATE_START;
-        m_cnt   = 0;
-      }
-      break;
-      //fallthrough
-    case KSTATE_START:
-      putEvent(EVT_KEY_FIRST(key()));
-      inactivity.counter = 0;
-      m_state   = KSTATE_RPTDELAY;
+  case KSTATE_OFF:
+    if (m_vals == FFVAL) { //gerade eben sprung auf ff
+      m_state = KSTATE_START;
+      m_cnt   = 0;
+    }
+    break;
+    //fallthrough
+  case KSTATE_START:
+    putEvent(EVT_KEY_FIRST(key()));
+    inactivity.counter = 0;
+    m_state   = KSTATE_RPTDELAY;
+    m_cnt     = 0;
+    break;
+
+  case KSTATE_RPTDELAY: // gruvin: delay state before first key repeat
+    if (m_cnt == KEY_LONG_DELAY) {
+      putEvent(EVT_KEY_LONG(key()));
+    }
+    if (m_cnt == 40) {
+      m_state = 16;
+      m_cnt = 0;
+    }
+    break;
+
+  case 16:
+  case 8:
+  case 4:
+  case 2:
+    if (m_cnt >= 48)  { //3 6 12 24 48 pulses in every 480ms
+      m_state >>= 1;
       m_cnt     = 0;
-      break;
+    }
+    // no break
+  case 1:
+    if ((m_cnt & (m_state-1)) == 0) {
+      putEvent(EVT_KEY_REPT(key()));
+    }
+    break;
 
-    case KSTATE_RPTDELAY: // gruvin: delay state before first key repeat
-      if (m_cnt == KEY_LONG_DELAY) {
-        putEvent(EVT_KEY_LONG(key()));
-      }
-      if (m_cnt == 40) {
-        m_state = 16;
-        m_cnt = 0;
-      }
-      break;
+  case KSTATE_PAUSE: //pause
+    if (m_cnt >= 64)      {
+      m_state = 8;
+      m_cnt   = 0;
+    }
+    break;
 
-    case 16:
-    case 8:
-    case 4:
-    case 2:
-      if (m_cnt >= 48)  { //3 6 12 24 48 pulses in every 480ms
-        m_state >>= 1;
-        m_cnt     = 0;
-      }
-      // no break
-    case 1:
-      if ((m_cnt & (m_state-1)) == 0) {
-        putEvent(EVT_KEY_REPT(key()));
-      }
-      break;
-
-    case KSTATE_PAUSE: //pause
-      if (m_cnt >= 64)      {
-        m_state = 8;
-        m_cnt   = 0;
-      }
-      break;
-
-    case KSTATE_KILLED: //killed
-      break;
+  case KSTATE_KILLED: //killed
+    break;
   }
 }
 

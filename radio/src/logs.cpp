@@ -21,7 +21,7 @@ FIL g_oLogFile = {0};
 //const pm_char * g_logError = NULL; bracame not used ? why
 uint8_t logDelay;
 
-  #define get2PosState(sw) (switchState(SW_ ## sw) ? -1 : 1)
+#define get2PosState(sw) (switchState(SW_ ## sw) ? -1 : 1)
 
 #define get3PosState(sw) (switchState(SW_ ## sw ## 0) ? -1 : (switchState(SW_ ## sw ## 2) ? 1 : 0))
 
