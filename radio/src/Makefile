@@ -681,7 +681,7 @@ ifeq ($(PCB), GRUVIN9X)
 
   ifeq ($(SDCARD), YES)
     CPPDEFS += -DRTCLOCK -DSDCARD
-    CPPSRC += rtc.cpp sdcard.cpp logs.cpp targets/gruvin9x/rtc_driver.cpp
+    CPPSRC += i2c_master.cpp rtc.cpp sdcard.cpp logs.cpp targets/gruvin9x/rtc_driver.cpp
     GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_sdmanager.cpp
     EXTRABOARDSRC += $(FATFSDIR)/ff.c $(FATFSDIR)/fattime.c $(FATFSDIR)/option/ccsbcs.c targets/gruvin9x/diskio.cpp
   endif
@@ -735,7 +735,7 @@ ifeq ($(PCB), MEGA2560)
     EXTRABOARDSRC += $(FATFSDIR)/ff.c $(FATFSDIR)/fattime.c $(FATFSDIR)/option/ccsbcs.c targets/gruvin9x/diskio.cpp
     CPPDEFS += -DSDCARD -DRTCLOCK
     GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_sdmanager.cpp
-    CPPSRC += rtc.cpp sdcard.cpp logs.cpp targets/gruvin9x/rtc_driver.cpp
+    CPPSRC += i2c_master.cpp rtc.cpp sdcard.cpp logs.cpp targets/gruvin9x/rtc_driver.cpp
   endif
 
   ifeq ($(AUDIO), YES)

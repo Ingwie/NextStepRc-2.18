@@ -15,6 +15,7 @@
 */
 
 #include "../../opentx.h"
+#include "../../i2c_master.h"
 
 #ifndef SIMU
 inline void boardInit()
@@ -68,6 +69,9 @@ inline void boardInit()
   EICRA = (1<<ISC30) | (1<<ISC20);
   EIFR = (3<<INTF2);
   EIMSK = (3<<INT4) | (3<<INT2); // enable the two rot. enc. ext. int. pairs.
+  
+  /* Hardware I2C init                               */
+  i2c_init();
 }              
 #endif // !SIMU
 

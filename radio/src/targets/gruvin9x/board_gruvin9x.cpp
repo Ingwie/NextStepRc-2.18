@@ -15,6 +15,7 @@
  */
 
 #include "../../opentx.h"
+#include "../../i2c_master.h"
 
 #ifndef SIMU
 inline void boardInit()
@@ -46,6 +47,9 @@ inline void boardInit()
 #endif
 
   adcInit();
+    /* Hardware I2C init */
+  i2c_init();
+
 
   /**** Set up timer/counter 0 ****/
   /** Move old 64A Timer0 functions to Timer2 and use WGM on OC0(A) (PB7) for spkear tone output **/
