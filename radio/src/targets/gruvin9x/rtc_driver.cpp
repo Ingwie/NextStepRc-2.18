@@ -22,13 +22,14 @@
 
 typedef struct {
         WORD    year;   /* 2000..2099 */
-        BYTE    month;  /* 1..12 */
-        BYTE    mday;   /* 1.. 31 */
-        BYTE    wday;   /* 1..7 */
-        BYTE    hour;   /* 0..23 */
-        BYTE    min;    /* 0..59 */
-        BYTE    sec;    /* 0..59 */
+        uint8_t    month;  /* 1..12 */
+        uint8_t    mday;   /* 1.. 31 */
+        uint8_t    wday;   /* 1..7 */
+        uint8_t    hour;   /* 0..23 */
+        uint8_t    min;    /* 0..59 */
+        uint8_t    sec;    /* 0..59 */
 } RTC;
+
 
 #define SCL_LOW()	DDRD |=	0x01		/* SCL = LOW */
 #define SCL_HIGH()	DDRD &=	~0x01		/* SCL = High-Z */
@@ -44,7 +45,7 @@ static
 void iic_delay (void)
 {
 #ifndef SIMU
-	for (int n = 4; n; n--) PINB;
+	for (uint8_t n = 4; n; n--) PINB;
 #endif
 }
 
@@ -77,12 +78,12 @@ void iic_stop (void)
 }
 
 
-/* Send a byte to the IIC bus */
+/* Send a uint8_t to the IIC bus */
 static
-int iic_send (BYTE dat)
+uint8_t iic_send (uint8_t dat)
 {
-	BYTE b = 0x80;
-	int ack;
+	uint8_t b = 0x80;
+	uint8_t ack;
 
 
 	do {
@@ -108,11 +109,11 @@ int iic_send (BYTE dat)
 }
 
 
-/* Receive a byte from the IIC bus */
+/* Receive a uint8_t from the IIC bus */
 static
-BYTE iic_rcvr (int ack)
+uint8_t iic_rcvr (uint8_t ack)
 {
-	UINT d = 1;
+	uint16_t d = 1;
 
 
 	do {
@@ -135,7 +136,7 @@ BYTE iic_rcvr (int ack)
 	SDA_HIGH();
 	iic_delay();
 
-	return (BYTE)d;
+	return (uint8_t)d;
 }
 
 
@@ -144,15 +145,15 @@ BYTE iic_rcvr (int ack)
 /* I2C block read/write controls                   */
 
 
-int iic_read (
-	BYTE dev,		/* Device address */
-	UINT adr,		/* Read start address */
-	UINT cnt,		/* Read byte count */
-	BYTE *buff		/* Read data buffer */
+uint8_t iic_read (
+	uint8_t dev,		/* Device address */
+	uint8_t adr,		/* Read start address */
+	uint8_t cnt,		/* Read uint8_t count */
+	uint8_t *buff		/* Read data buffer */
 )
 {
-	BYTE *rbuff = buff;
-	int n;
+	uint8_t *rbuff = buff;
+	uint8_t n;
 
 
 	if (!cnt) return 0;
@@ -162,7 +163,7 @@ int iic_read (
 		iic_start();
 	} while (!iic_send(dev) && --n);
 	if (n) {
-		if (iic_send((BYTE)adr)) {		/* Set start address */
+		if (iic_send((uint8_t)adr)) {		/* Set start address */
 			iic_start();				/* Reselect device in read mode */
 			if (iic_send(dev | 1)) {
 				do {					/* Receive data */
@@ -180,15 +181,15 @@ int iic_read (
 
 
 
-int iic_write (
-	BYTE dev,			/* Device address */
-	UINT adr,			/* Write start address */
-	UINT cnt,			/* Write byte count */
-	const BYTE *buff	/* Data to be written */
+uint8_t iic_write (
+	uint8_t dev,			/* Device address */
+	uint8_t adr,			/* Write start address */
+	uint8_t cnt,			/* Write uint8_t count */
+	const uint8_t *buff	/* Data to be written */
 )
 {
-	const BYTE *wbuff = buff;
-	int n;
+	const uint8_t *wbuff = buff;
+	uint8_t n;
 
 
 	if (!cnt) return 0;
@@ -198,7 +199,7 @@ int iic_write (
 		iic_start();
 	} while (!iic_send(dev) && --n);
 	if (n) {
-		if (iic_send((BYTE)adr)) {		/* Set start address */
+		if (iic_send((uint8_t)adr)) {		/* Set start address */
 			do {						/* Send data */
 				if (!iic_send(*wbuff++)) break;
 			} while (--cnt);
@@ -210,12 +211,13 @@ int iic_write (
 	return cnt ? 0 : 1;
 }
 
+
 /*-------------------------------------------------*/
 /* RTC functions                                   */
 
-int g9x_rtcGetTime (RTC *rtc)
+uint8_t g9x_rtcGetTime (RTC *rtc)
 {
-  BYTE buf[8];
+  uint8_t buf[8];
 
   if (!iic_read(0xD0, 0, 7, buf)) return 0;
 
@@ -230,9 +232,9 @@ int g9x_rtcGetTime (RTC *rtc)
   return 1;
 }
 
-int g9x_rtcSetTime (const RTC *rtc)
+uint8_t g9x_rtcSetTime (const RTC *rtc)
 {
-  BYTE buf[8];
+  uint8_t buf[8];
 
   buf[0] = rtc->sec / 10 * 16 + rtc->sec % 10;
   buf[1] = rtc->min / 10 * 16 + rtc->min % 10;
@@ -277,7 +279,7 @@ void rtcSetTime(struct gtm * t)
 
 void rtcInit (void)
 {
-  BYTE buf[8];	/* RTC R/W buffer */
+  uint8_t buf[8];	/* RTC R/W buffer */
   UINT adr;
 
 
@@ -298,4 +300,3 @@ void rtcInit (void)
   rtcGetTime(&utm);
   g_rtcTime = gmktime(&utm);
 }
-
