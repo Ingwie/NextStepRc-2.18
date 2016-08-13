@@ -98,7 +98,7 @@ void rtcSetTime(struct gtm * t)
 void rtcInit (void)
 {
   uint8_t buf[8];	/* RTC R/W buffer */
-  UINT adr;
+  uint8_t adr;
 
 
   /* Read RTC registers */
