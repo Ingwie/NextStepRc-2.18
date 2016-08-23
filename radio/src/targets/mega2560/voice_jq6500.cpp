@@ -84,7 +84,7 @@ uint8_t JQ6500_sendbyte(uint8_t Data_byte)
 #if !defined(SIMU)
 ISR(TIMER5_COMPA_vect) // every 104µS
 {
-  //sei();
+  sei();
 
   if (state == START) { OCR5A = 0x19; if (JQ6500_BUSY) return; if (JQ6500_sendbyte(state)) { state = NUMBY; return; } }
   
@@ -104,7 +104,6 @@ ISR(TIMER5_COMPA_vect) // every 104µS
     return; }
     }
 
-  
-  //cli();
+  cli();
 }
 #endif
