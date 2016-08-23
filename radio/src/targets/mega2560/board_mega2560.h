@@ -111,6 +111,8 @@ void sdPoll10ms(void);
 #define INP_H_Hold_Power          4    //not used, reserved for pwrCheck() 
 #define OUT_H_SpeakerBuzzer       3
 #define OUT_H_WTV_RESET           1    //WTV20SD
+#define OUT_B_JQ_SERIAL           4    //JQ6500
+#define INP_B_JQ_BUSY             7    //JQ6500, not used (reserved)
 #define OUT_H_HAPTIC              0
   
 // Rotary encoders driver
@@ -168,16 +170,21 @@ void pwrOff();
 #endif
 
 // Voice driver
-#if defined(VOICE)
+
+// WTV20SD
 #define WTV20SD_Clock_on              PORTG |=  (1<<OUT_G_WTV_CLK)
 #define WTV20SD_Clock_off             PORTG &= ~(1<<OUT_G_WTV_CLK)
 #define WTV20SD_Data_on               PORTE |=  (1<<OUT_E_WTV_DATA)
 #define WTV20SD_Data_off              PORTE &= ~(1<<OUT_E_WTV_DATA)
 #define WTV20SD_Reset_on              PORTH |=  (1<<OUT_H_WTV_RESET)
 #define WTV20SD_Reset_off             PORTH &= ~(1<<OUT_H_WTV_RESET)
-#define	WTV20SD_BUSY                  (PINB & 0x80)
-#define	WTV20SD_CLK                   (PING & 0x20)
-#endif
+#define WTV20SD_BUSY                  (PINB & 0x80)
+#define WTV20SD_CLK                   (PING & 0x20)
+
+//JQ6500
+#define JQ6500_Serial_on              PORTB |=  (1<<OUT_B_JQ_SERIAL)
+#define JQ6500_Serial_off             PORTB &= ~(1<<OUT_B_JQ_SERIAL)
+#define JQ6500_BUSY                   (PINB & 0x80)
 
 // EEPROM driver
 #if !defined(SIMU)

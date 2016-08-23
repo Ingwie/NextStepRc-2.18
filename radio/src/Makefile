@@ -122,7 +122,7 @@ DBLKEYS = NO
 AUDIO = NO
 
 # VOICE Mods
-# Values = YES, NO
+# Values = YES, NO (WTV20SD,JQ6500,NO on MEGA2560 DIY)
 VOICE = NO
 
 # corrects different rounding for negative values. So instead of -99.9 you will see again -100.0
@@ -751,9 +751,15 @@ ifeq ($(PCB), MEGA2560)
     CPPSRC += buzzer.cpp
   endif
 
-  ifeq ($(VOICE), YES)
-    CPPDEFS += -DVOICE
-    CPPSRC += targets/mega2560/voice.cpp
+  ifeq ($(VOICE), WTV20SD)
+  CPPDEFS += -DVOICE
+  CPPDEFS += -DVOICE_WTV20SD
+  CPPSRC += targets/mega2560/voice_wtv20sd.cpp
+  endif
+  ifeq ($(VOICE), JQ6500)
+  CPPDEFS += -DVOICE
+  CPPDEFS += -DVOICE_JQ6500
+  CPPSRC += targets/mega2560/voice_jq6500.cpp
   endif
   
   ifeq ($(HAPTIC), YES)

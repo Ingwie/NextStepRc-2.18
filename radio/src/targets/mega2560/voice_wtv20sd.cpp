@@ -19,7 +19,8 @@
 #include "../../opentx.h"
 
 // Start and stop bits need to be 2ms in duration. Start bit is low, stop bit is high
-#define WTV20SD_STOP_TIME    150 // This is the time allowed for the point at which the busy flag is checkable
+#define WTV20SD_STOP_TIME    84 // This is the needed 2ms (4) + 40ms (80) to allow for the
+// point at which the busy flag is checkable + 2ms for saftey (4)
 #define WTV20SD_START_TIME   5  // The 2ms of a stop/start bit
 
 enum WTV20SD_State

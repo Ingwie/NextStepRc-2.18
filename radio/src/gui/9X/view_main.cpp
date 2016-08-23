@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #include "../../opentx.h"
 #include "../../timers.h"
@@ -56,12 +56,12 @@ void doMainScreenGraphics()
 {
   int16_t calibStickVert = calibratedStick[CONVERT_MODE(1)];
   if (g_model.throttleReversed && CONVERT_MODE(1) == THR_STICK)
-    calibStickVert = -calibStickVert;
+  calibStickVert = -calibStickVert;
   drawStick(LBOX_CENTERX, calibratedStick[CONVERT_MODE(0)], calibStickVert);
 
   calibStickVert = calibratedStick[CONVERT_MODE(2)];
   if (g_model.throttleReversed && CONVERT_MODE(2) == THR_STICK)
-    calibStickVert = -calibStickVert;
+  calibStickVert = -calibStickVert;
   drawStick(RBOX_CENTERX, calibratedStick[CONVERT_MODE(3)], calibStickVert);
 
   drawPotsBars();
@@ -165,9 +165,9 @@ void displayBattVoltage()
   lcdDrawSolidVerticalLine(VBATT_X-4, VBATT_Y+10, 3);
   uint8_t count = GET_TXBATT_BARS();
   for (uint8_t i=0; i<count; i+=2)
-    lcdDrawSolidVerticalLine(VBATT_X-24+i, VBATT_Y+10, 3);
+  lcdDrawSolidVerticalLine(VBATT_X-24+i, VBATT_Y+10, 3);
   if (!IS_TXBATT_WARNING() || BLINK_ON_PHASE)
-    lcdDrawFilledRect(VBATT_X-26, VBATT_Y, 24, 15);
+  lcdDrawFilledRect(VBATT_X-26, VBATT_Y, 24, 15);
 #else
   LcdFlags att = (IS_TXBATT_WARNING() ? BLINK|INVERS : 0) | BIGSIZE;
   putsVBat(VBATT_X-1, VBATT_Y, att|NO_UNIT);
@@ -175,7 +175,7 @@ void displayBattVoltage()
 #endif
 }
 
-  #define displayVoltageOrAlarm() displayBattVoltage()
+#define displayVoltageOrAlarm() displayBattVoltage()
 
 #define EVT_KEY_MODEL_MENU   EVT_KEY_LONG(KEY_RIGHT)
 #define EVT_KEY_GENERAL_MENU EVT_KEY_LONG(KEY_LEFT)
@@ -220,11 +220,11 @@ void menuMainView(uint8_t event)
 
   switch(event) {
 
-    case EVT_ENTRY:
-      killEvents(KEY_EXIT);
-      killEvents(KEY_UP);
-      killEvents(KEY_DOWN);
-      break;
+  case EVT_ENTRY:
+    killEvents(KEY_EXIT);
+    killEvents(KEY_UP);
+    killEvents(KEY_DOWN);
+    break;
 
     /* TODO if timer2 is OFF, it's possible to use this timer2 as in er9x...
     case EVT_KEY_BREAK(KEY_MENU):
@@ -235,101 +235,101 @@ void menuMainView(uint8_t event)
     break;
     */
 
-    case EVT_KEY_BREAK(KEY_RIGHT):
-    case EVT_KEY_BREAK(KEY_LEFT):
-      if (view_base <= VIEW_INPUTS) {
-        g_eeGeneral.view ^= ALTERNATE_VIEW;
-        eeDirty(EE_GENERAL);
-        AUDIO_KEYPAD_UP();
-      }
-      break;
+  case EVT_KEY_BREAK(KEY_RIGHT):
+  case EVT_KEY_BREAK(KEY_LEFT):
+    if (view_base <= VIEW_INPUTS) {
+      g_eeGeneral.view ^= ALTERNATE_VIEW;
+      eeDirty(EE_GENERAL);
+      AUDIO_KEYPAD_UP();
+    }
+    break;
 
 #if defined(NAVIGATION_MENUS)
-    case EVT_KEY_CONTEXT_MENU:
-      killEvents(event);
+  case EVT_KEY_CONTEXT_MENU:
+    killEvents(event);
 
 
-      POPUP_MENU_ADD_ITEM(STR_RESET_TIMER1);
-      POPUP_MENU_ADD_ITEM(STR_RESET_TIMER2);
+    POPUP_MENU_ADD_ITEM(STR_RESET_TIMER1);
+    POPUP_MENU_ADD_ITEM(STR_RESET_TIMER2);
 #if defined(FRSKY)
-      POPUP_MENU_ADD_ITEM(STR_RESET_TELEMETRY);
+    POPUP_MENU_ADD_ITEM(STR_RESET_TELEMETRY);
 #endif
-      POPUP_MENU_ADD_ITEM(STR_RESET_FLIGHT);
+    POPUP_MENU_ADD_ITEM(STR_RESET_FLIGHT);
 
-      POPUP_MENU_ADD_ITEM(STR_STATISTICS);
-      popupMenuHandler = onMainViewMenu;
-      break;
+    POPUP_MENU_ADD_ITEM(STR_STATISTICS);
+    popupMenuHandler = onMainViewMenu;
+    break;
 #endif
 
 #if MENUS_LOCK != 2 /*no menus*/
-    case EVT_KEY_LONG(KEY_MENU):// go to last menu
-      pushMenu(lastPopMenu());
-      killEvents(event);
-      break;
+  case EVT_KEY_LONG(KEY_MENU):// go to last menu
+    pushMenu(lastPopMenu());
+    killEvents(event);
+    break;
 
     CASE_EVT_ROTARY_BREAK
-    case EVT_KEY_MODEL_MENU:
-      pushMenu(menuModelSelect);
-      killEvents(event);
-      break;
+  case EVT_KEY_MODEL_MENU:
+    pushMenu(menuModelSelect);
+    killEvents(event);
+    break;
 
     CASE_EVT_ROTARY_LONG
-    case EVT_KEY_GENERAL_MENU:
-      pushMenu(menuGeneralSetup);
-      killEvents(event);
-      break;
+  case EVT_KEY_GENERAL_MENU:
+    pushMenu(menuGeneralSetup);
+    killEvents(event);
+    break;
 #endif
 
-    case EVT_KEY_BREAK(KEY_UP):
-    case EVT_KEY_BREAK(KEY_DOWN):
-      g_eeGeneral.view = (event == EVT_KEY_BREAK(KEY_UP) ? (view_base == VIEW_COUNT-1 ? 0 : view_base+1) : (view_base == 0 ? VIEW_COUNT-1 : view_base-1));
-      eeDirty(EE_GENERAL);
-      AUDIO_KEYPAD_UP();
-      break;
+  case EVT_KEY_BREAK(KEY_UP):
+  case EVT_KEY_BREAK(KEY_DOWN):
+    g_eeGeneral.view = (event == EVT_KEY_BREAK(KEY_UP) ? (view_base == VIEW_COUNT-1 ? 0 : view_base+1) : (view_base == 0 ? VIEW_COUNT-1 : view_base-1));
+    eeDirty(EE_GENERAL);
+    AUDIO_KEYPAD_UP();
+    break;
 
-    case EVT_KEY_STATISTICS:
-      chainMenu(menuStatisticsView);
-      killEvents(event);
-      break;
+  case EVT_KEY_STATISTICS:
+    chainMenu(menuStatisticsView);
+    killEvents(event);
+    break;
 
-    case EVT_KEY_TELEMETRY:
+  case EVT_KEY_TELEMETRY:
 #if defined(FRSKY)
-      if (!IS_FAI_ENABLED())
-        chainMenu(menuTelemetryFrsky);
+    if (!IS_FAI_ENABLED())
+    chainMenu(menuTelemetryFrsky);
 #elif defined(JETI)
-      JETI_EnableRXD(); // enable JETI-Telemetry reception
-      chainMenu(menuTelemetryJeti);
+    JETI_EnableRXD(); // enable JETI-Telemetry reception
+    chainMenu(menuTelemetryJeti);
 #elif defined(ARDUPILOT)
-      ARDUPILOT_EnableRXD(); // enable ArduPilot-Telemetry reception
-      chainMenu(menuTelemetryArduPilot);
+    ARDUPILOT_EnableRXD(); // enable ArduPilot-Telemetry reception
+    chainMenu(menuTelemetryArduPilot);
 #elif defined(NMEA)
-      NMEA_EnableRXD(); // enable NMEA-Telemetry reception
-      chainMenu(menuTelemetryNMEA);
+    NMEA_EnableRXD(); // enable NMEA-Telemetry reception
+    chainMenu(menuTelemetryNMEA);
 #elif defined(MAVLINK)
-      chainMenu(menuTelemetryMavlink);
+    chainMenu(menuTelemetryMavlink);
 #else
-      chainMenu(menuStatisticsDebug);
+    chainMenu(menuStatisticsDebug);
 #endif
-      killEvents(event);
-      break;
+    killEvents(event);
+    break;
 
-    case EVT_KEY_FIRST(KEY_EXIT):
+  case EVT_KEY_FIRST(KEY_EXIT):
 #if defined(GVARS) && !defined(PCBSTD)
-      if (s_gvar_timer > 0) {
-        s_gvar_timer = 0;
-      }
+    if (s_gvar_timer > 0) {
+      s_gvar_timer = 0;
+    }
 #endif
-      if (view == VIEW_TIMER2) {
-        timerReset(1);
-      }
-      AUDIO_KEYPAD_UP();
-      break;
+    if (view == VIEW_TIMER2) {
+      timerReset(1);
+    }
+    AUDIO_KEYPAD_UP();
+    break;
 
 #if !defined(NAVIGATION_MENUS)
-    case EVT_KEY_LONG(KEY_EXIT):
-      flightReset();
-      AUDIO_KEYPAD_UP();
-      break;
+  case EVT_KEY_LONG(KEY_EXIT):
+    flightReset();
+    AUDIO_KEYPAD_UP();
+    break;
 #endif
   }
 
@@ -364,36 +364,36 @@ void menuMainView(uint8_t event)
 
       switch(view_base)
       {
-        case VIEW_OUTPUTS_VALUES:
-          x0 = (i%4*9+3)*FW/2;
-          y0 = i/4*FH+40;
+      case VIEW_OUTPUTS_VALUES:
+        x0 = (i%4*9+3)*FW/2;
+        y0 = i/4*FH+40;
 #if defined(PPM_UNIT_US)
-          lcdDrawNumberAttUnit(x0+4*FW , y0, PPM_CH_CENTER(chan)+val/2, 0);
+        lcdDrawNumberAttUnit(x0+4*FW , y0, PPM_CH_CENTER(chan)+val/2, 0);
 #elif defined(PPM_UNIT_PERCENT_PREC1)
-          lcdDrawNumberAttUnit(x0+4*FW , y0, calcRESXto1000(val), PREC1);
+        lcdDrawNumberAttUnit(x0+4*FW , y0, calcRESXto1000(val), PREC1);
 #else
-          lcdDrawNumberAttUnit(x0+4*FW , y0, calcRESXto1000(val)/10, 0); // G: Don't like the decimal part*
+        lcdDrawNumberAttUnit(x0+4*FW , y0, calcRESXto1000(val)/10, 0); // G: Don't like the decimal part*
 #endif
-          break;
+        break;
 
-        case VIEW_OUTPUTS_BARS:
+      case VIEW_OUTPUTS_BARS:
 #define WBAR2 (50/2)
-          x0       = i<4 ? LCD_W/4+2 : LCD_W*3/4-2;
-          y0       = 38+(i%4)*5;
+        x0       = i<4 ? LCD_W/4+2 : LCD_W*3/4-2;
+        y0       = 38+(i%4)*5;
 
-          uint16_t lim = g_model.extendedLimits ? 640*2 : 512*2;
-          int8_t len = (abs(val) * WBAR2 + lim/2) / lim;
+        uint16_t lim = g_model.extendedLimits ? 640*2 : 512*2;
+        int8_t len = (abs(val) * WBAR2 + lim/2) / lim;
 
-          if(len>WBAR2)  len = WBAR2;  // prevent bars from going over the end - comment for debugging
-          lcdDrawSolidHorizontalLineStip(x0-WBAR2, y0, WBAR2*2+1, DOTTED);
-          lcdDrawSolidVerticalLine(x0,y0-2,5);
-          if (val>0)
-            x0+=1;
-          else
-            x0-=len;
-          lcdDrawSolidHorizontalLine(x0,y0+1,len);
-          lcdDrawSolidHorizontalLine(x0,y0-1,len);
-          break;
+        if(len>WBAR2)  len = WBAR2;  // prevent bars from going over the end - comment for debugging
+        lcdDrawSolidHorizontalLineStip(x0-WBAR2, y0, WBAR2*2+1, DOTTED);
+        lcdDrawSolidVerticalLine(x0,y0-2,5);
+        if (val>0)
+        x0+=1;
+        else
+        x0-=len;
+        lcdDrawSolidHorizontalLine(x0,y0+1,len);
+        lcdDrawSolidHorizontalLine(x0,y0-1,len);
+        break;
       }
     }
   }
@@ -431,21 +431,21 @@ void menuMainView(uint8_t event)
       // Logical Switches
 #if   defined(CPUM2560)
       for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++)
-        lcdPutsSwitches(2*FW-3 + (i/3)*(i/3>2 ? 3*FW+2 : (3*FW-1)) + (i/3>2 ? 2*FW : 0), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
+      lcdPutsSwitches(2*FW-3 + (i/3)*(i/3>2 ? 3*FW+2 : (3*FW-1)) + (i/3>2 ? 2*FW : 0), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
 #elif !defined(PCBSTD)
       for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++)
-        lcdPutsSwitches(2*FW-2 + (i/3)*(4*FW-1), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
+      lcdPutsSwitches(2*FW-2 + (i/3)*(4*FW-1), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
 #else
       for (uint8_t i=0; i<NUM_LOGICAL_SWITCH; i++)
-        lcdPutsSwitches(2*FW-3 + (i/3)*(4*FW), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
+      lcdPutsSwitches(2*FW-3 + (i/3)*(4*FW), 4*FH+1 + (i%3)*FH, SWSRC_SW1+i, getSwitch(SWSRC_SW1+i) ? INVERS : 0);
 #endif
     }
   }
   else { // timer2
 #if defined(TRANSLATIONS_CZ)
-  #define TMR2_LBL_COL (20-FW/2+1)
+    #define TMR2_LBL_COL (20-FW/2+1)
 #else
-  #define TMR2_LBL_COL (20-FW/2+5)
+    #define TMR2_LBL_COL (20-FW/2+5)
 #endif
     putsTimer(33+FW+2+10*FWNUM-4, FH*5, timersStates[1].val, DBLSIZE, DBLSIZE);
     lcdPutsTimerMode(timersStates[1].val >= 0 ? TMR2_LBL_COL : TMR2_LBL_COL-7, FH*6, g_model.timers[1].mode);

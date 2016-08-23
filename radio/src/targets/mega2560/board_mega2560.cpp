@@ -21,8 +21,9 @@
 inline void boardInit()
 {
   // Set up I/O port data directions and initial states (unused pin setting : input, pull-up on)
+#if defined(VOICE_WTV20SD)
   DDRA = 0b11111111;  PORTA = 0b00000000; // LCD data
-  DDRB = 0b01100111;  PORTB = 0b00111111; // 7:WTV20SDBusy, 6:PPM_OUT, 5:SimCTRL, 4:Unused, SDCARD[3:MISO 2:MOSI 1:SCK 0:CS]
+  DDRB = 0b01100111;  PORTB = 0b10111111; // 7:WTV20SDBusy, 6:PPM_OUT, 5:SimCTRL, 4:Unused, SDCARD[3:MISO 2:MOSI 1:SCK 0:CS]
   DDRC = 0b11111100;  PORTC = 0b00000011; // 7-3:LCD, 2:BackLight, 1:ID2_SW, 0:ID1_SW
   DDRD = 0b00000000;  PORTD = 0b11111111; // 7:AilDR_SW, 6:N/A, 5:N/A, 4:N/A, 3:RENC2_B, 2:RENC2_A, 1:I2C_SDA, 0:I2C_SCL
   DDRE = 0b00001010;  PORTE = 0b01110100; // 7:PPM_IN, 6:N/A, 5:RENC1_B, 4:RENC1_A, 3:WTV20SDData, 2:N/A, 1:TELEM_TX, 0:TELEM_RX
@@ -31,11 +32,46 @@ inline void boardInit()
 #if defined(DEBUG)  
   DDRH = 0b01011011;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
 #else
-  DDRH = 0b00011010;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
+  DDRH = 0b00011011;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:WTV20SDReset, 0:Haptic
 #endif  
   DDRJ = 0b00000000;  PORTJ = 0b11111111; // 7:N/A, 6:N/A, 5:N/A, 4:N/A, 3:N/A, 2:N/A, 1:RENC2_push, 0:RENC1_push
   DDRK = 0b00000000;  PORTK = 0b00000000; // Analogic input (no pull-ups)
   DDRL = 0b00000000;  PORTL = 0b11111111; // 7:TRN_SW 6:EleDR_SW, 5:ESC, 4:MENU 3:Keyb_Left, 2:Keyb_Right, 1:Keyb_Up, 0:Keyb_Down
+#endif
+#if defined(VOICE_JQ6500)
+  DDRA = 0b11111111;  PORTA = 0b00000000; // LCD data
+  DDRB = 0b01110111;  PORTB = 0b10101111; // 7:JQ6500Busy, 6:PPM_OUT, 5:SimCTRL, 4:JQ6500Data, SDCARD[3:MISO 2:MOSI 1:SCK 0:CS]
+  DDRC = 0b11111100;  PORTC = 0b00000011; // 7-3:LCD, 2:BackLight, 1:ID2_SW, 0:ID1_SW
+  DDRD = 0b00000000;  PORTD = 0b11111111; // 7:AilDR_SW, 6:N/A, 5:N/A, 4:N/A, 3:RENC2_B, 2:RENC2_A, 1:I2C_SDA, 0:I2C_SCL
+  DDRE = 0b00000010;  PORTE = 0b01111100; // 7:PPM_IN, 6:N/A, 5:RENC1_B, 4:RENC1_A, 3:N/A, 2:N/A, 1:TELEM_TX, 0:TELEM_RX
+  DDRF = 0b00000000;  PORTF = 0b11111111; // 7-0:Trim switch inputs
+  DDRG = 0b00000000;  PORTG = 0b11111111; // 7:N/A, 6:N/A, 5:N/A, 4:N/A, 3:N/A, 2:TCut_SW, 1:Gear_SW, 0: RudDr_SW
+#if defined(DEBUG)  
+  DDRH = 0b01011001;  PORTH = 0b11110110; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:N/A, 0:Haptic
+#else
+  DDRH = 0b00011001;  PORTH = 0b11110110; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:N/A, 0:Haptic
+#endif  
+  DDRJ = 0b00000000;  PORTJ = 0b11111111; // 7:N/A, 6:N/A, 5:N/A, 4:N/A, 3:N/A, 2:N/A, 1:RENC2_push, 0:RENC1_push
+  DDRK = 0b00000000;  PORTK = 0b00000000; // Analogic input (no pull-ups)
+  DDRL = 0b00000000;  PORTL = 0b11111111; // 7:TRN_SW 6:EleDR_SW, 5:ESC, 4:MENU 3:Keyb_Left, 2:Keyb_Right, 1:Keyb_Up, 0:Keyb_Down
+#endif
+#if !defined(VOICE)
+  DDRA = 0b11111111;  PORTA = 0b00000000; // LCD data
+  DDRB = 0b01100111;  PORTB = 0b10111111; // 7:N/A, 6:PPM_OUT, 5:SimCTRL, 4:Unused, SDCARD[3:MISO 2:MOSI 1:SCK 0:CS]
+  DDRC = 0b11111100;  PORTC = 0b00000011; // 7-3:LCD, 2:BackLight, 1:ID2_SW, 0:ID1_SW
+  DDRD = 0b00000000;  PORTD = 0b11111111; // 7:AilDR_SW, 6:N/A, 5:N/A, 4:N/A, 3:RENC2_B, 2:RENC2_A, 1:I2C_SDA, 0:I2C_SCL
+  DDRE = 0b00000010;  PORTE = 0b01111100; // 7:PPM_IN, 6:N/A, 5:RENC1_B, 4:RENC1_A, 3:N/A, 2:N/A, 1:TELEM_TX, 0:TELEM_RX
+  DDRF = 0b00000000;  PORTF = 0b11111111; // 7-0:Trim switch inputs
+  DDRG = 0b00000000;  PORTG = 0b11111111; // 7:N/A, 6:N/A, 5:N/A, 4:N/A, 3:N/A, 2:TCut_SW, 1:Gear_SW, 0: RudDr_SW
+#if defined(DEBUG)  
+  DDRH = 0b01011001;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:N/A, 0:Haptic
+#else
+  DDRH = 0b00011001;  PORTH = 0b11110100; // 7:N/A, 6:RF_Activated, 5:DSC_Activated, 4:Hold_Power, 3:Speaker, 2:N/A, 1:N/A, 0:Haptic
+#endif  
+  DDRJ = 0b00000000;  PORTJ = 0b11111111; // 7:N/A, 6:N/A, 5:N/A, 4:N/A, 3:N/A, 2:N/A, 1:RENC2_push, 0:RENC1_push
+  DDRK = 0b00000000;  PORTK = 0b00000000; // Analogic input (no pull-ups)
+  DDRL = 0b00000000;  PORTL = 0b11111111; // 7:TRN_SW 6:EleDR_SW, 5:ESC, 4:MENU 3:Keyb_Left, 2:Keyb_Right, 1:Keyb_Up, 0:Keyb_Down
+#endif
   
   adcInit();
 
@@ -53,13 +89,19 @@ inline void boardInit()
   TCCR4A  = 0x00;
   #endif
   
-  #if defined(VOICE)
+  #if defined(VOICE_WTV20SD)
   // WTV20SD set-up, with TIMER5
   OCR5A = 0x1F4; //2ms
   TCCR5B = (1 << WGM52) | (0b011 << CS50); // CTC OCR5A
   TIMSK5 |= (1<<OCIE5A); // Start the interrupt so the unit reset can occur
   #endif
-
+  #if defined(VOICE_JQ6500)
+  // JQ6500 set-up, with TIMER5
+  JQ6500_Serial_on;      // Idle state (1)
+  OCR5A = 0x19; // 0x1A=104µs needed for the 9600Bps serial command JQ need less why ??
+  TCCR5B = (1 << WGM52) | (0b011 << CS50); // CTC OCR5A
+  #endif
+  
   /* Rotary encoder interrupt set-up                 */
   EIMSK = 0; // disable ALL external interrupts.
   // encoder 1
@@ -209,10 +251,10 @@ void readKeysAndTrims()
 
 #if defined(NAVIGATION_STICKS)
   if (~PINL & 0x10) {   //Check menu key
-    StickScrollTimer = STICK_SCROLL_TIMEOUT ;
+    StickScrollTimer = STICK_SCROLL_TIMEOUT;
     uint8_t sticks_evt = getSticksNavigationEvent();
     if (sticks_evt) {
-      putEvent(EVT_KEY_LONG(sticks_evt)); // create a stick based event long to choose menu
+      putEvent(EVT_KEY_LONG(sticks_evt)); // create a stick based event "long" to choose menu
     }
   }
 #endif
