@@ -12,6 +12,8 @@ In French ;-)
 
 > - remplacement carte WT par "mieux" -> JQ6500 testé bientôt
 
+> - changer le numéro de la pin vcc sur l'ampli op mpc6004
+
 
 *****************  DONE DONE DONE DONE  *****************
 
