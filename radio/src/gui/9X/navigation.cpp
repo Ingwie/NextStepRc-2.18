@@ -522,7 +522,7 @@ uint8_t getSticksNavigationEvent()
       {
         repeater += 1;
       }
-      value = calcStickScroll(1);
+      value = calcStickScroll(CONVERT_MODE(THR_STICK));
       direction = value & 0x80;
       value &= 0x7F;
       if ( value )
@@ -545,7 +545,7 @@ uint8_t getSticksNavigationEvent()
       }
       else
       {
-        value = calcStickScroll(3);
+        value = calcStickScroll(CONVERT_MODE(AIL_STICK));
         direction = value & 0x80;
         value &= 0x7F;
         if ( value )
