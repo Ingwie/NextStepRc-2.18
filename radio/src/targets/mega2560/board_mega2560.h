@@ -178,13 +178,13 @@ void pwrOff();
 #define WTV20SD_Data_off              PORTE &= ~(1<<OUT_E_WTV_DATA)
 #define WTV20SD_Reset_on              PORTH |=  (1<<OUT_H_WTV_RESET)
 #define WTV20SD_Reset_off             PORTH &= ~(1<<OUT_H_WTV_RESET)
-#define WTV20SD_BUSY                  (PINB & 0x80)
-#define WTV20SD_CLK                   (PING & 0x20)
+#define WTV20SD_BUSY                  PINB & (1<<INP_B_WTV_BUSY)
+#define WTV20SD_CLK                   PING & (1<<OUT_G_WTV_CLK)
 
 //JQ6500
 #define JQ6500_Serial_on              PORTB |=  (1<<OUT_B_JQ_SERIAL)
 #define JQ6500_Serial_off             PORTB &= ~(1<<OUT_B_JQ_SERIAL)
-#define JQ6500_BUSY                   (PINB & 0x80)
+#define JQ6500_BUSY                   PINB & (1<<INP_B_JQ_BUSY)
 
 // EEPROM driver
 #if !defined(SIMU)

@@ -29,6 +29,7 @@ uint8_t getEvent()
 #define KEY_LONG_DELAY 32
 
 Key keys[NUM_KEYS];
+
 void Key::input(bool val)
 {
   uint8_t t_vals = m_vals ;
@@ -45,7 +46,7 @@ void Key::input(bool val)
     m_cnt   = 0;
     m_state = KSTATE_OFF;
   }
-  switch(m_state){
+  switch(m_state) {
   case KSTATE_OFF:
     if (m_vals == FFVAL) { //gerade eben sprung auf ff
       m_state = KSTATE_START;
@@ -86,7 +87,7 @@ void Key::input(bool val)
     break;
 
   case KSTATE_PAUSE: //pause
-    if (m_cnt >= 64)      {
+    if (m_cnt >= 64) {
       m_state = 8;
       m_cnt   = 0;
     }

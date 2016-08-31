@@ -98,7 +98,7 @@ inline void boardInit()
   #if defined(VOICE_JQ6500)
   // JQ6500 set-up, with TIMER5
   JQ6500_Serial_on;      // Idle state (1)
-  OCR5A = 0x19; // 0x1A=104µs needed for the 9600Bps serial command JQ need less why ??
+  OCR5A = 0x19; // 0x1A=104µs needed for the 9600Bps serial command
   TCCR5B = (1 << WGM52) | (0b011 << CS50); // CTC OCR5A
   #endif
   
@@ -113,7 +113,7 @@ inline void boardInit()
   EIMSK = (3<<INT4) | (3<<INT2); // enable the two rot. enc. ext. int. pairs.
   
   #if defined(SDCARD)  
- /* Hardware I2C init                               */ 
+  /* Hardware I2C init                               */ 
   i2c_init(); 
   #endif                
 }              
@@ -226,8 +226,25 @@ uint8_t trimDown(uint8_t idx)
 
 void readKeysAndTrims()
 {
-  uint8_t enuk = KEY_MENU;
 
+#if defined(NAVIGATION_STICKS)
+  if (~PINL & (KEYS_GPIO_PIN_MENU | KEYS_GPIO_PIN_EXIT)) {   //Check menu key
+    StickScrollTimer = STICK_SCROLL_TIMEOUT;
+    uint8_t sticks_evt = getSticksNavigationEvent();
+    if (sticks_evt) {
+      if (~PINL & KEYS_GPIO_PIN_MENU) {
+        putEvent(EVT_KEY_LONG(sticks_evt)); // create a stick based event "long" to choose menu
+      }
+      else {
+        putEvent(EVT_KEY_BREAK(sticks_evt)); // create a stick based event "first" to choose view (EXIT pressed)
+      }
+      return;
+    }
+  }
+#endif
+
+  uint8_t enuk = KEY_MENU;
+  
   keys[BTN_REa].input(~PINJ & 0x01);
   keys[BTN_REb].input(~PINJ & 0x02);
 
@@ -248,17 +265,6 @@ void readKeysAndTrims()
     keys[enuk].input(in & pgm_read_byte(crossTrim+i));
     ++enuk;
   }
-
-#if defined(NAVIGATION_STICKS)
-  if (~PINL & 0x10) {   //Check menu key
-    StickScrollTimer = STICK_SCROLL_TIMEOUT;
-    uint8_t sticks_evt = getSticksNavigationEvent();
-    if (sticks_evt) {
-      putEvent(EVT_KEY_LONG(sticks_evt)); // create a stick based event "long" to choose menu
-    }
-  }
-#endif
-
 }
 
 // Rotary encoders increment/decrement (0 = rotary 1, 1 = rotary 2)
