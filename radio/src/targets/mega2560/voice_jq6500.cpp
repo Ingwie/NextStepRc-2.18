@@ -53,7 +53,7 @@ void pushPrompt(uint16_t prompt)
 {
   // if mute active => no voice
   if (g_eeGeneral.beepMode == e_mode_quiet) return;
-  //++prompt;
+  ++prompt;  // With SDformatter, first FAT address = 1 ? Not all th time ??
   /* Load playlist and activate interrupt */
   JQ6500_playlist[JQ6500_InputIndex] = (uint8_t)(prompt >> 8);    // MSB first
   ++JQ6500_InputIndex;
