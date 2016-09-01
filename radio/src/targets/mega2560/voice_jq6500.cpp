@@ -20,7 +20,7 @@
 #include "../../opentx.h"
 
 
-#define QUEUE_LENGTH 10*2  //bytes
+#define QUEUE_LENGTH 16*2  //bytes
 
 enum JQ6500_State
 {
@@ -60,7 +60,6 @@ void pushPrompt(uint16_t prompt)
   JQ6500_playlist[JQ6500_InputIndex] = (uint8_t)(prompt & 0xFF);  // LSB after
   ++JQ6500_InputIndex;
   if (JQ6500_InputIndex == QUEUE_LENGTH) JQ6500_InputIndex = 0;
-
   if (!isPlaying()) {
     TCNT5=0;
     OCR5A = 0xFA;
@@ -89,20 +88,20 @@ ISR(TIMER5_COMPA_vect) // every 104µS
   if (state == START) { OCR5A = 0x19; if (JQ6500_BUSY) return; if (JQ6500_sendbyte(state)) { state = NUMBY; return; } }
   
   if (state == NUMBY) { if (JQ6500_sendbyte(state)) { state = SELEC; return; } }
- 
+
   if (state == SELEC) { if (JQ6500_sendbyte(state)) { state = FILEH; return; } }
 
-  if (state == FILEH) { if (JQ6500_sendbyte(JQ6500_playlist[JQ6500_PlayIndex])) { state = FILEL; ++JQ6500_PlayIndex; return; } }
+  if (state == FILEH) { if (JQ6500_sendbyte(JQ6500_playlist[JQ6500_PlayIndex])) { ++JQ6500_PlayIndex; state = FILEL; return; } }
 
-  if (state == FILEL) { if (JQ6500_sendbyte(JQ6500_playlist[JQ6500_PlayIndex])) { state = TERMI; ++JQ6500_PlayIndex; return; } }
+  if (state == FILEL) { if (JQ6500_sendbyte(JQ6500_playlist[JQ6500_PlayIndex])) { ++JQ6500_PlayIndex; state = TERMI; return; } }
 
   if (state == TERMI) {
     if (JQ6500_sendbyte(state)) {
-    state = START;
-    if (JQ6500_PlayIndex == QUEUE_LENGTH) JQ6500_PlayIndex = 0;
-    if (JQ6500_PlayIndex == JQ6500_InputIndex) { TIMSK5 &= ~(1<<OCIE5A); } // stop reentrance
-    return; }
-    }
+      state = START;
+      if (JQ6500_PlayIndex == QUEUE_LENGTH) JQ6500_PlayIndex = 0;
+      if (JQ6500_PlayIndex == JQ6500_InputIndex) { OCR5A = 0x19; TIMSK5 &= ~(1<<OCIE5A); } // stop reentrance
+      return; }
+  }
 
   cli();
 }

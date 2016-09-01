@@ -111,8 +111,8 @@ void sdPoll10ms(void);
 #define INP_H_Hold_Power          4    //not used, reserved for pwrCheck() 
 #define OUT_H_SpeakerBuzzer       3
 #define OUT_H_WTV_RESET           1    //WTV20SD
-#define OUT_B_JQ_SERIAL           4    //JQ6500
-#define INP_B_JQ_BUSY             7    //JQ6500, not used (reserved)
+#define OUT_B_JQ_SERIAL           7    //JQ6500
+#define INP_B_JQ_BUSY             4    //JQ6500
 #define OUT_H_HAPTIC              0
   
 // Rotary encoders driver
