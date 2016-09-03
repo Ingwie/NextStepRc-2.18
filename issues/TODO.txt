@@ -10,9 +10,9 @@ In French ;-)
 
 > - ajout nouveaux modules d'emission
 
-> - remplacement carte WT par "mieux" -> JQ6500 testé bientôt
-
 > - changer le numéro de la pin vcc sur l'ampli op mpc6004
+
+> - telemetrie GPS : Ajout distance (a partir du point fixe ?)
 
 
 *****************  DONE DONE DONE DONE  *****************
@@ -25,3 +25,4 @@ In French ;-)
 > - Corriger bug de flash "error mismatch"
 > - Changer le splash (NEXTSTEPRC) - FAIT
 > - finir navigation avec les manches (placer les routines dans key.xxx) Placé dans gui/9X/navigation.cpp
+> - remplacement carte WT par "mieux" -> JQ6500 testé bientôt (28P retenu, le 16p ne gère que 200 fichiers)
