@@ -1,18 +1,20 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
+
+#define NUMITERATIONFULLREFRESH  5
 
 void lcdSendCtl(uint8_t val)
 {
@@ -38,7 +40,7 @@ const static pm_uchar lcdInitSequence[] PROGMEM =
 void lcdInit()
 {
   LCD_LOCK();
-  PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_RES);  //LCD reset
+  PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_RES); //LCD reset
   _delay_us(2);
   PORTC_LCD_CTRL |= (1<<OUT_C_LCD_RES);  //LCD normal operation
   _delay_ms(40);
@@ -54,8 +56,10 @@ void lcdSetRefVolt(uint8_t val)
 {
 }
 
-uint8_t lcdRefresh_ST7920(uint8_t full)
+void lcdRefreshFast()
 {
+  REFRESHDURATION1  //Debug function if defined LCDDURATIONSHOW in opentx.h
+
   LCD_LOCK();
   static uint8_t state;
   uint8_t yst;
@@ -69,22 +73,17 @@ uint8_t lcdRefresh_ST7920(uint8_t full)
   uint8_t result;
   uint8_t *p;
   
-  if(full!=0){
-    yst=0;
-    yend=64;
+  //Since writing to ST7920 is too slow we need to split it to five bands
+  yst=y_table[state];
+  yend=y_table[state+1];
+  if (state==4){
     state=0;
-  } 
-  else{ //Since writing to ST7920 is too slow we need to split it to five bands
-    yst=y_table[state];
-    yend=y_table[state+1];
-    if (state==4){
-      state=0;
-    }
-    else{
-      state++;
-    }    
   }
-  
+  else{
+    state++;
+  }    
+
+
   for (uint8_t y=yst; y<yend; y++) {
     x_addr = 0;
     //Convert coordinates to weirdly-arranged 128x64 screen (the ST7920 is mapped for 256x32 displays)
@@ -123,11 +122,13 @@ uint8_t lcdRefresh_ST7920(uint8_t full)
       _delay_us(49);
     }
   }
+  
   LCD_UNLOCK();
-  return state;
+  
+  REFRESHDURATION2  //Debug function if defined LCDDURATIONSHOW in opentx.h
 }
 
 void lcdRefresh()
 {
-  lcdRefresh_ST7920(1);
+  for (uint8_t i=0; i < NUMITERATIONFULLREFRESH; i++) { lcdRefreshFast(); }
 }

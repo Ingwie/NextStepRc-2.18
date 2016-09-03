@@ -36,17 +36,17 @@ void i2c_stop(void);
 // Nextsteprc functions
 
 uint8_t iic_read (
-	uint8_t dev,		/* Device address */
-	uint8_t adr,		/* Read start address */
-	uint16_t cnt,		/* Read uint8_t count */
-	uint8_t *buff		/* Read data buffer */
+uint8_t dev,    /* Device address */
+uint8_t adr,    /* Read start address */
+uint16_t cnt,   /* Read uint8_t count */
+uint8_t *buff   /* Read data buffer */
 );
 
 uint8_t iic_write (
-	uint8_t dev,			/* Device address */
-	uint8_t adr,			/* Write start address */
-	uint16_t cnt,			/* Write uint8_t count */
-	const uint8_t *buff	/* Data to be written */
+uint8_t dev,      /* Device address */
+uint8_t adr,      /* Write start address */
+uint16_t cnt,     /* Write uint8_t count */
+const uint8_t *buff /* Data to be written */
 );
 
 #endif // I2C_MASTER_H

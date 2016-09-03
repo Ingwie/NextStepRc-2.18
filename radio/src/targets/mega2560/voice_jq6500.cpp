@@ -55,7 +55,7 @@ void pushPrompt(uint16_t prompt)
   if (g_eeGeneral.beepMode == e_mode_quiet) return;
   ++prompt;  // With SDformatter, first FAT address = 1 ? Not all th time ??
   /* Load playlist and activate interrupt */
-  JQ6500_playlist[JQ6500_InputIndex] = (uint8_t)(prompt >> 8);    // MSB first
+    JQ6500_playlist[JQ6500_InputIndex] = (uint8_t)(prompt >> 8);    // MSB first
   ++JQ6500_InputIndex;
   JQ6500_playlist[JQ6500_InputIndex] = (uint8_t)(prompt & 0xFF);  // LSB after
   ++JQ6500_InputIndex;
@@ -88,7 +88,7 @@ ISR(TIMER5_COMPA_vect) // every 104µS
   if (state == START) { OCR5A = 0x19; if (JQ6500_BUSY) return; if (JQ6500_sendbyte(state)) { state = NUMBY; return; } }
   
   if (state == NUMBY) { if (JQ6500_sendbyte(state)) { state = SELEC; return; } }
-
+ 
   if (state == SELEC) { if (JQ6500_sendbyte(state)) { state = FILEH; return; } }
 
   if (state == FILEH) { if (JQ6500_sendbyte(JQ6500_playlist[JQ6500_PlayIndex])) { ++JQ6500_PlayIndex; state = FILEL; return; } }
@@ -97,11 +97,11 @@ ISR(TIMER5_COMPA_vect) // every 104µS
 
   if (state == TERMI) {
     if (JQ6500_sendbyte(state)) {
-      state = START;
-      if (JQ6500_PlayIndex == QUEUE_LENGTH) JQ6500_PlayIndex = 0;
-      if (JQ6500_PlayIndex == JQ6500_InputIndex) { OCR5A = 0x19; TIMSK5 &= ~(1<<OCIE5A); } // stop reentrance
-      return; }
-  }
+    state = START;
+    if (JQ6500_PlayIndex == QUEUE_LENGTH) JQ6500_PlayIndex = 0;
+    if (JQ6500_PlayIndex == JQ6500_InputIndex) { OCR5A = 0x19; TIMSK5 &= ~(1<<OCIE5A); } // stop reentrance
+    return; }
+    }
 
   cli();
 }

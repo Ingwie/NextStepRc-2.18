@@ -1,18 +1,18 @@
 /*
- *************************************************************
- *                      NEXTSTEPRC                           *
- *                                                           *
- *             -> Build your DIY MEGA 2560 TX                *
- *                                                           *
- *      Based on code named                                  *
- *      OpenTx - https://github.com/opentx/opentx            *
- *                                                           *
- *         Only avr code here for lisibility ;-)             *
- *                                                           *
- *  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
- *                                                           *
- *************************************************************
- */
+*************************************************************
+*                      NEXTSTEPRC                           *
+*                                                           *
+*             -> Build your DIY MEGA 2560 TX                *
+*                                                           *
+*      Based on code named                                  *
+*      OpenTx - https://github.com/opentx/opentx            *
+*                                                           *
+*         Only avr code here for lisibility ;-)             *
+*                                                           *
+*  License GPLv2: http://www.gnu.org/licenses/gpl-2.0.html  *
+*                                                           *
+*************************************************************
+*/
 
 #ifndef _LCD_H
 #define _LCD_H
@@ -27,8 +27,8 @@
 #define CONTRAST_MIN  10
 #define CONTRAST_MAX  45
 
-  #define lcdint_t      int16_t
-  #define lcduint_t     uint16_t
+#define lcdint_t      int16_t
+#define lcduint_t     uint16_t
 
 #define FW              6
 #define FWNUM           5
@@ -43,9 +43,9 @@
 /* lcd text flags */
 #define INVERS          0x02
 #if defined(BOLD_FONT)
-  #define BOLD          0x40
+#define BOLD          0x40
 #else
-  #define BOLD          0x00
+#define BOLD          0x00
 #endif
 
 /* lcd putc flags */
@@ -54,7 +54,7 @@
 /* lcd puts flags */
 /* no 0x80 here because of "GV"1 which is aligned LEFT */
 /* no 0x10 here because of "MODEL"01 which uses LEADING0 */
-  #define BSS           0x20
+#define BSS           0x20
 #define ZCHAR           0x80
 
 /* lcd outdez flags */
@@ -73,16 +73,16 @@
 /* telemetry flags */
 #define NO_UNIT         0x40
 
-  #define DBLSIZE       0x04
-  #define MIDSIZE       DBLSIZE
-  #define SMLSIZE       0x00
-  #define TINSIZE       0x00
-  #define XXLSIZE       0x00
-  #define ERASEBG       0x00
+#define DBLSIZE       0x04
+#define MIDSIZE       DBLSIZE
+#define SMLSIZE       0x00
+#define TINSIZE       0x00
+#define XXLSIZE       0x00
+#define ERASEBG       0x00
 
-  #define STREXPANDED   0x00
+#define STREXPANDED   0x00
 
-  #define LcdFlags             uint8_t
+#define LcdFlags             uint8_t
 
 #define display_t            uint8_t
 #define DISPLAY_BUF_SIZE     (LCD_W*((LCD_H+7)/8))
@@ -99,9 +99,8 @@ extern coord_t lcdNextPos;
 #define ASSERT_IN_DISPLAY(p)   assert((p) >= displayBuf && (p) < DISPLAY_END)
 
 #if defined(PCBSTD) && defined(VOICE)
-  extern volatile uint8_t LcdLock ;
+extern volatile uint8_t LcdLock ;
 #endif
-
 
 #if defined(BOOT)
 // TODO quick & dirty :(
@@ -118,9 +117,9 @@ void lcdDrawText(coord_t x, coord_t y, const pm_char * s);
 void lcdDrawSizedText(coord_t x, coord_t y, const pm_char * s, unsigned char len);
 void lcdDrawTextLeft(coord_t y, const pm_char * s);
 
-  #define lcdDrawTextCenter(y, s) lcdDrawText((LCD_W-sizeof(TR_##s)*FW+FW+1)/2, y, STR_##s)
+#define lcdDrawTextCenter(y, s) lcdDrawText((LCD_W-sizeof(TR_##s)*FW+FW+1)/2, y, STR_##s)
 
-  void lcd_outhex4(coord_t x, coord_t y, uint16_t val);
+void lcd_outhex4(coord_t x, coord_t y, uint16_t val);
 
 void lcdDrawNumberNAtt(coord_t x, coord_t y, lcdint_t val, LcdFlags mode=0, uint8_t len=0);
 void lcdDrawNumberAttUnit(coord_t x, coord_t y, lcdint_t val, LcdFlags mode=0);
@@ -135,7 +134,7 @@ void lcdDrawCurveName(coord_t x, coord_t y, int8_t idx, LcdFlags att=0);
 void lcdPutsTimerMode(coord_t x, coord_t y, int8_t mode, LcdFlags att=0);
 void lcdPutsTrimMode(coord_t x, coord_t y, uint8_t phase, uint8_t idx, LcdFlags att);
 #if defined(ROTARY_ENCODERS)
-  void lcdPutsRotaryEncoderMode(coord_t x, coord_t y, uint8_t phase, uint8_t idx, LcdFlags att);
+void lcdPutsRotaryEncoderMode(coord_t x, coord_t y, uint8_t phase, uint8_t idx, LcdFlags att);
 #endif
 
 #define putsChn(x, y, idx, att) putsMixerSource(x, y, MIXSRC_CH1+idx-1, att)
@@ -150,7 +149,7 @@ void putsChannel(coord_t x, coord_t y, source_t channel, LcdFlags att=0);
 void lcdPutsTelemetryChannelValue(coord_t x, coord_t y, uint8_t channel, lcdint_t val, LcdFlags att=0);
 #endif
 
-  #define putstime_t int16_t
+#define putstime_t int16_t
 
 void putsRtcTime(coord_t x, coord_t y, LcdFlags att);
 void putsTimer(coord_t x, coord_t y, putstime_t tme, LcdFlags att, LcdFlags att2);
@@ -164,9 +163,9 @@ void lcdDrawSolidHorizontalLine(coord_t x, coord_t y, coord_t w, LcdFlags att=0)
 void lcdDrawSolidHorizontalLineStip(coord_t x, coord_t y, coord_t w, uint8_t pat, LcdFlags att=0);
 void lcdDrawSolidVerticalLine(coord_t x, scoord_t y, scoord_t h);
 #if defined(CPUM64)
-  void lcdDrawSolidVerticalLineStip(coord_t x, scoord_t y, int8_t h, uint8_t pat);
+void lcdDrawSolidVerticalLineStip(coord_t x, scoord_t y, int8_t h, uint8_t pat);
 #else
-  void lcdDrawSolidVerticalLineStip(coord_t x, scoord_t y, scoord_t h, uint8_t pat, LcdFlags att=0);
+void lcdDrawSolidVerticalLineStip(coord_t x, scoord_t y, scoord_t h, uint8_t pat, LcdFlags att=0);
 #endif
 
 
@@ -196,27 +195,17 @@ void lcdInit();
 #define lcdOff()
 
 void lcdRefresh();
-
-#if defined(LCD_KS108)
-void lcdRefreshSide();
-#endif
-
-#if defined(LCD_ST7920)
-uint8_t	lcdRefresh_ST7920(uint8_t full);
-#define IS_LCD_REFRESH_ALLOWED() (0==lcdstate)
-#else 
-#define IS_LCD_REFRESH_ALLOWED() (1)
-#endif
+void lcdRefreshFast();
 
 #if defined(BOOT)
-  #define BLINK_ON_PHASE (0)
+#define BLINK_ON_PHASE (0)
 #else
-  #define BLINK_ON_PHASE (g_blinkTmr10ms & (1<<6))
+#define BLINK_ON_PHASE (g_blinkTmr10ms & (1<<6))
 #endif
 
 #if defined(SIMU)
-  extern bool lcd_refresh;
-  extern display_t lcd_buf[DISPLAY_BUF_SIZE];
+extern bool lcd_refresh;
+extern display_t lcd_buf[DISPLAY_BUF_SIZE];
 #endif
 
 char *strAppend(char * dest, const char * source, int len=0);

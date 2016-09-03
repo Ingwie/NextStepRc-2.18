@@ -20,6 +20,8 @@
 #include "../opentx.h"
 #include "../FatFs/integer.h"
 
+#define RTC_ADRESS  (0x68 << 1) //0x68 for ZS042
+
 typedef struct {
         WORD    year;   /* 2000..2099 */
         uint8_t    month;  /* 1..12 */
@@ -35,9 +37,9 @@ typedef struct {
 
 uint8_t g9x_rtcGetTime (RTC *rtc)
 {
-  uint8_t buf[8];
+  uint8_t buf[7];
 
-  if (!iic_read(0xD0, 0, 7, buf)) return 0;
+  if (!iic_read(RTC_ADRESS, 0, 7, buf)) return 0;
 
   rtc->sec = (buf[0] & 0x0F) + ((buf[0] >> 4) & 7) * 10;
   rtc->min = (buf[1] & 0x0F) + (buf[1] >> 4) * 10;
@@ -52,7 +54,7 @@ uint8_t g9x_rtcGetTime (RTC *rtc)
 
 uint8_t g9x_rtcSetTime (const RTC *rtc)
 {
-  uint8_t buf[8];
+  uint8_t buf[7];
 
   buf[0] = rtc->sec / 10 * 16 + rtc->sec % 10;
   buf[1] = rtc->min / 10 * 16 + rtc->min % 10;
@@ -61,7 +63,7 @@ uint8_t g9x_rtcSetTime (const RTC *rtc)
   buf[4] = rtc->mday / 10 * 16 + rtc->mday % 10;
   buf[5] = rtc->month / 10 * 16 + rtc->month % 10;
   buf[6] = (rtc->year - 2000) / 10 * 16 + (rtc->year - 2000) % 10;
-  return iic_write(0xD0, 0, 7, buf);
+  return iic_write(RTC_ADRESS, 0, 7, buf);
 }
 
 void rtcGetTime(struct gtm * utm)
@@ -100,9 +102,8 @@ void rtcInit (void)
   uint8_t buf[8];	/* RTC R/W buffer */
   uint8_t adr;
 
-
   /* Read RTC registers */
-  if (!iic_read(0xD0, 0, 8, buf)) return;	/* IIC error */
+  if (!iic_read(RTC_ADRESS, 0, 8, buf)) return;	/* IIC error */
 
   if (buf[7] & 0x20) {	/* When data has been volatiled, set default time */
           /* Clear nv-ram. Reg[8..63] */

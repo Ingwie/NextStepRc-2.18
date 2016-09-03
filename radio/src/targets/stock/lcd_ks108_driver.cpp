@@ -14,6 +14,8 @@
 *************************************************************
 */
 
+#define NUMITERATIONFULLREFRESH  2
+
 #define DISPLAY_SET_COLUMN       0x40
 #define DISPLAY_SET_PAGE         0xB8
 #define DISPLAY_SET_START        0XC0 
@@ -66,8 +68,10 @@ void lcdSetRefVolt(uint8_t val)
 {
 }
 
-void lcdRefreshSide()
+void lcdRefreshFast()
 {
+  REFRESHDURATION1  //Debug function if defined LCDDURATIONSHOW in opentx.h
+
   static uint8_t change = 0; // toggle left or right lcd writing
   uint8_t *p;
   if (!change){ CS2_off; CS1_on; p = displayBuf; change = 1;} // Right
@@ -84,10 +88,12 @@ void lcdRefreshSide()
     p += 64;
   }
   A0_off;
+  
+  REFRESHDURATION2  //Debug function if defined LCDDURATIONSHOW in opentx.h
+
 }
 
 void lcdRefresh()
 {
-  lcdRefreshSide();
-  lcdRefreshSide();
+  for (uint8_t i=0; i < NUMITERATIONFULLREFRESH; i++) { lcdRefreshFast(); }
 }

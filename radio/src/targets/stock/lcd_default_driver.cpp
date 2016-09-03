@@ -14,6 +14,9 @@
  *************************************************************
  */
 
+#define NUMITERATIONFULLREFRESH  1
+
+ 
 void lcdSendCtl(uint8_t val)
 {
   PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_CS1);
@@ -105,8 +108,10 @@ void lcdSetRefVolt(uint8_t val)
 }
 
 
-void lcdRefresh()
+void lcdRefreshFast()
 {
+  REFRESHDURATION1  //Debug function if defined LCDDURATIONSHOW in opentx.h
+
   LCD_LOCK();
   uint8_t * p = displayBuf;
   for (uint8_t y=0; y < 8; y++) {
@@ -132,4 +137,12 @@ void lcdRefresh()
     PORTC_LCD_CTRL |=  (1<<OUT_C_LCD_CS1);
   }
   LCD_UNLOCK();
+  
+  REFRESHDURATION2  //Debug function if defined LCDDURATIONSHOW in opentx.h
+
+}
+
+void lcdRefresh()
+{
+  for (uint8_t i=0; i < NUMITERATIONFULLREFRESH; i++) { lcdRefreshFast(); }
 }

@@ -22,6 +22,28 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+/////////////////DEBUG DEFINE///////////////////
+//#define LCDDURATIONSHOW 1  //Show refresh duration
+
+#if defined(LCDDURATIONSHOW)
+#define REFRESHDURATION1                                                      \
+  uint16_t t0 = getTmr16KHz();                                                \
+  static uint16_t refreshDuration;                                            \
+  lcdDrawNumberAttUnit(16*FW, 1, DURATION_MS_PREC2(refreshDuration), PREC2);  \
+
+#define REFRESHDURATION2                                                      \
+  t0 = getTmr16KHz() - t0;                                                    \
+  if (t0 > refreshDuration) refreshDuration = t0;                             \
+
+#else
+#define REFRESHDURATION1
+#define REFRESHDURATION2
+#endif
+
+
+////////////////////////////////////////////////
+
+
 #if defined(SIMU)
 #define SWITCH_SIMU(a, b)  (a)
 #else
@@ -210,7 +232,7 @@ char *convertSimuPath(const char *path);
 #define RESXul     1024ul
 #define RESXl      1024l
 
-#if   defined(PCBGRUVIN9X)
+#if defined(PCBGRUVIN9X)
 #include "targets/gruvin9x/board_gruvin9x.h"
 #elif defined(PCBMEGA2560)
 #include "targets/mega2560/board_mega2560.h"
