@@ -102,9 +102,9 @@ void lcdRefreshFast()
     PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_RnW);  //Write data register mode
     bit_count = y & 0x07; //Count from 0 bis 7 -> 0=0, 1=1..7=7, 8=0, 9=1...
     col_offset = 1 << bit_count; //Build a value for a AND operation with the vorrect bitposition
-    line_offset = ( y / 8 ) * 128; //On the ST7565 there are 8 lines with each 128 bytes width
+    line_offset = ( y / 8 ) * 128; //On the ST7920 there are 8 lines with each 128 bytes width
+    p = displayBuf + line_offset; //Calculate the position of the first byte im array
     for (coord_t x=0; x<16; x++) { //Walk through 16 bytes form left to right (128 Pixel)
-      p = displayBuf + line_offset + ( x * 8 ); //Calculate the position of the first byte im array
       // adressing the bytes sequential and set the bits at the correct position merging them with an OR operation to get all bits in one byte
       // the position of the LSB is the right-most position of the byte to the ST7920
       result = ((*p++ & col_offset)!=0?0x80:0);
@@ -116,13 +116,15 @@ void lcdRefreshFast()
       result |= ((*p++  & col_offset) !=0?0x02:0);
       result |= ((*p++  & col_offset)!=0?0x01:0);
       PORTA_LCD_DAT = result;
-      PORTC_LCD_CTRL |= (1<<OUT_C_LCD_E);
-      _delay_us(8);
+      PORTC_LCD_CTRL |= (1<<OUT_C_LCD_E); // ST7920 auto increase x counter and roll from 0F to 00
+      _delay_us(1);
       PORTC_LCD_CTRL &= ~(1<<OUT_C_LCD_E);
-      _delay_us(49);
+      _delay_us(8);
     }
+    _delay_us(41);
+
   }
-  
+
   LCD_UNLOCK();
   
   REFRESHDURATION2  //Debug function if defined LCDDURATIONSHOW in opentx.h
