@@ -17,7 +17,7 @@
 #include "../../opentx.h"
 
 const pm_uchar about_bmp[] PROGMEM = {
-#include "../../bitmaps/9X/about.lbm"
+#include "../../bitmaps/about.lbm"
 };
 
 enum AboutScreens {

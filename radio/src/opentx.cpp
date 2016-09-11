@@ -18,7 +18,7 @@
 #include "timers.h"
 
 const pm_uchar asterisk_lbm[] PROGMEM = {
-  #include "bitmaps/9X/asterisk.lbm"
+  #include "bitmaps/asterisk.lbm"
 };
 
 EEGeneral  g_eeGeneral;

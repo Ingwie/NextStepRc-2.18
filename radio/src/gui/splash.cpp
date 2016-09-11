@@ -20,7 +20,7 @@
 
 const pm_uchar splashdata[] PROGMEM = {
   'S','P','S',0,
-  #include "bitmaps/9X/splash.lbm"
+  #include "bitmaps/splash.lbm"
   'S','P','E',0 };
 
 #if !defined(PCBMEGA2560)
