@@ -58,7 +58,7 @@ PCB = 9X
 PCBREV =
 
 # LCD
-# Values: DEFAULT, ST7565P, ST7565R, ERC12864FSF, ST7920, KS108
+# Values: DEFAULT, ST7565P, ST7565R, ERC12864FSF, ST7920, KS108, SSD1306
 LCD = DEFAULT
 
 # Enable JETI-Telemetry or FrSky Telemetry reception on UART0
@@ -422,8 +422,8 @@ M128_VARIANT    = +32768
 M2561_VARIANT   = +16384
 EEPROM_VARIANT  = 0
 
-GUIMODELSRC = gui/$(GUIDIRECTORY)/menu_model.cpp gui/$(GUIDIRECTORY)/menu_model_select.cpp gui/$(GUIDIRECTORY)/menu_model_setup.cpp gui/$(GUIDIRECTORY)/menu_model_inputs_mixes.cpp gui/$(GUIDIRECTORY)/menu_model_limits.cpp gui/$(GUIDIRECTORY)/menu_model_logical_switches.cpp gui/$(GUIDIRECTORY)/menu_model_custom_functions.cpp gui/$(GUIDIRECTORY)/menu_model_telemetry.cpp
-GUIGENERALSRC = gui/$(GUIDIRECTORY)/menu_general.cpp gui/$(GUIDIRECTORY)/menu_general_setup.cpp gui/$(GUIDIRECTORY)/menu_general_trainer.cpp gui/$(GUIDIRECTORY)/menu_general_version.cpp gui/$(GUIDIRECTORY)/menu_general_calib.cpp
+GUIMODELSRC = gui/menu_model.cpp gui/menu_model_select.cpp gui/menu_model_setup.cpp gui/menu_model_inputs_mixes.cpp gui/menu_model_limits.cpp gui/menu_model_logical_switches.cpp gui/menu_model_custom_functions.cpp gui/menu_model_telemetry.cpp
+GUIGENERALSRC = gui/menu_general.cpp gui/menu_general_setup.cpp gui/menu_general_trainer.cpp gui/menu_general_version.cpp gui/menu_general_calib.cpp
 
 BITMAPS = bitmaps/sticks.lbm
 
@@ -431,7 +431,7 @@ FONTS = $(patsubst %.png,%.lbm,$(wildcard fonts/std/*.png))
 
 ifeq ($(PCB), $(filter $(PCB), STD 9X 9XR))
   # 9x/9xr radio
-  GUIDIRECTORY = 9X
+
   ARCH = AVR
   LCDSIZE = 128
   TRGT = avr-
@@ -449,8 +449,8 @@ ifeq ($(PCB), $(filter $(PCB), STD 9X 9XR))
   EEPROMSRC = eeprom_common.cpp eeprom_rlc.cpp
   PULSESSRC = pulses/pulses_avr.cpp
   CPPSRC += debug.cpp
-  BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
-  GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
+  BITMAPS += bitmaps/splash.lbm bitmaps/asterisk.lbm bitmaps/about.lbm
+  GUIGENERALSRC += gui/menu_general_diagkeys.cpp gui/menu_general_diaganas.cpp
 
   ifeq ($(PCB), 9XR)
     FLAVOUR = 9xr
@@ -512,7 +512,7 @@ endif
 
 ifeq ($(PCB), $(filter $(PCB), STD128 9X128 9XR128))
   # 9X/9XR radio with ATmega64 replaced by ATmega128
-  GUIDIRECTORY = 9X
+
   ARCH = AVR
   LCDSIZE = 128
   TRGT = avr-
@@ -528,8 +528,8 @@ ifeq ($(PCB), $(filter $(PCB), STD128 9X128 9XR128))
   EEPROMSRC = eeprom_common.cpp eeprom_rlc.cpp
   PULSESSRC = pulses/pulses_avr.cpp
   CPPSRC += debug.cpp
-  BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
-  GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
+  BITMAPS += bitmaps/splash.lbm bitmaps/asterisk.lbm bitmaps/about.lbm
+  GUIGENERALSRC += gui/menu_general_diagkeys.cpp gui/menu_general_diaganas.cpp
 
   ifeq ($(PCB), 9XR128)
     FLAVOUR = 9xr128
@@ -587,7 +587,7 @@ endif
 
 ifeq ($(PCB), $(filter $(PCB), 9X2561))
   # 9X/9XR radio with ATmega64 replaced by ATmega2561
-  GUIDIRECTORY = 9X
+
   ARCH = AVR
   LCDSIZE = 128
   TRGT = avr-
@@ -603,8 +603,8 @@ ifeq ($(PCB), $(filter $(PCB), 9X2561))
   EEPROMSRC = eeprom_common.cpp eeprom_rlc.cpp
   PULSESSRC = pulses/pulses_avr.cpp
   CPPSRC += debug.cpp
-  BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
-  GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
+  BITMAPS += bitmaps/splash.lbm bitmaps/asterisk.lbm bitmaps/about.lbm
+  GUIGENERALSRC += gui/menu_general_diagkeys.cpp gui/menu_general_diaganas.cpp
 
   ifeq ($(PCB), 9XR2561)
     FLAVOUR = 9xr2561
@@ -654,7 +654,7 @@ endif
 
 ifeq ($(PCB), GRUVIN9X)
   # 9x radio with a gruvin9x replacement board
-  GUIDIRECTORY = 9X
+
   FLAVOUR = gruvin9x
   ARCH = AVR
   LCDSIZE = 128
@@ -676,13 +676,13 @@ ifeq ($(PCB), GRUVIN9X)
   EEPROMSRC = eeprom_common.cpp eeprom_rlc.cpp
   PULSESSRC = pulses/pulses_avr.cpp
   CPPSRC += audio_avr.cpp haptic.cpp debug.cpp
-  BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
-  GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
+  BITMAPS += bitmaps/splash.lbm bitmaps/asterisk.lbm bitmaps/about.lbm
+  GUIGENERALSRC += gui/menu_general_diagkeys.cpp gui/menu_general_diaganas.cpp
 
   ifeq ($(SDCARD), YES)
     CPPDEFS += -DRTCLOCK -DSDCARD
     CPPSRC += i2c_master.cpp rtc.cpp sdcard.cpp logs.cpp targets/gruvin9x/rtc_driver.cpp
-    GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_sdmanager.cpp
+    GUIGENERALSRC += gui/menu_general_sdmanager.cpp
     EXTRABOARDSRC += $(FATFSDIR)/ff.c $(FATFSDIR)/fattime.c $(FATFSDIR)/option/ccsbcs.c targets/gruvin9x/diskio.cpp
   endif
 
@@ -704,7 +704,7 @@ endif
 
 ifeq ($(PCB), MEGA2560)
   # ARDUINO2560 DIY RADIO
-  GUIDIRECTORY = 9X
+
   FLAVOUR = mega2560
   ARCH = AVR
   LCDSIZE = 128
@@ -722,8 +722,8 @@ ifeq ($(PCB), MEGA2560)
   EEPROMSRC = eeprom_common.cpp eeprom_rlc.cpp
   PULSESSRC = pulses/pulses_avr.cpp
   CPPSRC += debug.cpp
-  BITMAPS += bitmaps/9X/splash.lbm bitmaps/9X/asterisk.lbm bitmaps/9X/about.lbm
-  GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_diagkeys.cpp gui/$(GUIDIRECTORY)/menu_general_diaganas.cpp
+  BITMAPS += bitmaps/splash.lbm bitmaps/asterisk.lbm bitmaps/about.lbm
+  GUIGENERALSRC += gui/menu_general_diagkeys.cpp gui/menu_general_diaganas.cpp
 
   EXTRABOARDSRC = targets/common_avr/adc_driver.cpp targets/stock/lcd_driver.cpp targets/common_avr/telemetry_driver.cpp
    
@@ -734,7 +734,7 @@ ifeq ($(PCB), MEGA2560)
   ifeq ($(SDCARD), YES)
     EXTRABOARDSRC += $(FATFSDIR)/ff.c $(FATFSDIR)/fattime.c $(FATFSDIR)/option/ccsbcs.c targets/gruvin9x/diskio.cpp
     CPPDEFS += -DSDCARD -DRTCLOCK
-    GUIGENERALSRC += gui/$(GUIDIRECTORY)/menu_general_sdmanager.cpp
+    GUIGENERALSRC += gui/menu_general_sdmanager.cpp
     CPPSRC += i2c_master.cpp rtc.cpp sdcard.cpp logs.cpp targets/gruvin9x/rtc_driver.cpp
   endif
 
@@ -799,14 +799,14 @@ TARGET = opentx
   TTS_SRC = $(shell sh -c "if test -f $(STD_TTS_SRC); then echo $(STD_TTS_SRC); else echo translations/tts_en.cpp; fi")
 
 ifeq ($(GUI), YES)
-  GUISRC = gui/$(GUIDIRECTORY)/helpers.cpp gui/$(GUIDIRECTORY)/navigation.cpp gui/$(GUIDIRECTORY)/popups.cpp gui/$(GUIDIRECTORY)/widgets.cpp gui/$(GUIDIRECTORY)/menus.cpp $(GUIMODELSRC) $(GUIGENERALSRC) gui/$(GUIDIRECTORY)/view_main.cpp gui/$(GUIDIRECTORY)/view_statistics.cpp
+  GUISRC = gui/helpers.cpp gui/navigation.cpp gui/popups.cpp gui/widgets.cpp gui/menus.cpp $(GUIMODELSRC) $(GUIGENERALSRC) gui/view_main.cpp gui/view_statistics.cpp
   CPPDEFS += -DGUI
 endif
 
 CPPSRC += opentx.cpp functions.cpp strhelpers.cpp $(PULSESSRC) switches.cpp curves.cpp mixer.cpp stamp.cpp $(GUISRC) $(EEPROMSRC) timers.cpp trainer_input.cpp
 
 ifeq ($(GUI), YES)
-  GUISRC += gui/$(GUIDIRECTORY)/lcd.cpp gui/$(GUIDIRECTORY)/splash.cpp gui/$(GUIDIRECTORY)/fonts.cpp
+  GUISRC += gui/lcd.cpp gui/splash.cpp gui/fonts.cpp
 endif
 
 GUISRC += keys.cpp maths.cpp translations.cpp $(TTS_SRC)
@@ -874,6 +874,8 @@ else ifeq ($(LCD), ST7920)
   CPPDEFS += -DLCD_ST7920
 else ifeq ($(LCD), KS108)
   CPPDEFS += -DLCD_KS108
+else ifeq ($(LCD), SSD1306)
+  CPPDEFS += -DLCD_SSD1306
 endif   
 
 ifeq ($(AUTOSWITCH), YES)
@@ -933,12 +935,12 @@ CPPDEFS += -DTIMERS=$(TIMERS)
 
 ifeq ($(FLIGHT_MODES), YES)
   CPPDEFS += -DFLIGHT_MODES
-  GUIMODELSRC += gui/$(GUIDIRECTORY)/menu_model_flightmodes.cpp
+  GUIMODELSRC += gui/menu_model_flightmodes.cpp
 endif
 
 ifeq ($(CURVES), YES)
   CPPDEFS += -DCURVES
-  GUIMODELSRC += gui/$(GUIDIRECTORY)/menu_model_curves.cpp
+  GUIMODELSRC += gui/menu_model_curves.cpp
 endif
 
 ifeq ($(GVARS), YES)
@@ -993,7 +995,7 @@ endif
 ifeq ($(EXT), MAVLINK)
   CPPDEFS += -DMAVLINK
   INCDIRS += thirdparty targets/common_avr/
-  CPPSRC += telemetry/mavlink.cpp gui/$(GUIDIRECTORY)/view_mavlink.cpp targets/common_avr/serial_driver.cpp
+  CPPSRC += telemetry/mavlink.cpp gui/view_mavlink.cpp targets/common_avr/serial_driver.cpp
   EEPROM_VARIANT += ${MAVLINK_VARIANT}
 endif
 
@@ -1011,7 +1013,7 @@ ifeq ($(EXT), $(filter $(EXT), FRSKY FRSKY_SPORT TELEMETREZ))
     CPPDEFS += -DFRSKY_SPORT
   endif
 
-  CPPSRC += gui/$(GUIDIRECTORY)/view_telemetry.cpp
+  CPPSRC += gui/view_telemetry.cpp
 
   ifeq ($(FRSKY_HUB), YES)
     CPPDEFS += -DFRSKY_HUB
@@ -1096,13 +1098,13 @@ endif
 
 ifeq ($(HELI), YES)
   CPPDEFS += -DHELI
-  GUIMODELSRC += gui/$(GUIDIRECTORY)/menu_model_heli.cpp
+  GUIMODELSRC += gui/menu_model_heli.cpp
 endif
 
 ifeq ($(TEMPLATES), YES)
     CPPDEFS += -DTEMPLATES
     CPPSRC += templates.cpp
-    GUIMODELSRC += gui/$(GUIDIRECTORY)/menu_model_templates.cpp
+    GUIMODELSRC += gui/menu_model_templates.cpp
 endif
 
 # Enable navigation with Pots / Sticks / Rotary encoders
@@ -1339,7 +1341,7 @@ bitmaps: $(BITMAPS)
 bitmaps/sticks.lbm: bitmaps/sticks.xbm
 	$(IMG2LBM) $^ $@ $(LCDSIZE) 1bit 4
 
-bitmaps/9X/%.lbm: bitmaps/9X/%.png
+bitmaps/%.lbm: bitmaps/%.png
 	$(IMG2LBM) $^ $@ $(LCDSIZE) 1bit
 
 ifeq ($(OS),Windows_NT)
@@ -1501,7 +1503,6 @@ clean_list :
 	$(REMOVE) *.lbm
 	$(REMOVE) bitmaps/*.lbm
 	$(REMOVE) bitmaps/*/*.lbm
-	$(REMOVE) bitmaps/*/*/*.lbm
 	$(REMOVE) fonts/*.lbm
 	$(REMOVE) fonts/*/*.lbm
 	$(REMOVE) translations/*.h

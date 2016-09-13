@@ -705,10 +705,6 @@ void checkAll();
 void getADC();
 #endif
 
-#if defined(SBUS)
-#include "sbus.h"
-#endif
-
 extern void backlightOn();
 
 enum Analogs {
