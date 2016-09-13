@@ -17,12 +17,6 @@
 #include "opentx.h"
 #include "timers.h"
 
-#if defined(FADMIXER)
-bool OffsetOnInput = false;   //temporary, option in makefile 
-#else
-bool OffsetOnInput = true;
-#endif
-
 int16_t  rawAnas[NUM_INPUTS] = {0};
 int16_t  anas [NUM_INPUTS] = {0};
 int16_t  trims[NUM_STICKS] = {0};
@@ -573,10 +567,12 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       }
 
       //========== OFFSET BEFORE ============
-      if (apply_offset_and_curve && OffsetOnInput) {
+#if defined(OFFSET_ON_INPUT)
+      if (apply_offset_and_curve) {
         int16_t offset = GET_GVAR(MD_OFFSET(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode);
         if (offset) v += calc100toRESX_16Bits(offset);
       }
+#endif
 
       //========== TRIMS ====================
       int16_t trim = 0;
@@ -646,11 +642,13 @@ void evalFlightModeMixes(uint8_t mode, uint8_t tick10ms)
       }
 #endif
 
-      //========== OFFSET AFTER ============= 
-      if (apply_offset_and_curve && !OffsetOnInput) {
+      //========== OFFSET AFTER =============
+#if !defined(OFFSET_ON_INPUT) 
+      if (apply_offset_and_curve) {
         int16_t offset = GET_GVAR(MD_OFFSET(md), GV_RANGELARGE_NEG, GV_RANGELARGE, mixerCurrentFlightMode); 
         if (offset) dv += int32_t(calc100toRESX_16Bits(offset)) << 8; 
       }
+#endif
       
       //Stick value to mixer
       //    stick => delay => slow_down => mixer source      
