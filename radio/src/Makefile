@@ -58,7 +58,7 @@ PCB = 9X
 PCBREV =
 
 # LCD
-# Values: DEFAULT, ST7565P, ST7565R, ERC12864FSF, ST7920, KS108
+# Values: DEFAULT, ST7565P, ST7565R, ERC12864FSF, ST7920, KS108, SSD1306
 LCD = DEFAULT
 
 # Enable JETI-Telemetry or FrSky Telemetry reception on UART0
@@ -874,6 +874,8 @@ else ifeq ($(LCD), ST7920)
   CPPDEFS += -DLCD_ST7920
 else ifeq ($(LCD), KS108)
   CPPDEFS += -DLCD_KS108
+else ifeq ($(LCD), SSD1306)
+  CPPDEFS += -DLCD_SSD1306
 endif   
 
 ifeq ($(AUTOSWITCH), YES)
