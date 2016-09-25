@@ -2,6 +2,8 @@ In French ;-)
 
 *****************  TODO TODO TODO TODO  *****************
 
+> - Les fonctions de ce type : L1 a<x Tmr1 02:00 --- sont décalées si EXT=NO (pas de télémétrie)
+
 > - changer le type des GVAR de 16bits vers 8bits (nouveau format d'eeprom) ou doubler le nombre de GVAR ...
 
 > - interrupteur 3 positions avec potar
