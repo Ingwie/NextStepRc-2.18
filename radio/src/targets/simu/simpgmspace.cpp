@@ -182,6 +182,7 @@ uint16_t getTmr16KHz()
 }
 
 bool eeprom_thread_running = true;
+
 void *eeprom_write_function(void *)
 {
   while (!sem_wait(eeprom_write_sem)) {
